@@ -167,7 +167,11 @@ export async function registerMovement(
   db: Db,
   orgId: string,
   userId: UserId,
-  input: MovementInput & { sourceType?: string; sourceId?: string },
+  input: MovementInput & {
+    sourceType?: string;
+    sourceId?: string;
+    lotId?: string;
+  },
 ): Promise<MovementRow> {
   return db.transaction(async (tx: Db) => {
     // Bloqueo por fila: serializa movimientos concurrentes del mismo producto
@@ -224,6 +228,7 @@ export async function registerMovement(
         balanceAvgCostBaseCents: newAvg,
         sourceType: input.sourceType ?? "manual",
         sourceId: input.sourceId,
+        lotId: input.lotId,
         note: input.note,
       })
       .returning();

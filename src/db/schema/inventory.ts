@@ -72,6 +72,9 @@ export const inventoryMovements = pgTable(
     }).notNull(),
     sourceType: text("source_type").notNull().default("manual"),
     sourceId: uuid("source_id"),
+    // F2: entrada por compra puede pertenecer a un lote (sin FK circular:
+    // lots vive en purchases.ts; la integridad la garantiza la capa de datos)
+    lotId: uuid("lot_id"),
     note: text("note"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
