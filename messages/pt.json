@@ -73,6 +73,42 @@
       "welcome": "Bem-vindo a {org}",
       "empty": "Aqui você verá as métricas do seu negócio quando registrar vendas."
     },
+    "customers": {
+      "title": "Clientes",
+      "new": "Novo cliente",
+      "edit": "Editar",
+      "delete": "Excluir cliente",
+      "deleteConfirm": "Tem certeza? Pode ser recuperado pelo suporte.",
+      "deleteYes": "Sim, excluir",
+      "deleteNo": "Cancelar",
+      "searchPlaceholder": "Buscar por nome…",
+      "empty": "Você ainda não tem clientes. Crie o primeiro em \"Novo cliente\".",
+      "emptySearch": "Sem resultados para \"{q}\".",
+      "contacts": "Contatos",
+      "noContacts": "Sem contatos ainda.",
+      "addContact": "Adicionar",
+      "timeline": "Histórico",
+      "noInteractions": "Sem interações ainda. Registre a primeira acima.",
+      "addInteraction": "Registrar",
+      "interactionPlaceholder": "O que aconteceu com este cliente?",
+      "saved": "Salvo",
+      "types": {
+        "call": "Ligação",
+        "meeting": "Reunião",
+        "email": "E-mail",
+        "whatsapp": "WhatsApp",
+        "note": "Nota"
+      },
+      "form": {
+        "name": "Nome",
+        "taxId": "CNPJ / identificação fiscal",
+        "email": "E-mail",
+        "phone": "Telefone",
+        "address": "Endereço",
+        "notes": "Notas",
+        "save": "Salvar"
+      }
+    },
     "members": {
       "title": "Configurações",
       "membersTitle": "Membros",

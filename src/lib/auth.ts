@@ -50,9 +50,10 @@ export function createAuth(
       enabled: true,
       minPasswordLength: 10,
     },
-    // Persistido en Postgres: sobrevive el ciclo de vida serverless de Vercel
+    // Persistido en Postgres: sobrevive el ciclo de vida serverless de Vercel.
+    // DISABLE_RATE_LIMIT=1 solo para E2E (los tests encadenan signups desde una IP).
     rateLimit: {
-      enabled: opts.rateLimitEnabled ?? true,
+      enabled: opts.rateLimitEnabled ?? process.env.DISABLE_RATE_LIMIT !== "1",
       storage: "database",
       window: 60,
       max: 30,

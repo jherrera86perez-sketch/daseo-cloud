@@ -73,6 +73,42 @@
       "welcome": "Bienvenido a {org}",
       "empty": "Aquí verás las métricas de tu negocio cuando registres ventas."
     },
+    "customers": {
+      "title": "Clientes",
+      "new": "Nuevo cliente",
+      "edit": "Editar",
+      "delete": "Eliminar cliente",
+      "deleteConfirm": "¿Seguro? Se puede recuperar desde soporte.",
+      "deleteYes": "Sí, eliminar",
+      "deleteNo": "Cancelar",
+      "searchPlaceholder": "Buscar por nombre…",
+      "empty": "Aún no tienes clientes. Crea el primero con \"Nuevo cliente\".",
+      "emptySearch": "Sin resultados para \"{q}\".",
+      "contacts": "Contactos",
+      "noContacts": "Sin contactos todavía.",
+      "addContact": "Agregar",
+      "timeline": "Historial",
+      "noInteractions": "Sin interacciones todavía. Registra la primera arriba.",
+      "addInteraction": "Registrar",
+      "interactionPlaceholder": "¿Qué pasó con este cliente?",
+      "saved": "Guardado",
+      "types": {
+        "call": "Llamada",
+        "meeting": "Reunión",
+        "email": "Correo",
+        "whatsapp": "WhatsApp",
+        "note": "Nota"
+      },
+      "form": {
+        "name": "Nombre",
+        "taxId": "NIT / identificación fiscal",
+        "email": "Correo",
+        "phone": "Teléfono",
+        "address": "Dirección",
+        "notes": "Notas",
+        "save": "Guardar"
+      }
+    },
     "members": {
       "title": "Configuración",
       "membersTitle": "Miembros",

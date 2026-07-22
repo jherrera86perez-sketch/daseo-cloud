@@ -19,5 +19,9 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    env: {
+      // Los E2E encadenan signups/logins desde una sola IP
+      DISABLE_RATE_LIMIT: "1",
+    },
   },
 });

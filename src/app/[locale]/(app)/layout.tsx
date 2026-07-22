@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { requireOrg } from "@/lib/session";
 import { Toaster } from "@/components/ui/sonner";
 import { Link } from "@/i18n/navigation";
-import { LayoutDashboard, Settings, Droplets } from "lucide-react";
+import { LayoutDashboard, Settings, Droplets, Users } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
 
 // Zona protegida: requireOrg() verifica sesión + membresía en BD.
@@ -17,6 +17,7 @@ export default async function AppLayout({
 
   const nav = [
     { href: "/dashboard", label: t("dashboard"), icon: LayoutDashboard },
+    { href: "/customers", label: t("customers"), icon: Users },
     { href: "/settings", label: t("settings"), icon: Settings },
   ] as const;
 
