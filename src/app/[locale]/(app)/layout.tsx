@@ -15,6 +15,7 @@ import {
   Factory,
   ShoppingCart,
   Truck,
+  Landmark,
 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
 import { LocaleSwitcher } from "@/features/auth/locale-switcher";
@@ -36,6 +37,7 @@ export default async function AppLayout({
     { href: "/sales", label: t("sales"), icon: Receipt },
     { href: "/purchases", label: t("purchases"), icon: ShoppingCart },
     { href: "/suppliers", label: t("suppliers"), icon: Truck },
+    { href: "/banking", label: t("banking"), icon: Landmark },
     { href: "/quotes", label: t("quotes"), icon: FileText },
     { href: "/pipeline", label: t("pipeline"), icon: KanbanSquare },
     { href: "/recipes", label: t("recipes"), icon: FlaskConical },

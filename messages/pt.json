@@ -69,6 +69,7 @@
       "recipes": "Receitas",
       "purchases": "Compras",
       "suppliers": "Fornecedores",
+      "banking": "Banco",
       "production": "Produção",
       "settings": "Configurações"
     },
@@ -286,6 +287,28 @@
         "accepted": "Aceito",
         "rejected": "Rejeitado"
       }
+    },
+    "banking": {
+      "title": "Contas bancárias",
+      "empty": "Crie sua primeira conta para importar os extratos do banco.",
+      "accountName": "Nome da conta",
+      "currency": "Moeda",
+      "addAccount": "Criar conta",
+      "importTitle": "Importar extrato (CSV)",
+      "importLabel": "Cole o CSV — cabeçalho: fecha,descripcion,monto[,referencia]",
+      "importPlaceholder": "fecha,descripcion,monto,referencia\n2026-07-15,PIX RECEBIDO,8000.00,TRF-001",
+      "import": "Importar",
+      "importedBalance": "Saldo importado",
+      "movements": "Movimentos",
+      "noMovements": "Sem movimentos. Importe seu primeiro CSV acima.",
+      "date": "Data",
+      "description": "Descrição",
+      "amount": "Valor",
+      "status": "Conciliação",
+      "link": "Vincular",
+      "linked": "Movimento conciliado",
+      "ignore": "Ignorar",
+      "statuses": { "matched": "Conciliado", "ignored": "Ignorado" }
     },
     "suppliers": {
       "title": "Fornecedores",

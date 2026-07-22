@@ -29,6 +29,13 @@
       "when": 1784756407227,
       "tag": "0003_f2_purchases",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1784757404239,
+      "tag": "0004_f3_banking",
+      "breakpoints": true
     }
   ]
 }

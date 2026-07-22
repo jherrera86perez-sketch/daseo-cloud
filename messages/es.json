@@ -69,6 +69,7 @@
       "recipes": "Recetas",
       "purchases": "Compras",
       "suppliers": "Proveedores",
+      "banking": "Banco",
       "production": "Producción",
       "settings": "Configuración"
     },
@@ -286,6 +287,28 @@
         "accepted": "Aceptada",
         "rejected": "Rechazada"
       }
+    },
+    "banking": {
+      "title": "Cuentas bancarias",
+      "empty": "Crea tu primera cuenta para importar los estados del banco.",
+      "accountName": "Nombre de la cuenta",
+      "currency": "Moneda",
+      "addAccount": "Crear cuenta",
+      "importTitle": "Importar estado de cuenta (CSV)",
+      "importLabel": "Pega el CSV — cabecera: fecha,descripcion,monto[,referencia]",
+      "importPlaceholder": "fecha,descripcion,monto,referencia\n2026-07-15,TRANSFERENCIA BODEGA,8000.00,TRF-001",
+      "import": "Importar",
+      "importedBalance": "Saldo importado",
+      "movements": "Movimientos",
+      "noMovements": "Sin movimientos. Importa tu primer CSV arriba.",
+      "date": "Fecha",
+      "description": "Descripción",
+      "amount": "Monto",
+      "status": "Conciliación",
+      "link": "Vincular",
+      "linked": "Movimiento conciliado",
+      "ignore": "Ignorar",
+      "statuses": { "matched": "Conciliado", "ignored": "Ignorado" }
     },
     "suppliers": {
       "title": "Proveedores",

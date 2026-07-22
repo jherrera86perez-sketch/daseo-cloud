@@ -146,6 +146,8 @@ export const supplierPayments = pgTable(
     rateFixed: numeric("rate_fixed", { precision: 18, scale: 6 }).notNull(),
     appliedCents: bigint("applied_cents", { mode: "bigint" }).notNull(),
     method: text("method").notNull().default("cash"),
+    // F3: conciliación bancaria
+    bankAccountId: uuid("bank_account_id"),
     paidAt: timestamp("paid_at", { withTimezone: true }).notNull().defaultNow(),
     note: text("note"),
     createdAt: timestamp("created_at", { withTimezone: true })
