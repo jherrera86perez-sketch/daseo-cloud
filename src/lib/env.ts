@@ -4,13 +4,15 @@ import { z } from "zod";
 /**
  * Validación de entorno en build: un .env mal configurado falla aquí,
  * nunca en runtime frente a un cliente.
- * M1 añadirá DATABASE_URL; M2 añadirá AUTH_SECRET.
+ * M2 añadirá AUTH_SECRET.
  */
 export const env = createEnv({
   server: {
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    // Opcional hasta que exista la cuenta de Neon; getDb() falla con mensaje claro
+    DATABASE_URL: z.string().url().optional(),
     SENTRY_DSN: z.string().url().optional(),
   },
   client: {
@@ -18,6 +20,7 @@ export const env = createEnv({
   },
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    DATABASE_URL: process.env.DATABASE_URL,
     SENTRY_DSN: process.env.SENTRY_DSN,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   },
