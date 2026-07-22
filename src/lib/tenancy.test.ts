@@ -14,11 +14,11 @@ beforeAll(async () => {
   ({ db } = await createTestDb());
   const [a] = await db
     .insert(organizations)
-    .values({ name: "A", slug: "a", baseCurrency: "CUP" })
+    .values({ name: "A", slug: "a" })
     .returning();
   const [b] = await db
     .insert(organizations)
-    .values({ name: "B", slug: "b", baseCurrency: "USD" })
+    .values({ name: "B", slug: "b" })
     .returning();
   orgA = a.id;
   orgB = b.id;

@@ -7,6 +7,7 @@ import {
   integer,
   numeric,
   jsonb,
+  boolean,
   check,
   uniqueIndex,
   index,
@@ -26,12 +27,125 @@ export const timestamps = {
     .defaultNow(),
 };
 
-export const organizations = pgTable(
-  "organizations",
+/*
+ * Tablas de auth: Better Auth (plugin organization) es el DUEÑO de su forma.
+ * Nombres de tabla/columna según su convención; ids uuid vía generateId.
+ * Los datos de negocio de la org viven en org_settings (1:1), no aquí.
+ */
+
+export const users = pgTable("user", {
+  id: id(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").notNull().default(false),
+  image: text("image"),
+  ...timestamps,
+});
+
+export const sessions = pgTable(
+  "session",
   {
     id: id(),
-    name: text("name").notNull(),
-    slug: text("slug").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    token: text("token").notNull().unique(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    activeOrganizationId: uuid("active_organization_id"),
+    ...timestamps,
+  },
+  (t) => [index("session_user_idx").on(t.userId)],
+);
+
+export const accounts = pgTable(
+  "account",
+  {
+    id: id(),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at", {
+      withTimezone: true,
+    }),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+      withTimezone: true,
+    }),
+    scope: text("scope"),
+    password: text("password"),
+    ...timestamps,
+  },
+  (t) => [index("account_user_idx").on(t.userId)],
+);
+
+export const verifications = pgTable("verification", {
+  id: id(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  ...timestamps,
+});
+
+export const organizations = pgTable("organization", {
+  id: id(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  logo: text("logo"),
+  metadata: text("metadata"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const members = pgTable(
+  "member",
+  {
+    id: id(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    role: text("role").notNull().default("member"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [uniqueIndex("member_user_org_idx").on(t.userId, t.organizationId)],
+);
+
+export const invitations = pgTable(
+  "invitation",
+  {
+    id: id(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    email: text("email").notNull(),
+    role: text("role"),
+    status: text("status").notNull().default("pending"),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    inviterId: uuid("inviter_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (t) => [index("invitation_org_idx").on(t.organizationId)],
+);
+
+/** Datos de negocio de la organización (1:1 con organization). */
+export const orgSettings = pgTable(
+  "org_settings",
+  {
+    orgId: uuid("org_id")
+      .primaryKey()
+      .references(() => organizations.id, { onDelete: "cascade" }),
     baseCurrency: text("base_currency").notNull(),
     locale: text("locale").notNull().default("es"),
     timezone: text("timezone").notNull().default("America/Havana"),
@@ -40,60 +154,11 @@ export const organizations = pgTable(
     ...timestamps,
   },
   (t) => [
-    uniqueIndex("organizations_slug_idx").on(t.slug),
     check(
-      "organizations_currency_check",
+      "org_settings_currency_check",
       sql`${t.baseCurrency} in ('CUP','USD','BRL')`,
     ),
   ],
-);
-
-export const users = pgTable(
-  "users",
-  {
-    id: id(),
-    email: text("email").notNull(),
-    name: text("name").notNull(),
-    locale: text("locale").notNull().default("es"),
-    ...timestamps,
-  },
-  (t) => [uniqueIndex("users_email_idx").on(t.email)],
-);
-
-export const memberships = pgTable(
-  "memberships",
-  {
-    id: id(),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id),
-    orgId: uuid("org_id")
-      .notNull()
-      .references(() => organizations.id),
-    role: text("role").notNull().default("member"),
-    ...timestamps,
-  },
-  (t) => [
-    uniqueIndex("memberships_user_org_idx").on(t.userId, t.orgId),
-    check("memberships_role_check", sql`${t.role} in ('admin','member')`),
-  ],
-);
-
-export const invitations = pgTable(
-  "invitations",
-  {
-    id: id(),
-    orgId: uuid("org_id")
-      .notNull()
-      .references(() => organizations.id),
-    email: text("email").notNull(),
-    role: text("role").notNull().default("member"),
-    token: text("token").notNull(),
-    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-    acceptedAt: timestamp("accepted_at", { withTimezone: true }),
-    ...timestamps,
-  },
-  (t) => [uniqueIndex("invitations_token_idx").on(t.token)],
 );
 
 export const auditLogs = pgTable(
