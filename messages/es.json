@@ -64,7 +64,9 @@
       "products": "Productos",
       "inventory": "Inventario",
       "sales": "Ventas",
+      "quotes": "Cotizaciones",
       "pipeline": "Pipeline",
+      "recipes": "Recetas",
       "production": "Producción",
       "settings": "Configuración"
     },
@@ -193,6 +195,55 @@
         "cash": "Efectivo",
         "transfer": "Transferencia",
         "other": "Otro"
+      }
+    },
+    "recipes": {
+      "title": "Recetas",
+      "new": "Nueva receta",
+      "edit": "Editar receta",
+      "empty": "Aún no hay recetas. Define la fórmula de tus productos.",
+      "needProducts": "Necesitas al menos un producto marcado \"se produce\" y un insumo marcado \"es insumo\" (créalos en Productos).",
+      "product": "Producto que produce",
+      "name": "Nombre de la fórmula",
+      "outputQty": "Rinde (cantidad)",
+      "components": "Insumos",
+      "component": "Insumo",
+      "qty": "Cantidad",
+      "addComponent": "Agregar insumo",
+      "removeComponent": "Quitar insumo",
+      "save": "Guardar receta",
+      "theoreticalCost": "Costo teórico",
+      "perBatch": "lote de {qty}",
+      "batchCost": "Costo del lote",
+      "unitCost": "Costo unitario",
+      "theoreticalNote": "Referencial, al costo promedio vigente de cada insumo. El costo real lo fija la orden de producción."
+    },
+    "pipeline": {
+      "title": "Pipeline",
+      "needCustomer": "Primero crea un cliente para abrir oportunidades.",
+      "dealTitle": "Título de la oportunidad",
+      "amount": "Monto est.",
+      "addDeal": "Abrir oportunidad",
+      "created": "Oportunidad creada",
+      "moveTo": "Mover a etapa",
+      "quoteIt": "Crear cotización"
+    },
+    "quotes": {
+      "title": "Cotizaciones",
+      "new": "Nueva cotización",
+      "save": "Guardar cotización",
+      "empty": "Aún no hay cotizaciones.",
+      "needCustomer": "Primero crea un cliente.",
+      "lines": "Líneas",
+      "total": "Total",
+      "send": "Marcar enviada",
+      "accept": "Aceptar → crear venta",
+      "reject": "Rechazar",
+      "statuses": {
+        "draft": "Borrador",
+        "sent": "Enviada",
+        "accepted": "Aceptada",
+        "rejected": "Rechazada"
       }
     },
     "rates": {

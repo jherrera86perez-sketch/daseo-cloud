@@ -64,7 +64,9 @@
       "products": "Produtos",
       "inventory": "Estoque",
       "sales": "Vendas",
+      "quotes": "Orçamentos",
       "pipeline": "Pipeline",
+      "recipes": "Receitas",
       "production": "Produção",
       "settings": "Configurações"
     },
@@ -193,6 +195,55 @@
         "cash": "Dinheiro",
         "transfer": "Transferência",
         "other": "Outro"
+      }
+    },
+    "recipes": {
+      "title": "Receitas",
+      "new": "Nova receita",
+      "edit": "Editar receita",
+      "empty": "Ainda não há receitas. Defina a fórmula dos seus produtos.",
+      "needProducts": "Você precisa de um produto marcado \"é produzido\" e um insumo marcado \"é insumo\" (crie-os em Produtos).",
+      "product": "Produto que produz",
+      "name": "Nome da fórmula",
+      "outputQty": "Rende (quantidade)",
+      "components": "Insumos",
+      "component": "Insumo",
+      "qty": "Quantidade",
+      "addComponent": "Adicionar insumo",
+      "removeComponent": "Remover insumo",
+      "save": "Salvar receita",
+      "theoreticalCost": "Custo teórico",
+      "perBatch": "lote de {qty}",
+      "batchCost": "Custo do lote",
+      "unitCost": "Custo unitário",
+      "theoreticalNote": "Referencial, ao custo médio vigente de cada insumo. O custo real é fixado pela ordem de produção."
+    },
+    "pipeline": {
+      "title": "Pipeline",
+      "needCustomer": "Primeiro crie um cliente para abrir oportunidades.",
+      "dealTitle": "Título da oportunidade",
+      "amount": "Valor est.",
+      "addDeal": "Abrir oportunidade",
+      "created": "Oportunidade criada",
+      "moveTo": "Mover para etapa",
+      "quoteIt": "Criar orçamento"
+    },
+    "quotes": {
+      "title": "Orçamentos",
+      "new": "Novo orçamento",
+      "save": "Salvar orçamento",
+      "empty": "Ainda não há orçamentos.",
+      "needCustomer": "Primeiro crie um cliente.",
+      "lines": "Linhas",
+      "total": "Total",
+      "send": "Marcar enviado",
+      "accept": "Aceitar → criar venda",
+      "reject": "Rejeitar",
+      "statuses": {
+        "draft": "Rascunho",
+        "sent": "Enviado",
+        "accepted": "Aceito",
+        "rejected": "Rejeitado"
       }
     },
     "rates": {

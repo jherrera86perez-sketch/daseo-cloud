@@ -6,7 +6,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createSaleAction } from "./actions";
+import { createSaleAction, type ActionState } from "./actions";
 
 type ProductOpt = {
   id: string;
@@ -28,14 +28,20 @@ export function SaleForm({
   products,
   rates,
   baseCurrency,
+  action = createSaleAction,
+  submitLabel,
+  dealId,
 }: Readonly<{
   customers: CustomerOpt[];
   products: ProductOpt[];
   rates: RateMap;
   baseCurrency: string;
+  action?: (prev: ActionState, form: FormData) => Promise<ActionState>;
+  submitLabel?: string;
+  dealId?: string;
 }>) {
   const t = useTranslations("app.sales");
-  const [state, formAction, pending] = useActionState(createSaleAction, null);
+  const [state, formAction, pending] = useActionState(action, null);
   const [currency, setCurrency] = useState(baseCurrency);
   const [rate, setRate] = useState("1");
   const [customerId, setCustomerId] = useState(customers[0]?.id ?? "");
@@ -73,6 +79,7 @@ export function SaleForm({
     currency,
     rateToBase: rate,
     idempotencyKey,
+    dealId,
     items: lines.filter((l) => l.description && l.qty && l.unitPrice),
   });
 
@@ -208,7 +215,7 @@ export function SaleForm({
         </p>
       )}
       <Button type="submit" disabled={pending || !customerId}>
-        {pending ? "…" : t("saveDraft")}
+        {pending ? "…" : (submitLabel ?? t("saveDraft"))}
       </Button>
     </form>
   );
