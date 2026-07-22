@@ -2,7 +2,10 @@
   "common": {
     "appName": "Daseo Cloud",
     "tagline": "O ERP na nuvem para o seu negócio",
-    "language": "Idioma"
+    "language": "Idioma",
+    "loading": "Carregando…",
+    "save": "Salvar",
+    "cancel": "Cancelar"
   },
   "landing": {
     "title": "Daseo Cloud",
@@ -12,6 +15,54 @@
       "sales": "Vendas e cobranças multimoeda",
       "inventory": "Estoque com custos reais",
       "production": "Produção com receitas"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar",
+      "email": "E-mail",
+      "password": "Senha",
+      "submit": "Entrar",
+      "noAccount": "Não tem conta?",
+      "signupLink": "Criar conta",
+      "error": "E-mail ou senha incorretos"
+    },
+    "signup": {
+      "title": "Criar conta",
+      "name": "Seu nome",
+      "email": "E-mail",
+      "password": "Senha (mínimo 10 caracteres)",
+      "submit": "Cadastrar",
+      "hasAccount": "Já tem conta?",
+      "loginLink": "Entrar",
+      "error": "Não foi possível criar a conta"
+    },
+    "onboarding": {
+      "title": "Crie sua organização",
+      "subtitle": "O espaço de trabalho do seu negócio",
+      "orgName": "Nome do negócio",
+      "orgSlug": "Identificador (URL)",
+      "currency": "Moeda principal",
+      "submit": "Criar organização",
+      "error": "Não foi possível criar a organização"
+    },
+    "logout": "Sair"
+  },
+  "app": {
+    "nav": {
+      "dashboard": "Painel",
+      "customers": "Clientes",
+      "products": "Produtos",
+      "inventory": "Estoque",
+      "sales": "Vendas",
+      "pipeline": "Pipeline",
+      "production": "Produção",
+      "settings": "Configurações"
+    },
+    "dashboard": {
+      "title": "Painel",
+      "welcome": "Bem-vindo a {org}",
+      "empty": "Aqui você verá as métricas do seu negócio quando registrar vendas."
     }
   }
 }
