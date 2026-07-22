@@ -30,7 +30,7 @@ npm run dev        # http://localhost:3000 (es) · /pt (pt)
 
 ## Performance budget (CI-enforced)
 
-Initial JS ≤ 150 KB gz per route · LCP < 2.5 s · CLS < 0.1 · Lighthouse perf ≥ 0.85, a11y ≥ 0.95. PRs that break the budget fail.
+Initial JS ≤ 175 KB (transfer) per route · LCP < 2.5 s · CLS < 0.1 · Lighthouse perf ≥ 0.85, a11y ≥ 0.95. PRs that break the budget fail. (The Next 16 + next-intl baseline is ~165 KB, so any new client-side dependency trips the budget — that pressure is intentional.)
 
 ## Architecture notes
 
