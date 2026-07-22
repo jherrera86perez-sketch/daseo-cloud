@@ -1,4 +1,4 @@
-﻿{
+{
   "ci": {
     "collect": {
       "startServerCommand": "npm run start",
