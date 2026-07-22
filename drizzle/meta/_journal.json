@@ -15,6 +15,13 @@
       "when": 1784738111650,
       "tag": "0001_rate_limit",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784750671784,
+      "tag": "0002_sale_idempotency",
+      "breakpoints": true
     }
   ]
 }

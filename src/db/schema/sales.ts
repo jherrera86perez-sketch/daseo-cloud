@@ -97,17 +97,25 @@ export const sales = pgTable(
     quoteId: uuid("quote_id").references(() => quotes.id),
     series: text("series").notNull().default("A"),
     year: integer("year").notNull(),
-    number: integer("number").notNull(),
+    // null en borradores; se asigna al confirmar (numeración sin huecos)
+    number: integer("number"),
     status: text("status").notNull().default("draft"),
     ...moneyDoc,
     soldAt: timestamp("sold_at", { withTimezone: true }),
     dueDate: timestamp("due_date", { withTimezone: true }),
+    // doble clic jamás duplica una venta (unique parcial por org)
+    idempotencyKey: uuid("idempotency_key"),
     // reservado para el plugin fiscal por país (F4)
     fiscalData: jsonb("fiscal_data"),
     ...timestamps,
   },
   (t) => [
-    uniqueIndex("sales_number_idx").on(t.orgId, t.series, t.year, t.number),
+    uniqueIndex("sales_number_idx")
+      .on(t.orgId, t.series, t.year, t.number)
+      .where(sql`${t.number} is not null`),
+    uniqueIndex("sales_idempotency_idx")
+      .on(t.orgId, t.idempotencyKey)
+      .where(sql`${t.idempotencyKey} is not null`),
     index("sales_org_customer_idx").on(t.orgId, t.customerId),
     check(
       "sales_status_check",
