@@ -15,6 +15,7 @@ import {
   Factory,
 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
+import { LocaleSwitcher } from "@/features/auth/locale-switcher";
 
 // Zona protegida: requireOrg() verifica sesión + membresía en BD.
 // Aquí sí se monta el Toaster (los client components lo usan).
@@ -58,6 +59,7 @@ export default async function AppLayout({
           ))}
           <LogoutButton />
         </nav>
+        <LocaleSwitcher />
       </aside>
       <main className="flex-1 p-4 sm:p-6">{children}</main>
       <Toaster />

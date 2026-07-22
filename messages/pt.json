@@ -73,7 +73,16 @@
     "dashboard": {
       "title": "Painel",
       "welcome": "Bem-vindo a {org}",
-      "empty": "Aqui você verá as métricas do seu negócio quando registrar vendas."
+      "empty": "Aqui você verá as métricas do seu negócio quando registrar vendas.",
+      "monthSales": "Vendas do mês ({base})",
+      "fixedRates": "consolidado às taxas fixadas",
+      "inCurrency": "{count} venda(s) em {currency}",
+      "productionMonth": "Ordens produzidas (mês)",
+      "funnel": "Funil do pipeline",
+      "receivables": "Contas a receber",
+      "noDebt": "Ninguém te deve. 🎉",
+      "overdue": "vencida",
+      "lowStock": "{count} produto(s) abaixo do estoque mínimo — ver produtos"
     },
     "customers": {
       "title": "Clientes",
@@ -122,6 +131,7 @@
       "lowStock": "Abaixo do mínimo",
       "lowStockAlert": "{count} produto(s) abaixo do estoque mínimo",
       "newMovement": "Registrar movimento",
+      "movementKind": "Tipo de movimento",
       "kardex": "Kardex",
       "noMovements": "Sem movimentos ainda. Registre a primeira entrada acima.",
       "movementSaved": "Movimento registrado",

@@ -34,7 +34,7 @@ test.describe.serial("inventario: kardex end-to-end", () => {
     await expect(page.getByText("50.00").first()).toBeVisible();
 
     // salida 30 (al promedio)
-    await page.getByRole("combobox").first().selectOption("out");
+    await page.getByLabel(/tipo de movimiento/i).selectOption("out");
     await page.getByPlaceholder(/^cantidad$/i).fill("30");
     await page.getByRole("button", { name: /^registrar$/i }).click();
     await expect(page.getByText(/^70 L$/)).toBeVisible();

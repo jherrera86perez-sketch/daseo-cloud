@@ -42,6 +42,7 @@ export function MovementForm({
     >
       <select
         name="kind"
+        aria-label={t("movementKind")}
         value={kind}
         onChange={(e) => setKind(e.target.value)}
         className="border-input h-9 rounded-md border bg-transparent px-2 text-sm"

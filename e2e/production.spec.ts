@@ -59,7 +59,10 @@ test.describe.serial("producción end-to-end", () => {
     await page.getByLabel(/mano de obra/i).fill("200.00");
     await page.getByLabel(/costos indirectos/i).fill("100.00");
     await page.getByRole("button", { name: /confirmar producción/i }).click();
-    await expect(page.getByText(/el costo real/i)).toBeVisible();
+    // la transacción hace varios movimientos contra Neon: margen para CI remoto
+    await expect(page.getByText(/el costo real/i)).toBeVisible({
+      timeout: 20_000,
+    });
 
     // kardex del terminado: 98 L al costo real ~8.67/L (850/98)
     await page.goto(productUrl);

@@ -1,26 +1,142 @@
 import { getTranslations } from "next-intl/server";
 import { eq } from "drizzle-orm";
+import { TriangleAlert } from "lucide-react";
 import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
-import { organizations } from "@/db/schema";
+import { organizations, orgSettings } from "@/db/schema";
+import { getDashboard } from "@/features/dashboard/queries";
+import { centsToDecimalString } from "@/lib/money";
+import { Link } from "@/i18n/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function DashboardPage() {
   const { orgId } = await requireOrg();
   const t = await getTranslations("app.dashboard");
-  const [org] = await getDb()
-    .select({ name: organizations.name })
-    .from(organizations)
-    .where(eq(organizations.id, orgId));
+  const db = getDb();
+  const [[org], [settings], data] = await Promise.all([
+    db
+      .select({ name: organizations.name })
+      .from(organizations)
+      .where(eq(organizations.id, orgId)),
+    db.select().from(orgSettings).where(eq(orgSettings.orgId, orgId)),
+    getDashboard(db, orgId),
+  ]);
+  const base = settings?.baseCurrency ?? "CUP";
+  const maxFunnel = Math.max(1, ...data.funnel.map((f) => f.count));
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">{t("title")}</h1>
-      <p className="text-muted-foreground">
-        {t("welcome", { org: org?.name ?? "" })}
-      </p>
-      <p className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-        {t("empty")}
-      </p>
+    <div className="flex flex-col gap-6">
+      <h1 className="text-2xl font-bold">
+        {t("title")}
+        <span className="ml-2 text-base font-normal text-muted-foreground">
+          {org?.name}
+        </span>
+      </h1>
+
+      {data.lowStockCount > 0 && (
+        <Link
+          href="/products"
+          className="flex items-center gap-2 rounded-md border border-warning/50 bg-warning/10 px-3 py-2 text-sm hover:bg-warning/20"
+        >
+          <TriangleAlert className="size-4 text-warning" aria-hidden />
+          {t("lowStock", { count: data.lowStockCount })}
+        </Link>
+      )}
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs text-muted-foreground">
+              {t("monthSales", { base })}
+            </p>
+            <p className="text-2xl font-bold" data-numeric="">
+              {centsToDecimalString(data.monthTotalBaseCents)}
+            </p>
+            <p className="text-xs text-muted-foreground">{t("fixedRates")}</p>
+          </CardContent>
+        </Card>
+        {data.salesByCurrency.map((s) => (
+          <Card key={s.currency}>
+            <CardContent className="p-4">
+              <p className="text-xs text-muted-foreground">
+                {t("inCurrency", { currency: s.currency, count: s.count })}
+              </p>
+              <p className="text-2xl font-bold" data-numeric="">
+                {centsToDecimalString(s.totalCents)}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs text-muted-foreground">
+              {t("productionMonth")}
+            </p>
+            <p className="text-2xl font-bold" data-numeric="">
+              {data.productionMonth.orders}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("funnel")}</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2">
+            {data.funnel.map((f) => (
+              <div
+                key={f.stageName}
+                className="flex items-center gap-2 text-sm"
+              >
+                <span className="w-28 shrink-0">{f.stageName}</span>
+                <div className="h-5 flex-1 rounded bg-muted">
+                  <div
+                    className="h-5 rounded bg-primary/70"
+                    style={{ width: `${(f.count / maxFunnel) * 100}%` }}
+                  />
+                </div>
+                <span className="w-6 text-right" data-numeric="">
+                  {f.count}
+                </span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("receivables")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.receivables.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t("noDebt")}</p>
+            ) : (
+              <ul className="divide-y text-sm">
+                {data.receivables.slice(0, 8).map((r) => (
+                  <li key={r.id} className="flex justify-between py-2">
+                    <Link
+                      href={`/sales/${r.id}`}
+                      className="underline-offset-4 hover:underline"
+                    >
+                      {r.label} · {r.customerName}
+                      {r.overdue && (
+                        <span className="ml-2 rounded-full bg-destructive/10 px-2 text-xs text-destructive">
+                          {t("overdue")}
+                        </span>
+                      )}
+                    </Link>
+                    <span className="font-medium" data-numeric="">
+                      {centsToDecimalString(r.balanceCents)} {r.currency}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

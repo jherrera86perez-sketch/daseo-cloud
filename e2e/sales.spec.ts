@@ -81,10 +81,16 @@ test.describe.serial("ventas: multi-moneda end-to-end", () => {
 
     // cobro cruzado: 3200 CUP = 10 USD
     await page.getByPlaceholder(/^monto$/i).fill("3200.00");
-    await page.getByRole("combobox").nth(0).selectOption("CUP");
+    await page.getByLabel(/^moneda$/i).selectOption("CUP");
     await page.getByPlaceholder(/^tasa$/i).fill("320");
     await page.getByPlaceholder(/equivale a/i).fill("10.00");
     await page.getByRole("button", { name: /^cobrar$/i }).click();
     await expect(page.getByText(/saldo: 15\.00 USD/i)).toBeVisible();
+
+    // dashboard (M9): consolidado a tasa fijada y CxC con el saldo
+    await page.getByRole("link", { name: /panel/i }).click();
+    await expect(page.getByText("8000.00")).toBeVisible(); // 25 USD × 320
+    await expect(page.getByText(/cuentas por cobrar/i)).toBeVisible();
+    await expect(page.getByText(/15\.00 USD/).first()).toBeVisible();
   });
 });

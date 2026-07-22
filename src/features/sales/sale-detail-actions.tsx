@@ -122,6 +122,7 @@ export function PaymentForm({
       />
       <select
         name="currency"
+        aria-label={t("currency")}
         value={currency}
         onChange={(e) => setCurrency(e.target.value)}
         className="border-input h-9 rounded-md border bg-transparent px-2 text-sm"
