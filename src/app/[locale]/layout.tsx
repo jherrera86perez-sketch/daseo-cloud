@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { hasLocale } from "next-intl";
+import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
@@ -31,9 +31,9 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-// NOTA de presupuesto: este layout raíz NO carga NextIntlClientProvider ni
-// Toaster — los server components traducen sin provider. El provider y el
-// Toaster se montan en el layout de (app), donde sí hay client components.
+// NOTA de presupuesto: sin Toaster/sonner aquí — se monta en el layout de
+// (app) cuando exista (M2). El NextIntlClientProvider sí es necesario: el
+// Link de next-intl (client) lo requiere incluso en páginas estáticas.
 export default async function LocaleLayout({
   children,
   params,
@@ -53,7 +53,9 @@ export default async function LocaleLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-dvh flex-col">{children}</body>
+      <body className="flex min-h-dvh flex-col">
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      </body>
     </html>
   );
 }
