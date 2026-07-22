@@ -3,6 +3,7 @@ import { requireOrg } from "@/lib/session";
 import { Toaster } from "@/components/ui/sonner";
 import { Link } from "@/i18n/navigation";
 import { LayoutDashboard, Settings, Droplets } from "lucide-react";
+import { LogoutButton } from "@/features/auth/logout-button";
 
 // Zona protegida: requireOrg() verifica sesión + membresía en BD.
 // Aquí sí se monta el Toaster (los client components lo usan).
@@ -37,6 +38,7 @@ export default async function AppLayout({
               {label}
             </Link>
           ))}
+          <LogoutButton />
         </nav>
       </aside>
       <main className="flex-1 p-4 sm:p-6">{children}</main>

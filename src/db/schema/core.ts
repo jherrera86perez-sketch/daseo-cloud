@@ -8,6 +8,7 @@ import {
   numeric,
   jsonb,
   boolean,
+  bigint as bigintCol,
   check,
   uniqueIndex,
   index,
@@ -138,6 +139,14 @@ export const invitations = pgTable(
   },
   (t) => [index("invitation_org_idx").on(t.organizationId)],
 );
+
+/** Almacén del rate limiting de Better Auth (storage: "database"). */
+export const rateLimits = pgTable("rate_limit", {
+  id: id(),
+  key: text("key").notNull(),
+  count: integer("count").notNull().default(0),
+  lastRequest: bigintCol("last_request", { mode: "number" }).notNull(),
+});
 
 /** Datos de negocio de la organización (1:1 con organization). */
 export const orgSettings = pgTable(

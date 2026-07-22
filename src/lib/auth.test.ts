@@ -52,6 +52,34 @@ describe("registro y login (Better Auth)", () => {
   });
 });
 
+describe("rate limiting (respaldado en BD)", () => {
+  it("bloquea con 429 los intentos repetidos de login fallido", async () => {
+    const limited = createAuth(db, {
+      secret: "secreto-de-test-1234567890",
+      rateLimitEnabled: true,
+    });
+    // Via handler HTTP (con IP): el rate limiting opera a nivel de request
+    let saw429 = false;
+    for (let i = 0; i < 12; i++) {
+      const res = await limited.handler(
+        new Request("http://localhost:3000/api/auth/sign-in/email", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-forwarded-for": "203.0.113.7",
+          },
+          body: JSON.stringify({ email: EMAIL, password: "incorrecta-123" }),
+        }),
+      );
+      if (res.status === 429) {
+        saw429 = true;
+        break;
+      }
+    }
+    expect(saw429).toBe(true);
+  });
+});
+
 describe("organización (plugin organization + aprovisionamiento)", () => {
   it("crea la org con el usuario como owner y siembra settings + 5 etapas", async () => {
     const org = await auth.api.createOrganization({

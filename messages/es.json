@@ -46,7 +46,16 @@
       "submit": "Crear organización",
       "error": "No se pudo crear la organización"
     },
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "invite": {
+      "title": "Invitación",
+      "subtitle": "Te invitaron a una organización en Daseo Cloud",
+      "accept": "Aceptar invitación",
+      "needLogin": "Para aceptar, primero crea tu cuenta o inicia sesión con el correo invitado.",
+      "goSignup": "Crear cuenta",
+      "goLogin": "Iniciar sesión",
+      "error": "No se pudo aceptar la invitación"
+    }
   },
   "app": {
     "nav": {
@@ -63,6 +72,20 @@
       "title": "Panel",
       "welcome": "Bienvenido a {org}",
       "empty": "Aquí verás las métricas de tu negocio cuando registres ventas."
+    },
+    "members": {
+      "title": "Configuración",
+      "membersTitle": "Miembros",
+      "inviteTitle": "Invitar a alguien",
+      "inviteEmail": "Correo del invitado",
+      "inviteRole": "Rol",
+      "roleMember": "Miembro",
+      "roleAdmin": "Administrador",
+      "inviteSubmit": "Generar enlace",
+      "inviteError": "No se pudo crear la invitación",
+      "linkCopied": "Enlace copiado — mándalo por WhatsApp",
+      "pendingCount": "{count} invitación(es) pendiente(s)",
+      "baseCurrency": "Moneda base"
     }
   }
 }

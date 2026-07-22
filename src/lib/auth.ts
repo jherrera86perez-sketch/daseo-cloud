@@ -26,7 +26,7 @@ type Db = any;
  */
 export function createAuth(
   db: Db,
-  opts: { secret: string; baseURL?: string } = {
+  opts: { secret: string; baseURL?: string; rateLimitEnabled?: boolean } = {
     secret: env.BETTER_AUTH_SECRET ?? "",
   },
 ) {
@@ -43,11 +43,19 @@ export function createAuth(
         organization: schema.organizations,
         member: schema.members,
         invitation: schema.invitations,
+        rateLimit: schema.rateLimits,
       },
     }),
     emailAndPassword: {
       enabled: true,
       minPasswordLength: 10,
+    },
+    // Persistido en Postgres: sobrevive el ciclo de vida serverless de Vercel
+    rateLimit: {
+      enabled: opts.rateLimitEnabled ?? true,
+      storage: "database",
+      window: 60,
+      max: 30,
     },
     advanced: {
       database: {

@@ -4,7 +4,7 @@
       "startServerCommand": "npm run start",
       "startServerReadyPattern": "Ready",
       "url": ["http://localhost:3000/", "http://localhost:3000/pt"],
-      "numberOfRuns": 1,
+      "numberOfRuns": 3,
       "settings": {
         "preset": "desktop"
       }

@@ -46,7 +46,16 @@
       "submit": "Criar organização",
       "error": "Não foi possível criar a organização"
     },
-    "logout": "Sair"
+    "logout": "Sair",
+    "invite": {
+      "title": "Convite",
+      "subtitle": "Você foi convidado para uma organização no Daseo Cloud",
+      "accept": "Aceitar convite",
+      "needLogin": "Para aceitar, primeiro crie sua conta ou entre com o e-mail convidado.",
+      "goSignup": "Criar conta",
+      "goLogin": "Entrar",
+      "error": "Não foi possível aceitar o convite"
+    }
   },
   "app": {
     "nav": {
@@ -63,6 +72,20 @@
       "title": "Painel",
       "welcome": "Bem-vindo a {org}",
       "empty": "Aqui você verá as métricas do seu negócio quando registrar vendas."
+    },
+    "members": {
+      "title": "Configurações",
+      "membersTitle": "Membros",
+      "inviteTitle": "Convidar alguém",
+      "inviteEmail": "E-mail do convidado",
+      "inviteRole": "Papel",
+      "roleMember": "Membro",
+      "roleAdmin": "Administrador",
+      "inviteSubmit": "Gerar link",
+      "inviteError": "Não foi possível criar o convite",
+      "linkCopied": "Link copiado — envie pelo WhatsApp",
+      "pendingCount": "{count} convite(s) pendente(s)",
+      "baseCurrency": "Moeda base"
     }
   }
 }
