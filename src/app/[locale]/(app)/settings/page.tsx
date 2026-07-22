@@ -4,6 +4,8 @@ import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
 import { members, users, invitations, orgSettings } from "@/db/schema";
 import { InviteForm } from "@/features/auth/invite-form";
+import { RateForm } from "@/features/rates/rate-form";
+import { listRates } from "@/features/rates/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function SettingsPage() {
@@ -41,6 +43,8 @@ export default async function SettingsPage() {
     .from(orgSettings)
     .where(eq(orgSettings.orgId, orgId));
 
+  const rates = await listRates(db, orgId);
+  const tr = await getTranslations("app.rates");
   const isAdmin = role === "owner" || role === "admin";
 
   return (
@@ -86,9 +90,32 @@ export default async function SettingsPage() {
         </Card>
       )}
 
-      <p className="text-sm text-muted-foreground">
-        {t("baseCurrency")}: <strong>{settings?.baseCurrency}</strong>
-      </p>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {tr("title")} ({t("baseCurrency")}: {settings?.baseCurrency})
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          {isAdmin && <RateForm />}
+          {rates.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{tr("empty")}</p>
+          ) : (
+            <ul className="divide-y text-sm">
+              {rates.slice(0, 10).map((r) => (
+                <li key={r.id} className="flex justify-between py-2">
+                  <span data-numeric="">
+                    1 {r.currency} = {r.rateToBase} {settings?.baseCurrency}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {r.effectiveAt.toISOString().slice(0, 10)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

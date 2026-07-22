@@ -149,6 +149,59 @@
         "save": "Guardar"
       }
     },
+    "sales": {
+      "title": "Ventas",
+      "new": "Nueva venta",
+      "empty": "Aún no hay ventas. Crea la primera con \"Nueva venta\".",
+      "needCustomer": "Primero crea un cliente para poder venderle.",
+      "customer": "Cliente",
+      "currency": "Moneda",
+      "base": "base",
+      "rate": "Tasa → {base}",
+      "lines": "Líneas",
+      "product": "Producto",
+      "freeLine": "— línea libre —",
+      "description": "Descripción",
+      "qty": "Cant.",
+      "unitPrice": "Precio",
+      "addLine": "Agregar línea",
+      "removeLine": "Quitar línea",
+      "total": "Total",
+      "saveDraft": "Guardar borrador",
+      "draft": "Borrador",
+      "status": "Estado",
+      "statuses": {
+        "draft": "Borrador",
+        "confirmed": "Confirmada",
+        "cancelled": "Cancelada"
+      },
+      "confirm": "Confirmar venta",
+      "cancelSale": "Cancelar venta",
+      "cancelConfirm": "¿Cancelar? Repone el inventario.",
+      "cancelYes": "Sí, cancelar",
+      "cancelNo": "No",
+      "rateFixed": "Tasa fijada",
+      "payments": "Cobros",
+      "balance": "Saldo",
+      "paid": "✓ Pagada por completo",
+      "amount": "Monto",
+      "paymentRate": "Tasa",
+      "applied": "Equivale a ({currency})",
+      "registerPayment": "Cobrar",
+      "paymentSaved": "Cobro registrado",
+      "methods": {
+        "cash": "Efectivo",
+        "transfer": "Transferencia",
+        "other": "Otro"
+      }
+    },
+    "rates": {
+      "title": "Tasas de cambio",
+      "empty": "Sin tasas registradas. Agrega la primera (ej.: 1 USD = 320 CUP).",
+      "placeholder": "ej. 320",
+      "add": "Registrar tasa",
+      "saved": "Tasa registrada"
+    },
     "members": {
       "title": "Configuración",
       "membersTitle": "Miembros",

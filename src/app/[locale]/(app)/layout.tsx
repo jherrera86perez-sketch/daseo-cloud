@@ -8,6 +8,7 @@ import {
   Droplets,
   Users,
   Package,
+  Receipt,
 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
 
@@ -25,6 +26,7 @@ export default async function AppLayout({
     { href: "/dashboard", label: t("dashboard"), icon: LayoutDashboard },
     { href: "/customers", label: t("customers"), icon: Users },
     { href: "/products", label: t("products"), icon: Package },
+    { href: "/sales", label: t("sales"), icon: Receipt },
     { href: "/settings", label: t("settings"), icon: Settings },
   ] as const;
 
