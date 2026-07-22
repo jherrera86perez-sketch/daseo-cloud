@@ -71,6 +71,8 @@
       "suppliers": "Proveedores",
       "banking": "Banco",
       "fiscal": "Fiscal",
+      "employees": "Empleados",
+      "audit": "Auditoría",
       "production": "Producción",
       "settings": "Configuración"
     },
@@ -86,7 +88,10 @@
       "receivables": "Cuentas por cobrar",
       "noDebt": "Nadie te debe. 🎉",
       "overdue": "vencida",
-      "lowStock": "{count} producto(s) bajo el stock mínimo — ver productos"
+      "lowStock": "{count} producto(s) bajo el stock mínimo — ver productos",
+      "topCustomers": "Top clientes (año)",
+      "noSales": "Sin ventas confirmadas aún.",
+      "commitmentsDue": "{count} compromiso(s) sin cumplir este período"
     },
     "customers": {
       "title": "Clientes",
@@ -154,7 +159,8 @@
         "in": "Entrada",
         "out": "Salida",
         "adjust_in": "Ajuste +",
-        "adjust_out": "Ajuste −"
+        "adjust_out": "Ajuste −",
+        "internal_out": "Salida interna (consumo propio)"
       },
       "form": {
         "name": "Nombre",
@@ -288,6 +294,43 @@
         "accepted": "Aceptada",
         "rejected": "Rechazada"
       }
+    },
+    "employees": {
+      "title": "Empleados",
+      "empty": "Aún no tienes empleados registrados.",
+      "name": "Nombre",
+      "role": "Cargo",
+      "salary": "Salario mensual",
+      "add": "Agregar",
+      "created": "Empleado agregado",
+      "status": "Estado",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "activate": "Activar",
+      "deactivate": "Desactivar",
+      "remove": "Eliminar",
+      "payrollTotal": "Nómina activa",
+      "fiscalNote": "La nómina de empleados activos alimenta automáticamente los impuestos de nómina en Fiscal (fuerza de trabajo, retención, seguridad social)."
+    },
+    "commitments": {
+      "title": "Compromisos recurrentes",
+      "placeholder": "ej. 20 L de detergente semanales",
+      "weekly": "Semanal",
+      "monthly": "Mensual",
+      "add": "Crear compromiso",
+      "created": "Compromiso creado",
+      "fulfilled": "Cumplido",
+      "dueLabel": "Pendiente este período",
+      "deactivate": "Desactivar"
+    },
+    "audit": {
+      "title": "Auditoría",
+      "adminOnly": "Solo los administradores pueden ver la auditoría.",
+      "empty": "Sin registros todavía.",
+      "date": "Fecha",
+      "user": "Usuario",
+      "entity": "Entidad",
+      "action": "Acción"
     },
     "fiscal": {
       "title": "Fiscal (ONAT)",

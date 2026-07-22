@@ -74,7 +74,10 @@ export async function registerMovementAction(
   form: FormData,
 ): Promise<ActionState> {
   const { orgId, userId } = await requireOrg();
-  const kind = String(form.get("kind"));
+  // "internal_out" (consumo propio/salida interna) = salida con sourceType propio
+  const rawKind = String(form.get("kind"));
+  const isInternal = rawKind === "internal_out";
+  const kind = isInternal ? "out" : rawKind;
   const costRaw = String(form.get("unitCost") ?? "");
   let unitCostCents: bigint | undefined;
   if (costRaw) {
@@ -95,7 +98,10 @@ export async function registerMovementAction(
     return { error: parsed.error.issues[0]?.message ?? "invalid" };
   }
   try {
-    await registerMovement(getDb(), orgId, userId, parsed.data);
+    await registerMovement(getDb(), orgId, userId, {
+      ...parsed.data,
+      sourceType: isInternal ? "internal_use" : undefined,
+    });
   } catch (e) {
     if (e instanceof InsufficientStockError) {
       return { error: e.message };

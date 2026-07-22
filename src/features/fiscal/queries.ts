@@ -118,10 +118,18 @@ export async function computeMonthObligations(
   const to = new Date(Date.UTC(year, month, 1));
   const salesBase = await salesBaseOfPeriod(db, orgId, from, to);
 
+  // nómina: empleados activos primero; si no hay, el valor manual de settings
+  const { activePayrollCents } = await import("@/features/people/queries");
+  const employeePayroll = await activePayrollCents(db, orgId);
+  const payrollCents =
+    employeePayroll > 0n
+      ? employeePayroll
+      : BigInt(settings.monthlyPayrollCents ?? "0");
+
   const lines = engine.monthlyObligations({
     regime: settings.regime ?? "TCP_GENERAL",
     salesBaseCents: salesBase,
-    payrollCents: BigInt(settings.monthlyPayrollCents ?? "0"),
+    payrollCents,
     fixedQuotaCents: BigInt(settings.fixedQuotaCents ?? "0"),
   });
 

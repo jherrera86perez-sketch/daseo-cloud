@@ -52,6 +52,7 @@ export function MovementForm({
             {t(`kinds.${k}`)}
           </option>
         ))}
+        <option value="internal_out">{t("kinds.internal_out")}</option>
       </select>
       <Input
         name="qty"

@@ -43,6 +43,13 @@
       "when": 1784758263468,
       "tag": "0005_f4_fiscal",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1784759318799,
+      "tag": "0006_f5_people",
+      "breakpoints": true
     }
   ]
 }

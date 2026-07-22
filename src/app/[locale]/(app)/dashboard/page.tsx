@@ -5,6 +5,10 @@ import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
 import { organizations, orgSettings } from "@/db/schema";
 import { getDashboard } from "@/features/dashboard/queries";
+import {
+  topCustomers,
+  listCommitmentsWithStatus,
+} from "@/features/people/queries";
 import { centsToDecimalString } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,14 +17,17 @@ export default async function DashboardPage() {
   const { orgId } = await requireOrg();
   const t = await getTranslations("app.dashboard");
   const db = getDb();
-  const [[org], [settings], data] = await Promise.all([
+  const [[org], [settings], data, top, commitments] = await Promise.all([
     db
       .select({ name: organizations.name })
       .from(organizations)
       .where(eq(organizations.id, orgId)),
     db.select().from(orgSettings).where(eq(orgSettings.orgId, orgId)),
     getDashboard(db, orgId),
+    topCustomers(db, orgId, 5),
+    listCommitmentsWithStatus(db, orgId),
   ]);
+  const unfulfilled = commitments.filter((c) => !c.fulfilled);
   const base = settings?.baseCurrency ?? "CUP";
   const maxFunnel = Math.max(1, ...data.funnel.map((f) => f.count));
 
@@ -32,6 +39,21 @@ export default async function DashboardPage() {
           {org?.name}
         </span>
       </h1>
+
+      {unfulfilled.length > 0 && (
+        <div className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm">
+          <p className="font-medium">
+            {t("commitmentsDue", { count: unfulfilled.length })}
+          </p>
+          <ul className="mt-1 text-xs text-muted-foreground">
+            {unfulfilled.slice(0, 3).map((c) => (
+              <li key={c.id}>
+                {c.customerName}: {c.description}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {data.lowStockCount > 0 && (
         <Link
@@ -102,6 +124,39 @@ export default async function DashboardPage() {
                 </span>
               </div>
             ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("topCustomers")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {top.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t("noSales")}</p>
+            ) : (
+              <ol className="divide-y text-sm">
+                {top.map((c, i) => (
+                  <li
+                    key={c.id}
+                    className="flex items-center justify-between py-2"
+                  >
+                    <span>
+                      <span className="mr-2 text-xs text-muted-foreground">
+                        {i + 1}.
+                      </span>
+                      {c.name}
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        ({c.count})
+                      </span>
+                    </span>
+                    <span className="font-medium" data-numeric="">
+                      {centsToDecimalString(c.totalBaseCents)}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            )}
           </CardContent>
         </Card>
 

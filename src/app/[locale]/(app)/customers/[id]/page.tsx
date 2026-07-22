@@ -8,6 +8,11 @@ import {
   addInteractionAction,
 } from "@/features/customers/actions";
 import { InlineForm } from "@/features/customers/inline-forms";
+import { listCommitmentsWithStatus } from "@/features/people/queries";
+import {
+  CommitmentForm,
+  DeactivateCommitmentButton,
+} from "@/features/people/people-ui";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,11 +24,14 @@ export default async function CustomerDetailPage({
   const { id } = await params;
   const t = await getTranslations("app.customers");
   const format = await getFormatter();
+  const db = getDb();
   const { customer, contacts, interactions } = await getCustomerDetail(
-    getDb(),
+    db,
     orgId,
     id,
   );
+  const commitments = await listCommitmentsWithStatus(db, orgId, id);
+  const tc = await getTranslations("app.commitments");
 
   return (
     <div className="flex max-w-2xl flex-col gap-6">
@@ -77,6 +85,44 @@ export default async function CustomerDetailPage({
             </ul>
           )}
           <InlineForm kind="contact" action={addContactAction.bind(null, id)} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{tc("title")}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <CommitmentForm customerId={id} />
+          {commitments.length > 0 && (
+            <ul className="divide-y text-sm">
+              {commitments.map((c) => (
+                <li
+                  key={c.id}
+                  className="flex flex-wrap items-center justify-between gap-2 py-2"
+                >
+                  <span>
+                    {c.description}{" "}
+                    <span className="text-xs text-muted-foreground">
+                      ({tc(c.frequency)})
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs ${
+                        c.fulfilled
+                          ? "bg-success/10 text-success"
+                          : "bg-destructive/10 text-destructive"
+                      }`}
+                    >
+                      {c.fulfilled ? tc("fulfilled") : tc("dueLabel")}
+                    </span>
+                    <DeactivateCommitmentButton id={c.id} />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </CardContent>
       </Card>
 

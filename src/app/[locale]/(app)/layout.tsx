@@ -17,6 +17,8 @@ import {
   Truck,
   Landmark,
   Scale,
+  UsersRound,
+  ScrollText,
 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
 import { LocaleSwitcher } from "@/features/auth/locale-switcher";
@@ -40,6 +42,8 @@ export default async function AppLayout({
     { href: "/suppliers", label: t("suppliers"), icon: Truck },
     { href: "/banking", label: t("banking"), icon: Landmark },
     { href: "/fiscal", label: t("fiscal"), icon: Scale },
+    { href: "/employees", label: t("employees"), icon: UsersRound },
+    { href: "/audit", label: t("audit"), icon: ScrollText },
     { href: "/quotes", label: t("quotes"), icon: FileText },
     { href: "/pipeline", label: t("pipeline"), icon: KanbanSquare },
     { href: "/recipes", label: t("recipes"), icon: FlaskConical },
