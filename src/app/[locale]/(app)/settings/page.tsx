@@ -6,6 +6,8 @@ import { members, users, invitations, orgSettings } from "@/db/schema";
 import { InviteForm } from "@/features/auth/invite-form";
 import { RateForm } from "@/features/rates/rate-form";
 import { listRates } from "@/features/rates/queries";
+import { listApiKeys } from "@/features/platform/queries";
+import { ApiKeysCard, TelegramCard } from "@/features/platform/platform-ui";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function SettingsPage() {
@@ -46,6 +48,13 @@ export default async function SettingsPage() {
   const rates = await listRates(db, orgId);
   const tr = await getTranslations("app.rates");
   const isAdmin = role === "owner" || role === "admin";
+  const apiKeysRows = isAdmin ? await listApiKeys(db, orgId) : [];
+  const tk = await getTranslations("app.apiKeys");
+  const tg = await getTranslations("app.telegram");
+  const notify = (settings?.notifySettings ?? {}) as {
+    telegramBotToken?: string;
+    telegramChatId?: string;
+  };
 
   return (
     <div className="flex max-w-2xl flex-col gap-6">
@@ -116,6 +125,38 @@ export default async function SettingsPage() {
           )}
         </CardContent>
       </Card>
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{tk("title")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ApiKeysCard
+              keys={apiKeysRows.map((k) => ({
+                id: k.id,
+                name: k.name,
+                prefix: k.prefix,
+              }))}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{tg("title")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TelegramCard
+              initial={{
+                botToken: notify.telegramBotToken ?? "",
+                chatId: notify.telegramChatId ?? "",
+              }}
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

@@ -295,6 +295,26 @@
         "rejected": "Rejeitado"
       }
     },
+    "apiKeys": {
+      "title": "API keys (API pública /api/v1)",
+      "namePlaceholder": "ex. bot de relatórios",
+      "create": "Gerar key",
+      "copied": "Key copiada",
+      "onceNote": "Exibida UMA única vez — salve agora",
+      "revoke": "Revogar",
+      "revoked": "Key revogada",
+      "usage": "Uso: GET /api/v1/{customers|products|sales|summary} com header Authorization: Bearer dsk_… (somente leitura)"
+    },
+    "telegram": {
+      "title": "Resumo de cobrança por Telegram",
+      "botToken": "Token do bot (BotFather)",
+      "chatId": "Chat ID destino",
+      "save": "Salvar",
+      "saved": "Configuração salva",
+      "sendNow": "Enviar resumo agora",
+      "sent": "Resumo enviado pelo Telegram",
+      "hint": "Enviado automaticamente todo dia ao meio-dia (UTC): contas a receber com vencidas marcadas + compromissos não cumpridos."
+    },
     "employees": {
       "title": "Funcionários",
       "empty": "Você ainda não tem funcionários registrados.",

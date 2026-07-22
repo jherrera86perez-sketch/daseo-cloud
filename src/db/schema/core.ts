@@ -160,6 +160,8 @@ export const orgSettings = pgTable(
     timezone: text("timezone").notNull().default("America/Havana"),
     fiscalCountry: text("fiscal_country"),
     fiscalSettings: jsonb("fiscal_settings"),
+    // F6: token/chat de Telegram para el resumen de cobranza
+    notifySettings: jsonb("notify_settings"),
     ...timestamps,
   },
   (t) => [

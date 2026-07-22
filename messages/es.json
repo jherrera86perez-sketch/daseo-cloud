@@ -295,6 +295,26 @@
         "rejected": "Rechazada"
       }
     },
+    "apiKeys": {
+      "title": "API keys (API pública /api/v1)",
+      "namePlaceholder": "ej. Laika / bot de reportes",
+      "create": "Generar key",
+      "copied": "Key copiada",
+      "onceNote": "Se muestra UNA sola vez — guárdala ya",
+      "revoke": "Revocar",
+      "revoked": "Key revocada",
+      "usage": "Uso: GET /api/v1/{customers|products|sales|summary} con cabecera Authorization: Bearer dsk_… (solo lectura)"
+    },
+    "telegram": {
+      "title": "Resumen de cobranza por Telegram",
+      "botToken": "Token del bot (BotFather)",
+      "chatId": "Chat ID destino",
+      "save": "Guardar",
+      "saved": "Configuración guardada",
+      "sendNow": "Enviar resumen ahora",
+      "sent": "Resumen enviado por Telegram",
+      "hint": "Se envía automáticamente cada día a mediodía (UTC): cuentas por cobrar con vencidas marcadas + compromisos sin cumplir. Ideal para el chat del equipo de cobranza."
+    },
     "employees": {
       "title": "Empleados",
       "empty": "Aún no tienes empleados registrados.",

@@ -1,0 +1,1 @@
+ALTER TABLE "org_settings" ADD COLUMN "notify_settings" jsonb;

@@ -7,3 +7,4 @@ export * from "./purchases";
 export * from "./banking";
 export * from "./fiscal";
 export * from "./people";
+export * from "./platform";
