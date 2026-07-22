@@ -19,7 +19,7 @@ jobs:
           sudo curl -sSo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc
           echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
           sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-18
-          pg_dump "$DATABASE_URL" -Fc -f "daseo-$(date +%F).dump"
+          /usr/lib/postgresql/18/bin/pg_dump "$DATABASE_URL" -Fc -f "daseo-$(date +%F).dump"
           ls -lh *.dump
 
       - name: Guardar artifact (30 días)
