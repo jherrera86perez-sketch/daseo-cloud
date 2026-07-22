@@ -1,0 +1,17 @@
+{
+  "common": {
+    "appName": "Daseo Cloud",
+    "tagline": "El ERP en la nube para tu negocio",
+    "language": "Idioma"
+  },
+  "landing": {
+    "title": "Daseo Cloud",
+    "subtitle": "Ventas, inventario, producción y cobros de tu negocio — multi-moneda, desde cualquier dispositivo.",
+    "cta": "Comenzar",
+    "features": {
+      "sales": "Ventas y cobros multi-moneda",
+      "inventory": "Inventario con costos reales",
+      "production": "Producción con recetas"
+    }
+  }
+}
