@@ -6,6 +6,8 @@ import { LayoutDashboard, Settings, Droplets } from "lucide-react";
 
 // Zona protegida: requireOrg() verifica sesión + membresía en BD.
 // Aquí sí se monta el Toaster (los client components lo usan).
+// force-dynamic: nada de esta zona se prerenderiza en build (requiere BD/sesión).
+export const dynamic = "force-dynamic";
 export default async function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
