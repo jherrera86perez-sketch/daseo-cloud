@@ -49,3 +49,6 @@ next-env.d.ts
 /.remember/
 /.claude/
 
+
+.vercel
+.env*
