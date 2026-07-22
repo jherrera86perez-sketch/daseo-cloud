@@ -7,6 +7,7 @@ import {
   getStock,
   listMovements,
 } from "@/features/inventory/queries";
+import { listLots } from "@/features/purchases/queries";
 import { registerMovementAction } from "@/features/inventory/actions";
 import { MovementForm } from "@/features/inventory/movement-form";
 import { milliToQtyString } from "@/lib/qty";
@@ -24,9 +25,10 @@ export default async function ProductDetailPage({
   const format = await getFormatter();
   const db = getDb();
   const product = await getOwnedProduct(db, orgId, id);
-  const [stock, movements] = await Promise.all([
+  const [stock, movements, lots] = await Promise.all([
     getStock(db, orgId, id),
     listMovements(db, orgId, id),
+    listLots(db, orgId, id),
   ]);
 
   return (
@@ -68,6 +70,39 @@ export default async function ProductDetailPage({
           <MovementForm action={registerMovementAction.bind(null, id)} />
         </CardContent>
       </Card>
+
+      {lots.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("lots")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="divide-y text-sm">
+              {lots.map((l) => {
+                const expired =
+                  l.expiryDate && new Date(l.expiryDate) < new Date();
+                return (
+                  <li key={l.id} className="flex justify-between py-2">
+                    <span className="font-medium" data-numeric="">
+                      {l.code}
+                    </span>
+                    <span
+                      className={
+                        expired ? "text-destructive" : "text-muted-foreground"
+                      }
+                      data-numeric=""
+                    >
+                      {l.expiryDate
+                        ? `${t("expiry")}: ${l.expiryDate}${expired ? ` (${t("expired")})` : ""}`
+                        : t("noExpiry")}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

@@ -79,10 +79,17 @@ export function ConfirmCancelButtons({
 export function PaymentForm({
   saleId,
   saleCurrency,
-}: Readonly<{ saleId: string; saleCurrency: string }>) {
+  action,
+}: Readonly<{
+  saleId: string;
+  saleCurrency: string;
+  // pre-enlazada al documento; por defecto, cobro de venta
+  action?: (prev: ActionState, form: FormData) => Promise<ActionState>;
+}>) {
   const t = useTranslations("app.sales");
   const ref = useRef<HTMLFormElement>(null);
   const [currency, setCurrency] = useState(saleCurrency);
+  const boundAction = action ?? addPaymentAction.bind(null, saleId);
   const [state, formAction, pending] = useActionState(
     async (prev: ActionState, form: FormData) => {
       // misma moneda: applied = amount (el usuario no repite el dato)
@@ -90,7 +97,7 @@ export function PaymentForm({
         form.set("applied", String(form.get("amount")));
         form.set("rate", "1");
       }
-      const res = await addPaymentAction(saleId, prev, form);
+      const res = await boundAction(prev, form);
       if (!res?.error) {
         ref.current?.reset();
         setCurrency(saleCurrency);

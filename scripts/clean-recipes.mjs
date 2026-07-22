@@ -7,7 +7,7 @@ const org =
     .rows?.[0] ??
   (await sql.query("select id from organization where slug=$1", [slug]))[0];
 const orgId = org.id;
-const a = await sql.query("delete from recipe_items where org_id=$1", [orgId]);
+await sql.query("delete from recipe_items where org_id=$1", [orgId]);
 const b = await sql.query("delete from recipes where org_id=$1 returning id", [
   orgId,
 ]);

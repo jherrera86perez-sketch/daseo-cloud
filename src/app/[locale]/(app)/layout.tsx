@@ -13,6 +13,8 @@ import {
   FileText,
   FlaskConical,
   Factory,
+  ShoppingCart,
+  Truck,
 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
 import { LocaleSwitcher } from "@/features/auth/locale-switcher";
@@ -32,6 +34,8 @@ export default async function AppLayout({
     { href: "/customers", label: t("customers"), icon: Users },
     { href: "/products", label: t("products"), icon: Package },
     { href: "/sales", label: t("sales"), icon: Receipt },
+    { href: "/purchases", label: t("purchases"), icon: ShoppingCart },
+    { href: "/suppliers", label: t("suppliers"), icon: Truck },
     { href: "/quotes", label: t("quotes"), icon: FileText },
     { href: "/pipeline", label: t("pipeline"), icon: KanbanSquare },
     { href: "/recipes", label: t("recipes"), icon: FlaskConical },
