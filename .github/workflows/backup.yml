@@ -14,7 +14,8 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          # Neon corre PG 18: cliente 18 del repo PGDG (ya presente en el runner)
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-18
           pg_dump "$DATABASE_URL" -Fc -f "daseo-$(date +%F).dump"
           ls -lh *.dump
 
