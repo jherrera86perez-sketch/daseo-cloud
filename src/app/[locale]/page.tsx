@@ -4,8 +4,9 @@ import { use } from "react";
 import { Droplets, Package, FlaskConical, BadgeDollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
 
+// Landing 100% estática: anclas nativas en lugar del Link de next-intl para
+// no cargar el router/runtime de cliente en la página más visitada.
 export default function LandingPage({
   params,
 }: Readonly<{ params: Promise<{ locale: string }> }>) {
@@ -13,6 +14,7 @@ export default function LandingPage({
   setRequestLocale(locale);
   const t = useTranslations("landing");
 
+  const home = locale === "es" ? "/" : `/${locale}`;
   const features = [
     { icon: BadgeDollarSign, label: t("features.sales") },
     { icon: Package, label: t("features.inventory") },
@@ -30,7 +32,7 @@ export default function LandingPage({
           {t("subtitle")}
         </p>
         <Button asChild size="lg">
-          <Link href="/">{t("cta")}</Link>
+          <a href={home}>{t("cta")}</a>
         </Button>
       </div>
 
@@ -46,23 +48,15 @@ export default function LandingPage({
       </div>
 
       <nav aria-label="Idioma / Língua" className="flex gap-3 text-sm">
-        <Link
-          href="/"
-          locale="es"
-          className="underline-offset-4 hover:underline"
-        >
+        <a href="/" className="underline-offset-4 hover:underline">
           Español
-        </Link>
+        </a>
         <span aria-hidden className="text-muted-foreground">
           ·
         </span>
-        <Link
-          href="/"
-          locale="pt"
-          className="underline-offset-4 hover:underline"
-        >
+        <a href="/pt" className="underline-offset-4 hover:underline">
           Português
-        </Link>
+        </a>
       </nav>
     </main>
   );

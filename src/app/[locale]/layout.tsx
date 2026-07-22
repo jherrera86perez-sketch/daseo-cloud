@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { NextIntlClientProvider, hasLocale } from "next-intl";
+import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { Toaster } from "@/components/ui/sonner";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -32,6 +31,9 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// NOTA de presupuesto: este layout raíz NO carga NextIntlClientProvider ni
+// Toaster — los server components traducen sin provider. El provider y el
+// Toaster se montan en el layout de (app), donde sí hay client components.
 export default async function LocaleLayout({
   children,
   params,
@@ -51,12 +53,7 @@ export default async function LocaleLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-dvh flex-col">
-        <NextIntlClientProvider>
-          {children}
-          <Toaster />
-        </NextIntlClientProvider>
-      </body>
+      <body className="flex min-h-dvh flex-col">{children}</body>
     </html>
   );
 }
