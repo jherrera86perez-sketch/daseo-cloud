@@ -1,0 +1,137 @@
+import { getTranslations, getFormatter } from "next-intl/server";
+import { Pencil } from "lucide-react";
+import { requireOrg } from "@/lib/session";
+import { getDb } from "@/db";
+import {
+  getOwnedProduct,
+  getStock,
+  listMovements,
+} from "@/features/inventory/queries";
+import { registerMovementAction } from "@/features/inventory/actions";
+import { MovementForm } from "@/features/inventory/movement-form";
+import { milliToQtyString } from "@/lib/qty";
+import { centsToDecimalString } from "@/lib/money";
+import { Link } from "@/i18n/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+export default async function ProductDetailPage({
+  params,
+}: Readonly<{ params: Promise<{ id: string }> }>) {
+  const { orgId } = await requireOrg();
+  const { id } = await params;
+  const t = await getTranslations("app.products");
+  const format = await getFormatter();
+  const db = getDb();
+  const product = await getOwnedProduct(db, orgId, id);
+  const [stock, movements] = await Promise.all([
+    getStock(db, orgId, id),
+    listMovements(db, orgId, id),
+  ]);
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="text-2xl font-bold">{product.name}</h1>
+        <Button asChild variant="outline" size="sm">
+          <Link href={`/products/${id}/edit`}>
+            <Pencil className="size-4" aria-hidden /> {t("edit")}
+          </Link>
+        </Button>
+      </div>
+
+      <div className="grid max-w-md grid-cols-2 gap-3">
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs text-muted-foreground">{t("stock")}</p>
+            <p className="text-xl font-bold" data-numeric="">
+              {milliToQtyString(stock.qtyMilli)}{" "}
+              {t(`form.units.${product.unit}`)}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs text-muted-foreground">{t("avgCost")}</p>
+            <p className="text-xl font-bold" data-numeric="">
+              {centsToDecimalString(stock.avgCostCents)}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("newMovement")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <MovementForm action={registerMovementAction.bind(null, id)} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("kardex")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {movements.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t("noMovements")}</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="border-b text-left text-xs text-muted-foreground">
+                  <tr>
+                    <th className="py-2 pr-3 font-medium">{t("date")}</th>
+                    <th className="py-2 pr-3 text-right font-medium">
+                      {t("qty")}
+                    </th>
+                    <th className="py-2 pr-3 text-right font-medium">
+                      {t("unitCost")}
+                    </th>
+                    <th className="py-2 pr-3 text-right font-medium">
+                      {t("balance")}
+                    </th>
+                    <th className="py-2 text-right font-medium">
+                      {t("avgCost")}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {movements.map((m) => (
+                    <tr key={m.id}>
+                      <td className="py-2 pr-3">
+                        {format.dateTime(m.createdAt, {
+                          dateStyle: "short",
+                          timeStyle: "short",
+                        })}
+                        {m.note && (
+                          <span className="block text-xs text-muted-foreground">
+                            {m.note}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2 pr-3 text-right" data-numeric="">
+                        {m.qty}
+                      </td>
+                      <td className="py-2 pr-3 text-right" data-numeric="">
+                        {m.unitCostBaseCents
+                          ? centsToDecimalString(m.unitCostBaseCents)
+                          : "—"}
+                      </td>
+                      <td className="py-2 pr-3 text-right" data-numeric="">
+                        {m.balanceQty}
+                      </td>
+                      <td className="py-2 text-right" data-numeric="">
+                        {centsToDecimalString(m.balanceAvgCostBaseCents)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

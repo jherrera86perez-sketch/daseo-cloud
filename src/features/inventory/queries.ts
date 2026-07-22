@@ -258,6 +258,29 @@ export async function listMovements(
     .orderBy(desc(inventoryMovements.createdAt), desc(inventoryMovements.id));
 }
 
+/** Lista con el saldo actual de cada producto (para la tabla). */
+export async function listProductsWithStock(
+  db: Db,
+  orgId: string,
+  opts: { search?: string },
+): Promise<Array<ProductRow & { balance: string }>> {
+  const searchClause = opts.search
+    ? sql`and p.name ilike ${"%" + opts.search + "%"}`
+    : sql``;
+  const rows = await db.execute(sql`
+    select p.*, coalesce(m.balance_qty, '0') as balance
+    from products p
+    left join lateral (
+      select balance_qty from inventory_movements im
+      where im.product_id = p.id and im.org_id = p.org_id
+      order by im.created_at desc, im.id desc limit 1
+    ) m on true
+    where p.org_id = ${orgId} and p.deleted_at is null ${searchClause}
+    order by p.name
+  `);
+  return rows.rows ?? rows;
+}
+
 /** Productos cuyo saldo actual está por debajo de su stock mínimo. */
 export async function lowStockProducts(
   db: Db,

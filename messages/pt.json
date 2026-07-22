@@ -109,6 +109,46 @@
         "save": "Salvar"
       }
     },
+    "products": {
+      "title": "Produtos",
+      "new": "Novo produto",
+      "edit": "Editar",
+      "searchPlaceholder": "Buscar por nome…",
+      "empty": "Você ainda não tem produtos. Crie o primeiro em \"Novo produto\".",
+      "stock": "Estoque",
+      "avgCost": "Custo médio",
+      "lowStock": "Abaixo do mínimo",
+      "lowStockAlert": "{count} produto(s) abaixo do estoque mínimo",
+      "newMovement": "Registrar movimento",
+      "kardex": "Kardex",
+      "noMovements": "Sem movimentos ainda. Registre a primeira entrada acima.",
+      "movementSaved": "Movimento registrado",
+      "date": "Data",
+      "qty": "Quantidade",
+      "unitCost": "Custo unit.",
+      "unitCostHint": "Na moeda base, ex. 50.00 (obrigatório nas entradas)",
+      "balance": "Saldo",
+      "note": "Nota (opcional)",
+      "register": "Registrar",
+      "kinds": {
+        "in": "Entrada",
+        "out": "Saída",
+        "adjust_in": "Ajuste +",
+        "adjust_out": "Ajuste −"
+      },
+      "form": {
+        "name": "Nome",
+        "sku": "SKU",
+        "unit": "Unidade",
+        "units": { "kg": "kg", "L": "L", "unit": "un" },
+        "stockMin": "Estoque mínimo (alerta)",
+        "isSellable": "É vendido",
+        "isComponent": "É insumo / matéria-prima",
+        "isProducible": "É produzido (tem receita)",
+        "description": "Descrição",
+        "save": "Salvar"
+      }
+    },
     "members": {
       "title": "Configurações",
       "membersTitle": "Membros",
