@@ -197,6 +197,31 @@
         "other": "Otro"
       }
     },
+    "production": {
+      "title": "Producción",
+      "empty": "Aún no hay órdenes de producción.",
+      "needRecipe": "Primero define una receta para poder producir.",
+      "recipe": "Receta",
+      "newOrder": "Nueva orden",
+      "confirmTitle": "Confirmar producción (consumos reales)",
+      "resultTitle": "Resultado",
+      "actualInputs": "Insumos consumidos",
+      "planned": "plan",
+      "actual": "Real",
+      "producedQty": "Producido",
+      "labor": "Mano de obra",
+      "overhead": "Costos indirectos",
+      "confirm": "Confirmar producción",
+      "confirmed": "Producción confirmada — inventario actualizado",
+      "cancel": "Cancelar orden",
+      "produced": "Producido",
+      "kardexNote": "El costo real (insumos + mano de obra + indirectos) quedó registrado en el kardex del producto.",
+      "statuses": {
+        "draft": "Borrador",
+        "confirmed": "Confirmada",
+        "cancelled": "Cancelada"
+      }
+    },
     "recipes": {
       "title": "Recetas",
       "new": "Nueva receta",

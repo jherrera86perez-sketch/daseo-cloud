@@ -12,6 +12,7 @@ import {
   KanbanSquare,
   FileText,
   FlaskConical,
+  Factory,
 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
 
@@ -33,6 +34,7 @@ export default async function AppLayout({
     { href: "/quotes", label: t("quotes"), icon: FileText },
     { href: "/pipeline", label: t("pipeline"), icon: KanbanSquare },
     { href: "/recipes", label: t("recipes"), icon: FlaskConical },
+    { href: "/production", label: t("production"), icon: Factory },
     { href: "/settings", label: t("settings"), icon: Settings },
   ] as const;
 
