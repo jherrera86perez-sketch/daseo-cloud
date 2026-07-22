@@ -15,11 +15,19 @@ import type { CustomerInput, ContactInput, InteractionInput } from "./schemas";
 type Db = any;
 type UserId = string | null;
 
+export type CustomerRow = typeof customers.$inferSelect;
+export type CustomerListItem = Pick<
+  CustomerRow,
+  "id" | "name" | "phone" | "email" | "createdAt"
+>;
+export type ContactRow = typeof contacts.$inferSelect;
+export type InteractionRow = typeof interactions.$inferSelect;
+
 export async function listCustomers(
   db: Db,
   orgId: string,
   opts: { search?: string },
-) {
+): Promise<CustomerListItem[]> {
   const filters = [eq(customers.orgId, orgId), notDeleted(customers)];
   if (opts.search) {
     filters.push(ilike(customers.name, `%${opts.search}%`));
@@ -37,7 +45,11 @@ export async function listCustomers(
     .orderBy(customers.name);
 }
 
-async function getOwnedCustomer(db: Db, orgId: string, id: string) {
+async function getOwnedCustomer(
+  db: Db,
+  orgId: string,
+  id: string,
+): Promise<CustomerRow> {
   const [row] = await db
     .select()
     .from(customers)
@@ -45,7 +57,15 @@ async function getOwnedCustomer(db: Db, orgId: string, id: string) {
   return assertOwnedByOrg(row, orgId);
 }
 
-export async function getCustomerDetail(db: Db, orgId: string, id: string) {
+export async function getCustomerDetail(
+  db: Db,
+  orgId: string,
+  id: string,
+): Promise<{
+  customer: CustomerRow;
+  contacts: ContactRow[];
+  interactions: InteractionRow[];
+}> {
   const customer = await getOwnedCustomer(db, orgId, id);
   const contactRows = await db
     .select()
@@ -71,7 +91,7 @@ export async function createCustomer(
   orgId: string,
   userId: UserId,
   input: CustomerInput,
-) {
+): Promise<CustomerRow> {
   const [row] = await db
     .insert(customers)
     .values({ ...input, orgId })
@@ -93,7 +113,7 @@ export async function updateCustomer(
   userId: UserId,
   id: string,
   input: CustomerInput,
-) {
+): Promise<CustomerRow> {
   const before = await getOwnedCustomer(db, orgId, id);
   const [row] = await db
     .update(customers)
@@ -138,7 +158,7 @@ export async function addContact(
   userId: UserId,
   customerId: string,
   input: ContactInput,
-) {
+): Promise<ContactRow> {
   await getOwnedCustomer(db, orgId, customerId);
   const [row] = await db
     .insert(contacts)
@@ -161,7 +181,7 @@ export async function addInteraction(
   userId: UserId,
   customerId: string,
   input: InteractionInput,
-) {
+): Promise<InteractionRow> {
   await getOwnedCustomer(db, orgId, customerId);
   const [row] = await db
     .insert(interactions)
