@@ -10,6 +10,7 @@ import { listApiKeys } from "@/features/platform/queries";
 import { listStagesWithDeals } from "@/features/pipeline/queries";
 import { StagesEditor } from "@/features/pipeline/stages-ui";
 import { ApiKeysCard, TelegramCard } from "@/features/platform/platform-ui";
+import { AssistantCard } from "@/features/assistant/assistant-ui";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function SettingsPage() {
@@ -58,7 +59,10 @@ export default async function SettingsPage() {
   const notify = (settings?.notifySettings ?? {}) as {
     telegramBotToken?: string;
     telegramChatId?: string;
+    salesGoalBase?: string;
+    overdueLimitBase?: string;
   };
+  const ta = await getTranslations("app.assistant");
 
   return (
     <div className="flex max-w-2xl flex-col gap-6">
@@ -160,6 +164,23 @@ export default async function SettingsPage() {
                 isLost: b.stage.isLost,
                 dealCount: b.deals.length,
               }))}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{ta("title")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AssistantCard
+              baseCurrency={settings?.baseCurrency ?? "CUP"}
+              initial={{
+                salesGoal: notify.salesGoalBase ?? "",
+                overdueLimit: notify.overdueLimitBase ?? "",
+              }}
             />
           </CardContent>
         </Card>

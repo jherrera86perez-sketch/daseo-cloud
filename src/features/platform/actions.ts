@@ -61,16 +61,20 @@ export async function saveTelegramAction(
     .safeParse({ botToken: form.get("botToken"), chatId: form.get("chatId") });
   if (!parsed.success) return { error: "Datos inválidos" };
   const db = getDb();
+  // Merge: notify_settings también guarda los umbrales del asistente (F5).
+  const [row] = await db
+    .select()
+    .from(orgSettings)
+    .where(eq(orgSettings.orgId, orgId));
+  const current = (row?.notifySettings ?? {}) as Record<string, unknown>;
   await db
     .update(orgSettings)
     .set({
-      notifySettings:
-        parsed.data.botToken && parsed.data.chatId
-          ? {
-              telegramBotToken: parsed.data.botToken,
-              telegramChatId: parsed.data.chatId,
-            }
-          : null,
+      notifySettings: {
+        ...current,
+        telegramBotToken: parsed.data.botToken || undefined,
+        telegramChatId: parsed.data.chatId || undefined,
+      },
       updatedAt: new Date(),
     })
     .where(eq(orgSettings.orgId, orgId));

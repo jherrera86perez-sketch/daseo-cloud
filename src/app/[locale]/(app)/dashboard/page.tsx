@@ -9,7 +9,7 @@ import {
   topCustomers,
   listCommitmentsWithStatus,
 } from "@/features/people/queries";
-import { centsToDecimalString } from "@/lib/money";
+import { centsToDecimalString, parseDecimalToCents } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -31,6 +31,38 @@ export default async function DashboardPage() {
   const base = settings?.baseCurrency ?? "CUP";
   const maxFunnel = Math.max(1, ...data.funnel.map((f) => f.count));
 
+  // Asistente directivo (F5): umbrales de notify_settings contra los KPIs.
+  const ta = await getTranslations("app.assistant");
+  const notify = (settings?.notifySettings ?? {}) as {
+    salesGoalBase?: string;
+    overdueLimitBase?: string;
+  };
+  const assistant: string[] = [];
+  if (notify.salesGoalBase) {
+    const goal = parseDecimalToCents(notify.salesGoalBase);
+    if (data.monthTotalBaseCents < goal) {
+      assistant.push(
+        ta("belowGoal", {
+          actual: centsToDecimalString(data.monthTotalBaseCents),
+          goal: centsToDecimalString(goal),
+          base,
+        }),
+      );
+    }
+  }
+  if (notify.overdueLimitBase) {
+    const limit = parseDecimalToCents(notify.overdueLimitBase);
+    if (data.overdueBaseCents > limit) {
+      assistant.push(
+        ta("overLimit", {
+          actual: centsToDecimalString(data.overdueBaseCents),
+          limit: centsToDecimalString(limit),
+          base,
+        }),
+      );
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-bold">
@@ -39,6 +71,17 @@ export default async function DashboardPage() {
           {org?.name}
         </span>
       </h1>
+
+      {assistant.length > 0 && (
+        <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm">
+          <p className="font-medium">{ta("title")}</p>
+          <ul className="mt-1 list-disc pl-5">
+            {assistant.map((msg) => (
+              <li key={msg}>{msg}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {unfulfilled.length > 0 && (
         <div className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm">

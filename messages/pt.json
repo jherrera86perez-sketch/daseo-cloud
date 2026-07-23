@@ -384,6 +384,16 @@
       "sent": "Resumo enviado pelo Telegram",
       "hint": "Enviado automaticamente todo dia ao meio-dia (UTC): contas a receber com vencidas marcadas + compromissos não cumpridos."
     },
+    "assistant": {
+      "title": "Assistente executivo",
+      "hint": "Defina suas metas e o assistente avisará no painel quando algo exigir atenção. Vazio = sem aviso.",
+      "salesGoal": "Meta de vendas do mês",
+      "overdueLimit": "Limite tolerado de contas a receber vencidas",
+      "save": "Salvar limites",
+      "saved": "Limites salvos",
+      "belowGoal": "Vendas do mês abaixo da meta: {actual} de {goal} {base}.",
+      "overLimit": "Contas vencidas acima do limite: {actual} {base} (limite {limit})."
+    },
     "evaluations": {
       "summary": "Última: {last} · méd. {avg} ({count})",
       "none": "Sem avaliações",

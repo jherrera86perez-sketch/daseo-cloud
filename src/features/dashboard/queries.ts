@@ -2,6 +2,7 @@ import { listSales, accountsReceivable } from "@/features/sales/queries";
 import { listStagesWithDeals } from "@/features/pipeline/queries";
 import { lowStockProducts } from "@/features/inventory/queries";
 import { listOrders } from "@/features/production/queries";
+import { convertToBase } from "@/lib/money";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Db = any;
@@ -25,6 +26,8 @@ export type Dashboard = {
   funnel: Array<{ stageName: string; count: number; amountBase: bigint }>;
   lowStockCount: number;
   productionMonth: { orders: number };
+  /** CxC vencida consolidada a base (tasas fijadas) — para el asistente. */
+  overdueBaseCents: bigint;
 };
 
 /** Consolidación SIEMPRE a las tasas fijadas de cada documento (regla del plan). */
@@ -73,6 +76,12 @@ export async function getDashboard(db: Db, orgId: string): Promise<Dashboard> {
       count: b.deals.length,
       amountBase: b.deals.reduce((acc, d) => acc + d.amountCents, 0n),
     })),
+    overdueBaseCents: ar
+      .filter((r) => r.dueDate && r.dueDate < now)
+      .reduce(
+        (acc, r) => acc + convertToBase(r.balanceCents, r.rateToBaseFixed),
+        0n,
+      ),
     lowStockCount: low.length,
     productionMonth: {
       orders: orders.filter(

@@ -384,6 +384,16 @@
       "sent": "Resumen enviado por Telegram",
       "hint": "Se envía automáticamente cada día a mediodía (UTC): cuentas por cobrar con vencidas marcadas + compromisos sin cumplir. Ideal para el chat del equipo de cobranza."
     },
+    "assistant": {
+      "title": "Asistente directivo",
+      "hint": "Define tus metas y el asistente te avisará en el panel cuando algo exija atención. Vacío = sin aviso.",
+      "salesGoal": "Meta de ventas del mes",
+      "overdueLimit": "Tope tolerado de CxC vencida",
+      "save": "Guardar umbrales",
+      "saved": "Umbrales guardados",
+      "belowGoal": "Ventas del mes por debajo de la meta: {actual} de {goal} {base}.",
+      "overLimit": "CxC vencida por encima del tope: {actual} {base} (tope {limit})."
+    },
     "evaluations": {
       "summary": "Última: {last} · prom. {avg} ({count})",
       "none": "Sin evaluaciones",
