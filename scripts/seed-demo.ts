@@ -61,7 +61,9 @@ async function main() {
     .from(organizations)
     .where(eq(organizations.slug, DEMO_SLUG));
   if (existing[0]) {
-    console.log(`La org "${DEMO_SLUG}" ya existe (${existing[0].id}). Nada que hacer.`);
+    console.log(
+      `La org "${DEMO_SLUG}" ya existe (${existing[0].id}). Nada que hacer.`,
+    );
     return;
   }
 
