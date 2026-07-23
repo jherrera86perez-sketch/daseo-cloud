@@ -17,7 +17,7 @@ test.describe.serial("pipeline + cotizaciones end-to-end", () => {
     await page.getByRole("button", { name: /crear organización/i }).click();
     await page.waitForURL(/\/dashboard/);
 
-    await page.getByRole("link", { name: /clientes/i }).click();
+    await page.getByRole("link", { name: "Clientes", exact: true }).click();
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Cliente Pipeline");
     await page.getByRole("button", { name: /guardar/i }).click();

@@ -24,7 +24,7 @@ test.describe.serial("ventas: multi-moneda end-to-end", () => {
     await expect(page.getByText(/1 USD = 320/)).toBeVisible();
 
     // cliente
-    await page.getByRole("link", { name: /clientes/i }).click();
+    await page.getByRole("link", { name: "Clientes", exact: true }).click();
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Bodega Ventas");
     await page.getByRole("button", { name: /guardar/i }).click();

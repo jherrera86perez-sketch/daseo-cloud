@@ -25,7 +25,7 @@ test.describe.serial("personas y análisis end-to-end", () => {
     await expect(page.getByText(/nómina activa/i)).toBeVisible();
 
     // cliente + compromiso semanal
-    await page.getByRole("link", { name: /clientes/i }).click();
+    await page.getByRole("link", { name: "Clientes", exact: true }).click();
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("J-Carlos E2E");
     await page.getByRole("button", { name: /guardar/i }).click();

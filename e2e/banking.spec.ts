@@ -17,7 +17,7 @@ test.describe.serial("banco: conciliación end-to-end", () => {
     await page.waitForURL(/\/dashboard/);
 
     // cliente + venta CUP 8000 confirmada + cobro por transferencia
-    await page.getByRole("link", { name: /clientes/i }).click();
+    await page.getByRole("link", { name: "Clientes", exact: true }).click();
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Bodega Banco");
     await page.getByRole("button", { name: /guardar/i }).click();

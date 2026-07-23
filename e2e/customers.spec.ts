@@ -20,7 +20,7 @@ test.describe.serial("clientes: patrón CRUD + ficha", () => {
     await page.waitForURL(/\/dashboard/);
 
     // estado vacío
-    await page.getByRole("link", { name: /clientes/i }).click();
+    await page.getByRole("link", { name: "Clientes", exact: true }).click();
     await expect(page.getByText(/aún no tienes clientes/i)).toBeVisible();
 
     // crear
@@ -51,7 +51,7 @@ test.describe.serial("clientes: patrón CRUD + ficha", () => {
 
     // aparece en la lista
     await page
-      .getByRole("link", { name: /clientes/i })
+      .getByRole("link", { name: "Clientes", exact: true })
       .first()
       .click();
     await expect(page.getByText("Bodega E2E Editada")).toBeVisible();
