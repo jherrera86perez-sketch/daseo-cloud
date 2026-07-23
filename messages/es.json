@@ -86,6 +86,23 @@
       "receivables": "Por cobrar",
       "payables": "Por pagar"
     },
+    "admin": {
+      "title": "Plataforma (super-admin)",
+      "org": "Organización",
+      "members": "Miembros",
+      "plan": "Plan",
+      "status": "Estado",
+      "trialEnds": "Fin del trial",
+      "actions": "Acciones",
+      "activate": "Activar",
+      "suspend": "Suspender",
+      "statuses": {
+        "trialing": "En prueba",
+        "active": "Activa",
+        "suspended": "Suspendida",
+        "none": "Sin suscripción"
+      }
+    },
     "receivables": {
       "title": "Cuentas por cobrar",
       "empty": "No hay ventas con saldo pendiente. Todo cobrado. 🎉",

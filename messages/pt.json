@@ -86,6 +86,23 @@
       "receivables": "A receber",
       "payables": "A pagar"
     },
+    "admin": {
+      "title": "Plataforma (super-admin)",
+      "org": "Organização",
+      "members": "Membros",
+      "plan": "Plano",
+      "status": "Status",
+      "trialEnds": "Fim do trial",
+      "actions": "Ações",
+      "activate": "Ativar",
+      "suspend": "Suspender",
+      "statuses": {
+        "trialing": "Em teste",
+        "active": "Ativa",
+        "suspended": "Suspensa",
+        "none": "Sem assinatura"
+      }
+    },
     "receivables": {
       "title": "Contas a receber",
       "empty": "Nenhuma venda com saldo pendente. Tudo recebido. 🎉",

@@ -6,6 +6,7 @@ import {
   timestamp,
   uniqueIndex,
   index,
+  check,
 } from "drizzle-orm/pg-core";
 import { id, timestamps, organizations } from "./core";
 
@@ -33,4 +34,29 @@ export const apiKeys = pgTable(
   ],
 );
 
-void sql; // (sin checks; el hash es opaco)
+/**
+ * F7: suscripción por organización (1:1). El cobro CU es manual: un
+ * super-admin activa/suspende desde /admin. Stripe (BR) llegará como
+ * segundo proveedor sobre este mismo estado.
+ */
+export const subscriptions = pgTable(
+  "subscriptions",
+  {
+    orgId: uuid("org_id")
+      .primaryKey()
+      .references(() => organizations.id),
+    plan: text("plan").notNull().default("trial"),
+    status: text("status").notNull().default("trialing"),
+    trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
+    activatedAt: timestamp("activated_at", { withTimezone: true }),
+    notes: text("notes"),
+    ...timestamps,
+  },
+  (t) => [
+    check("subscriptions_plan_check", sql`${t.plan} in ('trial','pro')`),
+    check(
+      "subscriptions_status_check",
+      sql`${t.status} in ('trialing','active','suspended')`,
+    ),
+  ],
+);

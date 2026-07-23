@@ -16,6 +16,8 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: z.string().min(20).optional(),
     BETTER_AUTH_URL: z.string().url().optional(),
     SENTRY_DSN: z.string().url().optional(),
+    // F7: emails (separados por coma) con acceso al panel /admin
+    SUPERADMIN_EMAILS: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
@@ -26,6 +28,7 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
     SENTRY_DSN: process.env.SENTRY_DSN,
+    SUPERADMIN_EMAILS: process.env.SUPERADMIN_EMAILS,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   },
   emptyStringAsUndefined: true,
