@@ -6,6 +6,7 @@ import {
   timestamp,
   bigint,
   date,
+  integer,
   check,
   index,
 } from "drizzle-orm/pg-core";
@@ -35,6 +36,30 @@ export const employees = pgTable(
     index("employees_org_idx").on(t.orgId, t.name),
     check("employees_salary_check", sql`${t.salaryCents} >= 0`),
     check("employees_active_check", sql`${t.active} in ('yes','no')`),
+  ],
+);
+
+/** Evaluaciones periódicas de empleados (F5): nota 1–5 + comentario. */
+export const employeeEvaluations = pgTable(
+  "employee_evaluations",
+  {
+    id: id(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id),
+    employeeId: uuid("employee_id")
+      .notNull()
+      .references(() => employees.id),
+    score: integer("score").notNull(),
+    notes: text("notes"),
+    evaluatedAt: date("evaluated_at")
+      .notNull()
+      .default(sql`current_date`),
+    ...timestamps,
+  },
+  (t) => [
+    index("employee_evaluations_org_idx").on(t.orgId, t.employeeId),
+    check("employee_evaluations_score_check", sql`${t.score} between 1 and 5`),
   ],
 );
 

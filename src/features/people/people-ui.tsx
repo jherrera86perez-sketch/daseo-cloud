@@ -12,6 +12,7 @@ import {
   deleteEmployeeAction,
   createCommitmentAction,
   deactivateCommitmentAction,
+  addEvaluationAction,
   type ActionState,
 } from "./actions";
 
@@ -159,5 +160,62 @@ export function DeactivateCommitmentButton({ id }: Readonly<{ id: string }>) {
     >
       {t("deactivate")}
     </Button>
+  );
+}
+
+export function EvaluationCell({
+  employeeId,
+  summary,
+}: Readonly<{
+  employeeId: string;
+  summary: { last: number; avg: number; count: number } | null;
+}>) {
+  const t = useTranslations("app.evaluations");
+  const [, formAction, pending] = useActionState(
+    async (prev: ActionState, form: FormData) => {
+      const res = await addEvaluationAction(prev, form);
+      if (res?.error) toast.error(res.error);
+      else toast.success(t("saved"));
+      return res;
+    },
+    null,
+  );
+
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-xs text-muted-foreground" data-numeric="">
+        {summary
+          ? t("summary", {
+              last: summary.last,
+              avg: summary.avg,
+              count: summary.count,
+            })
+          : t("none")}
+      </span>
+      <form action={formAction} className="flex items-center gap-1">
+        <input type="hidden" name="employeeId" value={employeeId} />
+        <select
+          name="score"
+          aria-label={t("score")}
+          className="border-input h-7 rounded border bg-transparent px-1 text-xs"
+          defaultValue="5"
+        >
+          {[1, 2, 3, 4, 5].map((n) => (
+            <option key={n} value={n}>
+              {n}
+            </option>
+          ))}
+        </select>
+        <Input
+          name="notes"
+          placeholder={t("notes")}
+          aria-label={t("notes")}
+          className="h-7 w-28 text-xs"
+        />
+        <Button size="sm" variant="outline" type="submit" disabled={pending}>
+          {pending ? "…" : t("save")}
+        </Button>
+      </form>
+    </div>
   );
 }

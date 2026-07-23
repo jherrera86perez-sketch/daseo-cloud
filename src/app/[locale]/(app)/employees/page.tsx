@@ -1,10 +1,15 @@
 import { getTranslations } from "next-intl/server";
 import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
-import { listEmployees, activePayrollCents } from "@/features/people/queries";
+import {
+  listEmployees,
+  activePayrollCents,
+  evaluationSummary,
+} from "@/features/people/queries";
 import {
   NewEmployeeForm,
   EmployeeRowActions,
+  EvaluationCell,
 } from "@/features/people/people-ui";
 import { centsToDecimalString } from "@/lib/money";
 
@@ -12,9 +17,10 @@ export default async function EmployeesPage() {
   const { orgId } = await requireOrg();
   const t = await getTranslations("app.employees");
   const db = getDb();
-  const [rows, payroll] = await Promise.all([
+  const [rows, payroll, evals] = await Promise.all([
     listEmployees(db, orgId),
     activePayrollCents(db, orgId),
+    evaluationSummary(db, orgId),
   ]);
 
   return (
@@ -41,6 +47,7 @@ export default async function EmployeesPage() {
                   {t("salary")}
                 </th>
                 <th className="px-4 py-2 font-medium">{t("status")}</th>
+                <th className="px-4 py-2 font-medium">{t("evaluation")}</th>
                 <th className="px-4 py-2" />
               </tr>
             </thead>
@@ -61,6 +68,12 @@ export default async function EmployeesPage() {
                     <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">
                       {e.active === "yes" ? t("active") : t("inactive")}
                     </span>
+                  </td>
+                  <td className="px-4 py-2">
+                    <EvaluationCell
+                      employeeId={e.id}
+                      summary={evals.get(e.id) ?? null}
+                    />
                   </td>
                   <td className="px-4 py-2">
                     <EmployeeRowActions id={e.id} active={e.active === "yes"} />

@@ -384,9 +384,18 @@
       "sent": "Resumen enviado por Telegram",
       "hint": "Se envía automáticamente cada día a mediodía (UTC): cuentas por cobrar con vencidas marcadas + compromisos sin cumplir. Ideal para el chat del equipo de cobranza."
     },
+    "evaluations": {
+      "summary": "Última: {last} · prom. {avg} ({count})",
+      "none": "Sin evaluaciones",
+      "score": "Nota",
+      "notes": "Comentario",
+      "save": "Evaluar",
+      "saved": "Evaluación guardada"
+    },
     "employees": {
       "title": "Empleados",
       "empty": "Aún no tienes empleados registrados.",
+      "evaluation": "Evaluación",
       "name": "Nombre",
       "role": "Cargo",
       "salary": "Salario mensual",

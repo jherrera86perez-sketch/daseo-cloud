@@ -119,3 +119,50 @@ describe("top clientes", () => {
     expect(topB).toHaveLength(0);
   });
 });
+
+describe("evaluaciones de empleados (F5)", () => {
+  let empId: string;
+
+  it("addEvaluation valida la nota y crea la fila", async () => {
+    const {
+      addEvaluation,
+      listEvaluations,
+      createEmployee: mk,
+    } = await import("./queries");
+    const emp = await mk(db, orgA, USER, {
+      name: "Evaluado",
+      salaryCents: 5000_00n,
+    });
+    empId = emp.id;
+    await expect(
+      addEvaluation(db, orgA, USER, { employeeId: empId, score: 6 }),
+    ).rejects.toThrow(/1 a 5/);
+    await addEvaluation(db, orgA, USER, {
+      employeeId: empId,
+      score: 4,
+      notes: "Buen mes",
+      evaluatedAt: "2026-06-30",
+    });
+    await addEvaluation(db, orgA, USER, { employeeId: empId, score: 5 });
+    const list = await listEvaluations(db, orgA, empId);
+    expect(list).toHaveLength(2);
+    expect(list[0].score).toBe(5); // la más reciente primero
+  });
+
+  it("evaluationSummary devuelve última nota, promedio y conteo", async () => {
+    const { evaluationSummary } = await import("./queries");
+    const summary = await evaluationSummary(db, orgA);
+    const s = summary.get(empId)!;
+    expect(s.count).toBe(2);
+    expect(s.last).toBe(5);
+    expect(s.avg).toBe(4.5);
+  });
+
+  it("aislamiento: la org B no ve ni evalúa empleados de A", async () => {
+    const { addEvaluation, listEvaluations } = await import("./queries");
+    await expect(
+      addEvaluation(db, orgB, USER, { employeeId: empId, score: 3 }),
+    ).rejects.toThrow();
+    await expect(listEvaluations(db, orgB, empId)).rejects.toThrow();
+  });
+});

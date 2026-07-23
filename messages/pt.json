@@ -384,9 +384,18 @@
       "sent": "Resumo enviado pelo Telegram",
       "hint": "Enviado automaticamente todo dia ao meio-dia (UTC): contas a receber com vencidas marcadas + compromissos não cumpridos."
     },
+    "evaluations": {
+      "summary": "Última: {last} · méd. {avg} ({count})",
+      "none": "Sem avaliações",
+      "score": "Nota",
+      "notes": "Comentário",
+      "save": "Avaliar",
+      "saved": "Avaliação salva"
+    },
     "employees": {
       "title": "Funcionários",
       "empty": "Você ainda não tem funcionários registrados.",
+      "evaluation": "Avaliação",
       "name": "Nome",
       "role": "Cargo",
       "salary": "Salário mensal",

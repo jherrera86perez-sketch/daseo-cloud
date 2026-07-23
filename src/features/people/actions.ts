@@ -109,3 +109,36 @@ export async function deactivateCommitmentAction(
   revalidatePath("/[locale]/customers/[id]", "page");
   return null;
 }
+
+const evaluationSchema = z.object({
+  employeeId: z.string().uuid(),
+  score: z.coerce.number().int().min(1).max(5),
+  notes: z.string().max(1000).optional().or(z.literal("")),
+});
+
+export async function addEvaluationAction(
+  _prev: ActionState,
+  form: FormData,
+): Promise<ActionState> {
+  const { orgId, userId } = await requireOrg();
+  const parsed = evaluationSchema.safeParse({
+    employeeId: form.get("employeeId"),
+    score: form.get("score"),
+    notes: form.get("notes"),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "invalid" };
+  }
+  try {
+    const { addEvaluation } = await import("./queries");
+    await addEvaluation(getDb(), orgId, userId, {
+      employeeId: parsed.data.employeeId,
+      score: parsed.data.score,
+      notes: parsed.data.notes || undefined,
+    });
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "error" };
+  }
+  revalidatePath("/[locale]/employees", "page");
+  return null;
+}

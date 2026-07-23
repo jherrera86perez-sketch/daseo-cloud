@@ -1,5 +1,11 @@
 import { and, asc, desc, eq, gte, sql as dsql } from "drizzle-orm";
-import { employees, customerCommitments, customers, sales } from "@/db/schema";
+import {
+  employees,
+  employeeEvaluations,
+  customerCommitments,
+  customers,
+  sales,
+} from "@/db/schema";
 import { assertOwnedByOrg, notDeleted } from "@/lib/tenant";
 import { logAudit } from "@/lib/audit";
 
@@ -264,4 +270,90 @@ export async function topCustomers(
     totalBaseCents: BigInt(r.total),
     count: Number(r.count),
   }));
+}
+
+export type EvaluationRow = typeof employeeEvaluations.$inferSelect;
+
+/** Evaluación 1–5 con comentario; la fecha por defecto es hoy (F5). */
+export async function addEvaluation(
+  db: Db,
+  orgId: string,
+  userId: UserId,
+  input: {
+    employeeId: string;
+    score: number;
+    notes?: string;
+    evaluatedAt?: string;
+  },
+): Promise<EvaluationRow> {
+  if (!Number.isInteger(input.score) || input.score < 1 || input.score > 5) {
+    throw new Error("La nota va de 1 a 5");
+  }
+  await getOwnedEmployee(db, orgId, input.employeeId);
+  const [row] = await db
+    .insert(employeeEvaluations)
+    .values({
+      orgId,
+      employeeId: input.employeeId,
+      score: input.score,
+      notes: input.notes,
+      ...(input.evaluatedAt ? { evaluatedAt: input.evaluatedAt } : {}),
+    })
+    .returning();
+  await logAudit(db, {
+    orgId,
+    userId,
+    entity: "employee_evaluation",
+    entityId: row.id,
+    action: "create",
+    after: { employeeId: input.employeeId, score: input.score },
+  });
+  return row;
+}
+
+export async function listEvaluations(
+  db: Db,
+  orgId: string,
+  employeeId: string,
+): Promise<EvaluationRow[]> {
+  await getOwnedEmployee(db, orgId, employeeId);
+  return db
+    .select()
+    .from(employeeEvaluations)
+    .where(
+      and(
+        eq(employeeEvaluations.orgId, orgId),
+        eq(employeeEvaluations.employeeId, employeeId),
+      ),
+    )
+    .orderBy(
+      desc(employeeEvaluations.evaluatedAt),
+      desc(employeeEvaluations.createdAt),
+    );
+}
+
+/** Última nota y promedio por empleado (para la tabla de RRHH). */
+export async function evaluationSummary(
+  db: Db,
+  orgId: string,
+): Promise<Map<string, { last: number; avg: number; count: number }>> {
+  const rows = await db
+    .select({
+      employeeId: employeeEvaluations.employeeId,
+      avg: dsql<number>`avg(${employeeEvaluations.score})`.mapWith(Number),
+      count: dsql<number>`count(*)`.mapWith(Number),
+      last: dsql<number>`(array_agg(${employeeEvaluations.score} order by ${employeeEvaluations.evaluatedAt} desc, ${employeeEvaluations.createdAt} desc))[1]`.mapWith(
+        Number,
+      ),
+    })
+    .from(employeeEvaluations)
+    .where(eq(employeeEvaluations.orgId, orgId))
+    .groupBy(employeeEvaluations.employeeId);
+  return new Map(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rows.map((r: any) => [
+      r.employeeId,
+      { last: r.last, avg: Math.round(r.avg * 10) / 10, count: r.count },
+    ]),
+  );
 }
