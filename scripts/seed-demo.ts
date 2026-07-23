@@ -17,6 +17,7 @@ import {
   members,
   orgSettings,
   pipelineStages,
+  subscriptions,
   users,
 } from "../src/db/schema";
 import { createCustomer } from "../src/features/customers/queries";
@@ -102,6 +103,14 @@ async function main() {
   await db
     .insert(pipelineStages)
     .values(DEFAULT_STAGES.map((s) => ({ ...s, orgId })));
+  // La demo siempre activa: sin banners de trial para los visitantes (F7).
+  await db.insert(subscriptions).values({
+    orgId,
+    plan: "pro",
+    status: "active",
+    activatedAt: new Date(),
+    notes: "Org demo pública",
+  });
   console.log(`Org demo creada: ${orgId}`);
 
   // --- tasa vigente ---

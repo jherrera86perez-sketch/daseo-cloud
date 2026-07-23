@@ -25,6 +25,9 @@ import {
 import { LogoutButton } from "@/features/auth/logout-button";
 import { LocaleSwitcher } from "@/features/auth/locale-switcher";
 import { ThemeSwitcher } from "@/features/auth/theme-switcher";
+import { getDb } from "@/db";
+import { getSubscription } from "@/features/admin/queries";
+import { subscriptionGate } from "@/features/admin/gate";
 
 // Zona protegida: requireOrg() verifica sesión + membresía en BD.
 // Aquí sí se monta el Toaster (los client components lo usan).
@@ -33,8 +36,33 @@ export const dynamic = "force-dynamic";
 export default async function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  await requireOrg();
+  const { orgId } = await requireOrg();
   const t = await getTranslations("app.nav");
+
+  // F7-M2: la suscripción manda sobre toda la zona app.
+  const gate = subscriptionGate(
+    await getSubscription(getDb(), orgId),
+    new Date(),
+  );
+  if (gate.kind === "suspended") {
+    const tg = await getTranslations("app.gate");
+    return (
+      <main className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center">
+        <h1 className="text-2xl font-bold">{tg("suspendedTitle")}</h1>
+        <p className="max-w-md text-sm text-muted-foreground">
+          {tg("suspendedBody")}
+        </p>
+        <LogoutButton />
+      </main>
+    );
+  }
+  const tg = await getTranslations("app.gate");
+  const trialNotice =
+    gate.kind === "trial"
+      ? tg("trialDays", { days: gate.daysLeft })
+      : gate.kind === "trial-expired"
+        ? tg("trialExpired")
+        : null;
 
   const nav = [
     { href: "/dashboard", label: t("dashboard"), icon: LayoutDashboard },
@@ -79,7 +107,14 @@ export default async function AppLayout({
         <LocaleSwitcher />
         <ThemeSwitcher />
       </aside>
-      <main className="flex-1 p-4 sm:p-6">{children}</main>
+      <main className="flex-1 p-4 sm:p-6">
+        {trialNotice && (
+          <div className="mb-4 rounded-md border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-sm">
+            {trialNotice}
+          </div>
+        )}
+        {children}
+      </main>
       <Toaster />
     </div>
   );

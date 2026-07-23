@@ -86,6 +86,12 @@
       "receivables": "Por cobrar",
       "payables": "Por pagar"
     },
+    "gate": {
+      "suspendedTitle": "Organización suspendida",
+      "suspendedBody": "El acceso está pausado. Escribe a jherrera86perez@gmail.com para reactivar tu suscripción.",
+      "trialDays": "Tu período de prueba termina en {days, plural, one {# día} other {# días}}. Escríbenos para activar tu plan.",
+      "trialExpired": "Tu período de prueba terminó. Escríbenos para activar tu plan y seguir sin interrupciones."
+    },
     "admin": {
       "title": "Plataforma (super-admin)",
       "org": "Organización",
