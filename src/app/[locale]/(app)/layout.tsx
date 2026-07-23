@@ -23,6 +23,7 @@ import {
   Wallet,
   Banknote,
   Trophy,
+  Gift,
 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
 import { LocaleSwitcher } from "@/features/auth/locale-switcher";
@@ -85,6 +86,7 @@ export default async function AppLayout({
     { href: "/banking", label: t("banking"), icon: Landmark },
     { href: "/statements", label: t("statements"), icon: Banknote },
     { href: "/top-clients", label: t("topClients"), icon: Trophy },
+    { href: "/raffles", label: t("raffles"), icon: Gift },
     { href: "/fiscal", label: t("fiscal"), icon: Scale },
     { href: "/employees", label: t("employees"), icon: UsersRound },
     { href: "/audit", label: t("audit"), icon: ScrollText },

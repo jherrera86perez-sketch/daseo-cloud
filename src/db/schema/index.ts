@@ -9,3 +9,4 @@ export * from "./fiscal";
 export * from "./people";
 export * from "./platform";
 export * from "./statements";
+export * from "./raffles";
