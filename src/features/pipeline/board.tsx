@@ -1,6 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useTransition } from "react";
+import {
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { FileText } from "lucide-react";
@@ -37,6 +43,9 @@ export function PipelineBoard({
 }>) {
   const t = useTranslations("app.pipeline");
   const [movePending, startMove] = useTransition();
+  // Columna bajo el cursor durante un arrastre (DnD nativo: 0 KB extra;
+  // en táctil no existe dragstart, ahí queda el select como vía oficial).
+  const [dragOverStage, setDragOverStage] = useState<string | null>(null);
 
   function onMove(dealId: string, stageId: string) {
     startMove(async () => {
@@ -52,7 +61,29 @@ export function PipelineBoard({
         {stages.map((stage) => (
           <section
             key={stage.id}
-            className={`rounded-md border p-2 ${
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = "move";
+              setDragOverStage(stage.id);
+            }}
+            onDragLeave={(e) => {
+              // Solo al salir de la sección, no al pasar sobre sus hijos.
+              if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                setDragOverStage(null);
+              }
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragOverStage(null);
+              const dealId = e.dataTransfer.getData("text/plain");
+              const current = dealsByStage[stage.id]?.some(
+                (d) => d.id === dealId,
+              );
+              if (dealId && !current) onMove(dealId, stage.id);
+            }}
+            className={`rounded-md border p-2 transition-shadow ${
+              dragOverStage === stage.id ? "ring-2 ring-primary/60" : ""
+            } ${
               stage.isWon
                 ? "border-success/40 bg-success/5"
                 : stage.isLost
@@ -70,7 +101,13 @@ export function PipelineBoard({
               {(dealsByStage[stage.id] ?? []).map((deal) => (
                 <li
                   key={deal.id}
-                  className="rounded-md border bg-card p-2 text-sm shadow-xs"
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData("text/plain", deal.id);
+                    e.dataTransfer.effectAllowed = "move";
+                  }}
+                  onDragEnd={() => setDragOverStage(null)}
+                  className="cursor-grab rounded-md border bg-card p-2 text-sm shadow-xs active:cursor-grabbing"
                 >
                   <p className="font-medium">{deal.title}</p>
                   <p className="text-xs text-muted-foreground">
