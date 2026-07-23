@@ -8,3 +8,4 @@ export * from "./banking";
 export * from "./fiscal";
 export * from "./people";
 export * from "./platform";
+export * from "./statements";
