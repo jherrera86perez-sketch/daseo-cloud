@@ -28,6 +28,7 @@ import { ThemeSwitcher } from "@/features/auth/theme-switcher";
 import { getDb } from "@/db";
 import { getSubscription } from "@/features/admin/queries";
 import { subscriptionGate } from "@/features/admin/gate";
+import { documentAllowance } from "@/features/admin/limits";
 
 // Zona protegida: requireOrg() verifica sesión + membresía en BD.
 // Aquí sí se monta el Toaster (los client components lo usan).
@@ -57,12 +58,18 @@ export default async function AppLayout({
     );
   }
   const tg = await getTranslations("app.gate");
-  const trialNotice =
-    gate.kind === "trial"
-      ? tg("trialDays", { days: gate.daysLeft })
-      : gate.kind === "trial-expired"
-        ? tg("trialExpired")
-        : null;
+  let trialNotice: string | null = null;
+  if (gate.kind === "trial") {
+    trialNotice = tg("trialDays", { days: gate.daysLeft });
+  } else if (gate.kind === "trial-expired") {
+    const allowance = await documentAllowance(getDb(), orgId);
+    trialNotice = allowance.limited
+      ? `${tg("trialExpired")} ${tg("freeQuota", {
+          used: allowance.used,
+          max: allowance.max,
+        })}`
+      : tg("trialExpired");
+  }
 
   const nav = [
     { href: "/dashboard", label: t("dashboard"), icon: LayoutDashboard },

@@ -7,6 +7,7 @@ import { z } from "zod";
 import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
 import { parseDecimalToCents } from "@/lib/money";
+import { documentAllowance, FREE_LIMIT_ERROR } from "@/features/admin/limits";
 import {
   createSupplier,
   updateSupplier,
@@ -141,6 +142,11 @@ export async function createPurchaseAction(
 export async function confirmPurchaseAction(id: string): Promise<ActionState> {
   const { orgId, userId } = await requireOrg();
   try {
+    // F7: el modo gratuito (trial vencido) tiene tope mensual de documentos
+    const allowance = await documentAllowance(getDb(), orgId);
+    if (allowance.limited && !allowance.allowed) {
+      return { error: FREE_LIMIT_ERROR };
+    }
     await confirmPurchase(getDb(), orgId, userId, id);
   } catch (e) {
     return { error: e instanceof Error ? e.message : "error" };

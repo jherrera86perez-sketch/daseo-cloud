@@ -8,6 +8,7 @@ import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
 import { parseDecimalToCents } from "@/lib/money";
 import { addRate } from "@/features/rates/queries";
+import { documentAllowance, FREE_LIMIT_ERROR } from "@/features/admin/limits";
 import { createSale, confirmSale, cancelSale, addPayment } from "./queries";
 
 export type ActionState = { error?: string } | null;
@@ -72,6 +73,11 @@ export async function createSaleAction(
 export async function confirmSaleAction(id: string): Promise<ActionState> {
   const { orgId, userId } = await requireOrg();
   try {
+    // F7: el modo gratuito (trial vencido) tiene tope mensual de documentos
+    const allowance = await documentAllowance(getDb(), orgId);
+    if (allowance.limited && !allowance.allowed) {
+      return { error: FREE_LIMIT_ERROR };
+    }
     await confirmSale(getDb(), orgId, userId, id);
   } catch (e) {
     return { error: e instanceof Error ? e.message : "error" };

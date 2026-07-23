@@ -90,7 +90,8 @@
       "suspendedTitle": "Organização suspensa",
       "suspendedBody": "O acesso está pausado. Escreva para jherrera86perez@gmail.com para reativar sua assinatura.",
       "trialDays": "Seu período de teste termina em {days, plural, one {# dia} other {# dias}}. Fale conosco para ativar seu plano.",
-      "trialExpired": "Seu período de teste terminou. Fale conosco para ativar seu plano e continuar sem interrupções."
+      "trialExpired": "Seu período de teste terminou. Fale conosco para ativar seu plano e continuar sem interrupções.",
+      "freeQuota": "Plano gratuito: {used} de {max} documentos usados neste mês."
     },
     "admin": {
       "title": "Plataforma (super-admin)",
