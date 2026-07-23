@@ -50,6 +50,7 @@ next-env.d.ts
 /.claude/
 /ESTADO.md
 /docs/research/
+/docs/cv/
 
 
 .vercel
