@@ -37,41 +37,41 @@ for (const o of orgs) {
 console.log(`Orgs candidatas: ${orgs.length} · a borrar: ${safe.length}`);
 if (safe.length === 0) process.exit(0);
 
-const tables = [
-  "payments",
-  "sale_items",
-  "sales",
-  "quote_items",
-  "quotes",
-  "deals",
-  "production_inputs",
-  "production_orders",
-  "recipe_items",
-  "recipes",
-  "inventory_movements",
-  "interactions",
-  "contacts",
-  "customers",
-  "products",
-  "exchange_rates",
-  "document_sequences",
-  "pipeline_stages",
-  "org_settings",
-  "audit_logs",
-  "invitation",
-];
+// Tablas de negocio descubiertas por columna org_id (a prueba de fases
+// futuras: una tabla nueva jamás vuelve a romper esta limpieza). Borrado en
+// pasadas repetidas hasta que las FKs dejen de estorbar.
+const discovered = await q(
+  `select distinct table_name from information_schema.columns
+   where column_name = 'org_id' and table_schema = 'public'`,
+);
+let pending = discovered.map((t) => t.table_name).concat(["invitation"]);
 
-for (const t of tables) {
-  const col = t === "invitation" ? "organization_id" : "org_id";
-  if (apply) {
-    const del = await q(
-      `delete from ${t} where ${col} = any($1::uuid[]) returning 1`,
-      [safe],
-    );
-    console.log(`  ${t}: ${del.length} filas borradas`);
-  } else {
+if (apply) {
+  for (let pass = 0; pass < 10 && pending.length > 0; pass++) {
+    const next = [];
+    for (const t of pending) {
+      const col = t === "invitation" ? "organization_id" : "org_id";
+      try {
+        const del = await q(
+          `delete from "${t}" where ${col} = any($1::uuid[]) returning 1`,
+          [safe],
+        );
+        console.log(`  ${t}: ${del.length} filas borradas`);
+      } catch {
+        next.push(t); // FK aún referenciada: próxima pasada
+      }
+    }
+    if (next.length === pending.length) {
+      console.error("Sin progreso; quedan:", next.join(", "));
+      process.exit(1);
+    }
+    pending = next;
+  }
+} else {
+  for (const t of pending) {
+    const col = t === "invitation" ? "organization_id" : "org_id";
     const c = await q(
-      `select count(*) c from ${t} where ${col} = any($1::uuid[])`,
+      `select count(*) c from "${t}" where ${col} = any($1::uuid[])`,
       [safe],
     );
     console.log(`  ${t}: ${c[0].c} filas`);
