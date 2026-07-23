@@ -48,6 +48,8 @@ next-env.d.ts
 # local (no es parte del producto)
 /.remember/
 /.claude/
+/ESTADO.md
+/docs/research/
 
 
 .vercel
