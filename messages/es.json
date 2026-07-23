@@ -60,6 +60,12 @@
     }
   },
   "app": {
+    "theme": {
+      "label": "Tema",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    },
     "nav": {
       "dashboard": "Panel",
       "customers": "Clientes",
