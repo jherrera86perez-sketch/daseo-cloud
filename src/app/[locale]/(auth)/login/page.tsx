@@ -31,6 +31,21 @@ export default function LoginPage() {
     router.push("/dashboard");
   }
 
+  // Credenciales públicas por diseño: la org "demo" solo contiene datos ficticios.
+  async function onDemo() {
+    setPending(true);
+    const { error } = await authClient.signIn.email({
+      email: "demo@daseo.app",
+      password: "demo-daseo-2026",
+    });
+    setPending(false);
+    if (error) {
+      toast.error(t("error"));
+      return;
+    }
+    router.push("/dashboard");
+  }
+
   return (
     <main className="flex flex-1 items-center justify-center px-4">
       <Card className="w-full max-w-sm">
@@ -71,6 +86,19 @@ export default function LoginPage() {
                 {t("signupLink")}
               </Link>
             </p>
+            <div className="flex flex-col gap-1 border-t pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onDemo}
+                disabled={pending}
+              >
+                {t("demo")}
+              </Button>
+              <p className="text-center text-xs text-muted-foreground">
+                {t("demoHint")}
+              </p>
+            </div>
           </form>
         </CardContent>
       </Card>

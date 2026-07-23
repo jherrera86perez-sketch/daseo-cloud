@@ -25,7 +25,9 @@
       "submit": "Entrar",
       "noAccount": "¿No tienes cuenta?",
       "signupLink": "Crear cuenta",
-      "error": "Correo o contraseña incorrectos"
+      "error": "Correo o contraseña incorrectos",
+      "demo": "Explorar la demo",
+      "demoHint": "Sin registro: entra a una organización de ejemplo con datos ficticios."
     },
     "signup": {
       "title": "Crear cuenta",
