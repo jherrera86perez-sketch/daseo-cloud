@@ -75,6 +75,124 @@ export async function createDeal(
   return row;
 }
 
+/** Etapas nuevas entran justo antes de Ganado/Perdido (cierran el tablero). */
+export async function createStage(
+  db: Db,
+  orgId: string,
+  userId: UserId,
+  name: string,
+): Promise<StageRow> {
+  const clean = name.trim();
+  if (!clean) throw new Error("La etapa necesita un nombre");
+  return db.transaction(async (tx: Db) => {
+    const stages: StageRow[] = await tx
+      .select()
+      .from(pipelineStages)
+      .where(eq(pipelineStages.orgId, orgId))
+      .orderBy(asc(pipelineStages.position));
+    if (stages.some((s) => s.name.toLowerCase() === clean.toLowerCase())) {
+      throw new Error("Ya existe una etapa con ese nombre");
+    }
+    const terminals = stages.filter((s) => s.isWon || s.isLost);
+    const newPos = terminals.length
+      ? Math.min(...terminals.map((s) => s.position))
+      : stages.length
+        ? Math.max(...stages.map((s) => s.position)) + 1
+        : 1;
+    // Desplazar en orden descendente: la position es única por org.
+    const toShift = stages
+      .filter((s) => s.position >= newPos)
+      .sort((a, b) => b.position - a.position);
+    for (const s of toShift) {
+      await tx
+        .update(pipelineStages)
+        .set({ position: s.position + 1 })
+        .where(eq(pipelineStages.id, s.id));
+    }
+    const [row] = await tx
+      .insert(pipelineStages)
+      .values({ orgId, name: clean, position: newPos })
+      .returning();
+    await logAudit(tx, {
+      orgId,
+      userId,
+      entity: "pipeline_stage",
+      entityId: row.id,
+      action: "create",
+      after: { name: clean },
+    });
+    return row;
+  });
+}
+
+export async function renameStage(
+  db: Db,
+  orgId: string,
+  userId: UserId,
+  stageId: string,
+  name: string,
+): Promise<StageRow> {
+  const clean = name.trim();
+  if (!clean) throw new Error("La etapa necesita un nombre");
+  const [stage] = await db
+    .select()
+    .from(pipelineStages)
+    .where(eq(pipelineStages.id, stageId));
+  assertOwnedByOrg(stage, orgId);
+  const [row] = await db
+    .update(pipelineStages)
+    .set({ name: clean })
+    .where(and(eq(pipelineStages.id, stageId), eq(pipelineStages.orgId, orgId)))
+    .returning();
+  await logAudit(db, {
+    orgId,
+    userId,
+    entity: "pipeline_stage",
+    entityId: stageId,
+    action: "update",
+    after: { name: clean },
+  });
+  return row;
+}
+
+/** Solo se borran etapas vacías y no terminales (Ganado/Perdido son fijas). */
+export async function deleteStage(
+  db: Db,
+  orgId: string,
+  userId: UserId,
+  stageId: string,
+): Promise<void> {
+  const [stage] = await db
+    .select()
+    .from(pipelineStages)
+    .where(eq(pipelineStages.id, stageId));
+  assertOwnedByOrg(stage, orgId);
+  if (stage.isWon || stage.isLost) {
+    throw new Error("Ganado y Perdido no se pueden borrar");
+  }
+  const [dealInStage] = await db
+    .select({ id: deals.id })
+    .from(deals)
+    .where(and(eq(deals.orgId, orgId), eq(deals.stageId, stageId)))
+    .limit(1);
+  if (dealInStage) {
+    throw new Error("La etapa tiene oportunidades; muévelas primero");
+  }
+  await db
+    .delete(pipelineStages)
+    .where(
+      and(eq(pipelineStages.id, stageId), eq(pipelineStages.orgId, orgId)),
+    );
+  await logAudit(db, {
+    orgId,
+    userId,
+    entity: "pipeline_stage",
+    entityId: stageId,
+    action: "delete",
+    after: { name: stage.name },
+  });
+}
+
 /** Mueve el deal de etapa; Ganado/Perdido actualizan el status. */
 export async function moveDeal(
   db: Db,

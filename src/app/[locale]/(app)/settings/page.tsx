@@ -7,6 +7,8 @@ import { InviteForm } from "@/features/auth/invite-form";
 import { RateForm } from "@/features/rates/rate-form";
 import { listRates } from "@/features/rates/queries";
 import { listApiKeys } from "@/features/platform/queries";
+import { listStagesWithDeals } from "@/features/pipeline/queries";
+import { StagesEditor } from "@/features/pipeline/stages-ui";
 import { ApiKeysCard, TelegramCard } from "@/features/platform/platform-ui";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -51,6 +53,8 @@ export default async function SettingsPage() {
   const apiKeysRows = isAdmin ? await listApiKeys(db, orgId) : [];
   const tk = await getTranslations("app.apiKeys");
   const tg = await getTranslations("app.telegram");
+  const ts = await getTranslations("app.stages");
+  const board = isAdmin ? await listStagesWithDeals(db, orgId) : [];
   const notify = (settings?.notifySettings ?? {}) as {
     telegramBotToken?: string;
     telegramChatId?: string;
@@ -136,6 +140,25 @@ export default async function SettingsPage() {
                 id: k.id,
                 name: k.name,
                 prefix: k.prefix,
+              }))}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{ts("title")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <StagesEditor
+              stages={board.map((b) => ({
+                id: b.stage.id,
+                name: b.stage.name,
+                isWon: b.stage.isWon,
+                isLost: b.stage.isLost,
+                dealCount: b.deals.length,
               }))}
             />
           </CardContent>

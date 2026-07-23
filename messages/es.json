@@ -86,6 +86,19 @@
       "receivables": "Por cobrar",
       "payables": "Por pagar"
     },
+    "stages": {
+      "title": "Etapas del pipeline",
+      "name": "Nombre de la etapa",
+      "save": "Guardar",
+      "delete": "Borrar",
+      "add": "Añadir",
+      "newPlaceholder": "Nueva etapa (entra antes de Ganado)",
+      "deals": "{count, plural, =0 {vacía} one {# oport.} other {# oports.}}",
+      "protected": "Ganado y Perdido son fijas",
+      "added": "Etapa añadida",
+      "renamed": "Etapa renombrada",
+      "deleted": "Etapa borrada"
+    },
     "gate": {
       "suspendedTitle": "Organización suspendida",
       "suspendedBody": "El acceso está pausado. Escribe a jherrera86perez@gmail.com para reactivar tu suscripción.",

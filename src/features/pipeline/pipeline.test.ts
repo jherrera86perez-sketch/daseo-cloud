@@ -4,7 +4,14 @@ import { createTestDb, type TestDb } from "@/test/db";
 import { organizations, orgSettings, pipelineStages } from "@/db/schema";
 import { DEFAULT_STAGES } from "@/lib/auth";
 import { createCustomer } from "@/features/customers/queries";
-import { listStagesWithDeals, createDeal, moveDeal } from "./queries";
+import {
+  listStagesWithDeals,
+  createDeal,
+  moveDeal,
+  createStage,
+  renameStage,
+  deleteStage,
+} from "./queries";
 import {
   createQuote,
   sendQuote,
@@ -128,5 +135,49 @@ describe("cotizaciones", () => {
 
   it("no se acepta dos veces", async () => {
     await expect(acceptQuote(db, orgA, USER, quoteId)).rejects.toThrow();
+  });
+});
+
+describe("etapas editables (F7+)", () => {
+  it("createStage entra justo antes de Ganado/Perdido", async () => {
+    const nueva = await createStage(db, orgA, USER, "Negociación");
+    const board = await listStagesWithDeals(db, orgA);
+    const names = board.map((b) => b.stage.name);
+    expect(names).toEqual([
+      "Prospecto",
+      "Contactado",
+      "Propuesta",
+      "Negociación",
+      "Ganado",
+      "Perdido",
+    ]);
+    expect(nueva.isWon).toBe(false);
+    await expect(createStage(db, orgA, USER, "negociación")).rejects.toThrow(
+      /ya existe/i,
+    );
+  });
+
+  it("renameStage cambia el nombre", async () => {
+    const board = await listStagesWithDeals(db, orgA);
+    const negociacion = board.find((b) => b.stage.name === "Negociación")!;
+    await renameStage(db, orgA, USER, negociacion.stage.id, "Cierre");
+    const after = await listStagesWithDeals(db, orgA);
+    expect(after.map((b) => b.stage.name)).toContain("Cierre");
+  });
+
+  it("deleteStage borra vacías; protege terminales y ocupadas", async () => {
+    const board = await listStagesWithDeals(db, orgA);
+    const cierre = board.find((b) => b.stage.name === "Cierre")!;
+    const ganado = board.find((b) => b.stage.isWon)!;
+    const conDeals = board.find((b) => b.deals.length > 0)!;
+    await expect(deleteStage(db, orgA, USER, ganado.stage.id)).rejects.toThrow(
+      /no se pueden borrar/i,
+    );
+    await expect(
+      deleteStage(db, orgA, USER, conDeals.stage.id),
+    ).rejects.toThrow(/oportunidades/i);
+    await deleteStage(db, orgA, USER, cierre.stage.id);
+    const after = await listStagesWithDeals(db, orgA);
+    expect(after.map((b) => b.stage.name)).not.toContain("Cierre");
   });
 });
