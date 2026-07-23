@@ -104,3 +104,43 @@ export async function statementDetailAction(id: string): Promise<{
     return { error: e instanceof Error ? e.message : "error" };
   }
 }
+
+// ---------- F8-M3b: Top Clientes ----------
+
+export async function topClientesAction(opts: {
+  desde?: string;
+  hasta?: string;
+}): Promise<{
+  error?: string;
+  rows?: import("./analytics").ClienteRow[];
+  kpis?: import("./analytics").ClientesKpis;
+  dias?: import("./analytics").HeatmapDia[];
+}> {
+  const { orgId } = await requireOrg();
+  try {
+    const { analyticsClientes, heatmapDiaSemana } = await import("./analytics");
+    const [clientes, dias] = await Promise.all([
+      analyticsClientes(getDb(), orgId, { ...opts, limit: 500 }),
+      heatmapDiaSemana(getDb(), orgId, opts),
+    ]);
+    return { rows: clientes.rows, kpis: clientes.kpis, dias };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "error" };
+  }
+}
+
+export async function clienteFichaAction(
+  clientName: string,
+  panOrigen?: string,
+): Promise<{
+  error?: string;
+  ficha?: import("./analytics").FichaResult;
+}> {
+  const { orgId } = await requireOrg();
+  try {
+    const { clienteFicha } = await import("./analytics");
+    return { ficha: await clienteFicha(getDb(), orgId, clientName, panOrigen) };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "error" };
+  }
+}
