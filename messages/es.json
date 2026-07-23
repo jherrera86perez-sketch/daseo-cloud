@@ -82,7 +82,31 @@
       "employees": "Empleados",
       "audit": "Auditoría",
       "production": "Producción",
-      "settings": "Configuración"
+      "settings": "Configuración",
+      "receivables": "Por cobrar",
+      "payables": "Por pagar"
+    },
+    "receivables": {
+      "title": "Cuentas por cobrar",
+      "empty": "No hay ventas con saldo pendiente. Todo cobrado. 🎉",
+      "pending": "Pendiente",
+      "customer": "Cliente",
+      "due": "Vence",
+      "total": "Total",
+      "paid": "Cobrado",
+      "balance": "Saldo",
+      "overdue": "vencida"
+    },
+    "payables": {
+      "title": "Cuentas por pagar",
+      "empty": "No hay compras con saldo pendiente.",
+      "pending": "Pendiente",
+      "supplier": "Proveedor",
+      "due": "Vence",
+      "total": "Total",
+      "paid": "Pagado",
+      "balance": "Saldo",
+      "overdue": "vencida"
     },
     "dashboard": {
       "title": "Panel",

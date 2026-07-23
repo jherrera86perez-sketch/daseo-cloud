@@ -82,7 +82,31 @@
       "employees": "Funcionários",
       "audit": "Auditoria",
       "production": "Produção",
-      "settings": "Configurações"
+      "settings": "Configurações",
+      "receivables": "A receber",
+      "payables": "A pagar"
+    },
+    "receivables": {
+      "title": "Contas a receber",
+      "empty": "Nenhuma venda com saldo pendente. Tudo recebido. 🎉",
+      "pending": "Pendente",
+      "customer": "Cliente",
+      "due": "Vence",
+      "total": "Total",
+      "paid": "Recebido",
+      "balance": "Saldo",
+      "overdue": "vencida"
+    },
+    "payables": {
+      "title": "Contas a pagar",
+      "empty": "Nenhuma compra com saldo pendente.",
+      "pending": "Pendente",
+      "supplier": "Fornecedor",
+      "due": "Vence",
+      "total": "Total",
+      "paid": "Pago",
+      "balance": "Saldo",
+      "overdue": "vencida"
     },
     "dashboard": {
       "title": "Painel",

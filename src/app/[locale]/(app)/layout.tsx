@@ -19,6 +19,8 @@ import {
   Scale,
   UsersRound,
   ScrollText,
+  Coins,
+  Wallet,
 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
 import { LocaleSwitcher } from "@/features/auth/locale-switcher";
@@ -39,7 +41,9 @@ export default async function AppLayout({
     { href: "/customers", label: t("customers"), icon: Users },
     { href: "/products", label: t("products"), icon: Package },
     { href: "/sales", label: t("sales"), icon: Receipt },
+    { href: "/receivables", label: t("receivables"), icon: Coins },
     { href: "/purchases", label: t("purchases"), icon: ShoppingCart },
+    { href: "/payables", label: t("payables"), icon: Wallet },
     { href: "/suppliers", label: t("suppliers"), icon: Truck },
     { href: "/banking", label: t("banking"), icon: Landmark },
     { href: "/fiscal", label: t("fiscal"), icon: Scale },
