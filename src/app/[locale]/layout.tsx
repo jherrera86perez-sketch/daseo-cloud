@@ -5,6 +5,7 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -32,9 +33,6 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-// NOTA de presupuesto: sin Toaster/sonner aquí — se monta en el layout de
-// (app) cuando exista (M2). El NextIntlClientProvider sí es necesario: el
-// Link de next-intl (client) lo requiere incluso en páginas estáticas.
 export default async function LocaleLayout({
   children,
   params,
@@ -56,7 +54,10 @@ export default async function LocaleLayout({
     >
       <body className="flex min-h-dvh flex-col">
         <ThemeProvider>
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          <NextIntlClientProvider>
+            {children}
+            <Toaster />
+          </NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>

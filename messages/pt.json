@@ -71,7 +71,6 @@
       "assistant": "Assistente",
       "customers": "Clientes",
       "products": "Produtos",
-      "inventory": "Estoque",
       "sales": "Vendas",
       "quotes": "Orçamentos",
       "pipeline": "Pipeline",
@@ -91,7 +90,25 @@
       "topClients": "Top clientes",
       "raffles": "Sorteios",
       "internalOutflows": "Saídas internas",
-      "reconciliation": "Controle de caixa"
+      "reconciliation": "Controle de caixa",
+      "section": {
+        "home": "Início",
+        "sales": "Vendas e cobranças",
+        "purchases": "Compras e pagamentos",
+        "inventory": "Estoque e produção",
+        "finance": "Finanças",
+        "tax": "Impostos (ONAT)",
+        "settings": "Configurações"
+      }
+    },
+    "header": {
+      "search": "Buscar",
+      "searchPlaceholder": "Ir para um módulo…",
+      "noResults": "Sem resultados",
+      "receivable": "Devem-lhe {amount} {currency}",
+      "receivableTitle": "Ver contas a receber",
+      "lowStockTitle": "{count} produto(s) abaixo do estoque mínimo",
+      "noAlerts": "Sem alertas de estoque"
     },
     "reconciliation": {
       "title": "Controle de Caixa",

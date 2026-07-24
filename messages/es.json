@@ -71,7 +71,6 @@
       "assistant": "Asistente",
       "customers": "Clientes",
       "products": "Productos",
-      "inventory": "Inventario",
       "sales": "Ventas",
       "quotes": "Cotizaciones",
       "pipeline": "Pipeline",
@@ -91,7 +90,25 @@
       "topClients": "Top clientes",
       "raffles": "Sorteos",
       "internalOutflows": "Salidas internas",
-      "reconciliation": "Control de caja"
+      "reconciliation": "Control de caja",
+      "section": {
+        "home": "Inicio",
+        "sales": "Ventas y cobros",
+        "purchases": "Compras y pagos",
+        "inventory": "Inventario y producción",
+        "finance": "Finanzas",
+        "tax": "Impuestos (ONAT)",
+        "settings": "Configuración"
+      }
+    },
+    "header": {
+      "search": "Buscar",
+      "searchPlaceholder": "Ir a un módulo…",
+      "noResults": "Sin resultados",
+      "receivable": "Te deben {amount} {currency}",
+      "receivableTitle": "Ver cuentas por cobrar",
+      "lowStockTitle": "{count} producto(s) bajo el stock mínimo",
+      "noAlerts": "Sin alertas de stock"
     },
     "reconciliation": {
       "title": "Control de Caja",
