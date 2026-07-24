@@ -67,6 +67,15 @@ const confirmSchema = z.object({
       }),
     )
     .optional(),
+  // ≈ produccion_costos_adicionales del ERP ("Otros Gastos Adicionales")
+  overheadLines: z
+    .array(
+      z.object({
+        concept: z.string().trim().min(1).max(200),
+        amount: z.string().regex(/^\d+(?:[.,]\d{1,2})?$/),
+      }),
+    )
+    .optional(),
 });
 
 export async function confirmOrderAction(
@@ -96,6 +105,10 @@ export async function confirmOrderAction(
         employeeId: l.employeeId,
         hours: l.hours,
         costHourCents: parseDecimalToCents(l.costHour),
+      })),
+      overheadItems: d.overheadLines?.map((l) => ({
+        concept: l.concept,
+        amountCents: parseDecimalToCents(l.amount),
       })),
     });
   } catch (e) {

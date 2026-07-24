@@ -22,6 +22,7 @@ type InputRow = {
 export type EmployeeOption = { id: string; name: string };
 
 type LaborLine = { employeeId: string; hours: string; costHour: string };
+type OverheadLine = { concept: string; amount: string };
 
 export function ConfirmOrderForm({
   orderId,
@@ -40,6 +41,7 @@ export function ConfirmOrderForm({
   const [overhead, setOverhead] = useState("");
   const [wasteQty, setWasteQty] = useState("");
   const [laborLines, setLaborLines] = useState<LaborLine[]>([]);
+  const [overheadLines, setOverheadLines] = useState<OverheadLine[]>([]);
   const [actuals, setActuals] = useState<Record<string, string>>(
     Object.fromEntries(inputs.map((i) => [i.id, i.plannedQty])),
   );
@@ -66,6 +68,11 @@ export function ConfirmOrderForm({
   const validLines = laborLines.filter(
     (l) => l.employeeId && l.hours && l.costHour,
   );
+  const validOverheadLines = overheadLines.filter((l) => l.concept && l.amount);
+  const overheadTotal = validOverheadLines.reduce(
+    (s, l) => s + (Number(l.amount.replace(",", ".")) || 0),
+    0,
+  );
   const payload = JSON.stringify({
     producedQty,
     labor,
@@ -76,6 +83,8 @@ export function ConfirmOrderForm({
     })),
     wasteQty,
     laborLines: validLines.length > 0 ? validLines : undefined,
+    overheadLines:
+      validOverheadLines.length > 0 ? validOverheadLines : undefined,
   });
 
   return (
@@ -146,7 +155,74 @@ export function ConfirmOrderForm({
             placeholder="0.00"
             value={overhead}
             onChange={(e) => setOverhead(e.target.value)}
+            disabled={validOverheadLines.length > 0}
           />
+        </div>
+      </div>
+
+      {/* ≈ produccion_costos_adicionales del ERP ("Otros Gastos Adicionales"):
+          renglones libres concepto+monto; si hay líneas, su suma reemplaza
+          al monto manual (no se prorratean entre insumos) */}
+      <div className="flex flex-col gap-2">
+        <Label>{t("overheadLines")}</Label>
+        {overheadLines.map((line, idx) => (
+          <div key={idx} className="flex flex-wrap items-center gap-2">
+            <Input
+              aria-label={t("overheadConcept")}
+              placeholder={t("overheadConceptPlaceholder")}
+              className="flex-1"
+              value={line.concept}
+              onChange={(e) =>
+                setOverheadLines((ls) =>
+                  ls.map((l, i) =>
+                    i === idx ? { ...l, concept: e.target.value } : l,
+                  ),
+                )
+              }
+            />
+            <Input
+              aria-label={t("overheadAmount")}
+              inputMode="decimal"
+              placeholder="0.00"
+              className="w-28"
+              value={line.amount}
+              onChange={(e) =>
+                setOverheadLines((ls) =>
+                  ls.map((l, i) =>
+                    i === idx ? { ...l, amount: e.target.value } : l,
+                  ),
+                )
+              }
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              aria-label={t("removeLine")}
+              onClick={() =>
+                setOverheadLines((ls) => ls.filter((_, i) => i !== idx))
+              }
+            >
+              ✕
+            </Button>
+          </div>
+        ))}
+        <div className="flex items-center gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              setOverheadLines((ls) => [...ls, { concept: "", amount: "" }])
+            }
+          >
+            {t("addOverheadLine")}
+          </Button>
+          {validOverheadLines.length > 0 && (
+            <span className="text-sm text-muted-foreground" data-numeric="">
+              {t("overheadTotal")}: {overheadTotal.toFixed(2)}
+            </span>
+          )}
         </div>
       </div>
 

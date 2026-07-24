@@ -3,14 +3,16 @@ import {
   productionOrders,
   productionInputs,
   productionLabor,
+  productionOverheadItems,
   products,
   recipes,
   employees,
+  lots,
 } from "@/db/schema";
 import { assertOwnedByOrg } from "@/lib/tenant";
 import { logAudit } from "@/lib/audit";
 import { parseQtyToMilli } from "@/lib/qty";
-import { registerMovement } from "@/features/inventory/queries";
+import { registerMovement, getStock } from "@/features/inventory/queries";
 import { getRecipeDetail } from "@/features/recipes/queries";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -95,6 +97,10 @@ export async function confirmOrder(
     /** Mano de obra por empleado (produccion_mano_obra del ERP). Si viene,
      * laborCostBaseCents se CALCULA como Σ horas×costo_hora. */
     labor?: Array<{ employeeId: string; hours: string; costHourCents: bigint }>;
+    /** ≈ produccion_costos_adicionales del ERP ("Otros Gastos Adicionales"):
+     * renglones libres concepto+monto, NO prorrateados entre insumos. Si
+     * vienen, overheadBaseCents se CALCULA como su suma. */
+    overheadItems?: Array<{ concept: string; amountCents: bigint }>;
   },
 ): Promise<OrderRow> {
   return db.transaction(async (tx: Db) => {
@@ -132,6 +138,24 @@ export async function confirmOrder(
       }
     }
 
+    // Costos indirectos itemizados: si vienen, reemplazan el monto manual
+    let overheadCents = input.overheadBaseCents;
+    if (input.overheadItems && input.overheadItems.length > 0) {
+      overheadCents = 0n;
+      for (const item of input.overheadItems) {
+        if (item.amountCents < 0n) {
+          throw new Error("Los costos no pueden ser negativos");
+        }
+        overheadCents += item.amountCents;
+        await tx.insert(productionOverheadItems).values({
+          orgId,
+          orderId: id,
+          concept: item.concept,
+          amountCents: item.amountCents,
+        });
+      }
+    }
+
     const rows: OrderInputRow[] = await tx
       .select()
       .from(productionInputs)
@@ -162,19 +186,61 @@ export async function confirmOrder(
         .where(eq(productionInputs.id, row.id));
     }
 
-    const totalCostCents =
-      inputsCostCents + laborCents + input.overheadBaseCents;
+    const totalCostCents = inputsCostCents + laborCents + overheadCents;
     const unitCostCents =
       (totalCostCents * 1000n + producedMilli / 2n) / producedMilli;
 
-    await registerMovement(tx, orgId, userId, {
+    // Costo ANTES de esta producción (para el margen del ERP, ver abajo)
+    const stockAntes = await getStock(tx, orgId, order.productId);
+    const costoAnteriorCents = stockAntes.avgCostCents;
+
+    // ≈ código de lote del terminado del ERP: nace en producción (como en
+    // compras). Único por orden — trazable, sin colisión posible.
+    const [lot] = await tx
+      .insert(lots)
+      .values({
+        orgId,
+        productId: order.productId,
+        code: `PROD-${id}`,
+      })
+      .returning();
+
+    const finishedMovement = await registerMovement(tx, orgId, userId, {
       productId: order.productId,
       kind: "in",
       qty: input.producedQty,
       unitCostCents,
       sourceType: "production_in",
       sourceId: id,
+      lotId: lot.id,
     });
+
+    // ERP: al confirmar producción, el precio de venta se recalcula
+    // manteniendo el margen % previo (30% por defecto si no había margen
+    // positivo) — nuevoPrecio = nuevoCosto × (1 + margen). Solo aplica a
+    // productos vendibles con precio propio (evita inflar intermedios).
+    const [product] = await tx
+      .select({
+        priceCents: products.priceCents,
+        isSellable: products.isSellable,
+      })
+      .from(products)
+      .where(eq(products.id, order.productId));
+    if (product?.isSellable) {
+      const nuevoCostoCents = finishedMovement.balanceAvgCostBaseCents;
+      const precioAnteriorCents = product.priceCents;
+      const margenMicros =
+        costoAnteriorCents > 0n && precioAnteriorCents > costoAnteriorCents
+          ? ((precioAnteriorCents - costoAnteriorCents) * 1_000_000n) /
+            costoAnteriorCents
+          : 300_000n; // 30% por defecto, igual que el ERP
+      const nuevoPrecioCents =
+        (nuevoCostoCents * (1_000_000n + margenMicros) + 500_000n) / 1_000_000n;
+      await tx
+        .update(products)
+        .set({ priceCents: nuevoPrecioCents, updatedAt: new Date() })
+        .where(eq(products.id, order.productId));
+    }
 
     const [updated] = await tx
       .update(productionOrders)
@@ -183,7 +249,7 @@ export async function confirmOrder(
         producedQty: input.producedQty.replace(",", "."),
         wasteQty: input.wasteQty ? input.wasteQty.replace(",", ".") : null,
         laborCostBaseCents: laborCents,
-        overheadBaseCents: input.overheadBaseCents,
+        overheadBaseCents: overheadCents,
         updatedAt: new Date(),
       })
       .where(eq(productionOrders.id, id))

@@ -220,6 +220,14 @@ beforeAll(async () => {
     .update(productionOrders)
     .set({ wasteQty: "2" })
     .where(eq(productionOrders.id, order1.id));
+  // confirmOrder recalcula products.priceCents (paridad ERP: margen
+  // mantenido o 30% default) — este fixture fija el precio a propósito
+  // para testear el ANÁLISIS de costo/margen, no el side-effect de
+  // confirmOrder (que tiene su propia cobertura en produccion-parity.test.ts)
+  await db
+    .update(products)
+    .set({ priceCents: 10_00n })
+    .where(eq(products.id, ids["CaroProd"]));
   // Orden 2 en borrador → pendiente (costo estimado 10×$10 = $100)
   await createOrder(db, orgId, USER, { recipeId: recipe.id });
 

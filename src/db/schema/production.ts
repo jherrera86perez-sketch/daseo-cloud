@@ -115,3 +115,27 @@ export const productionInputs = pgTable(
     check("production_inputs_planned_check", sql`${t.plannedQty} > 0`),
   ],
 );
+
+/**
+ * ≈ produccion_costos_adicionales del ERP: renglones libres {concepto,monto}
+ * ("Otros Gastos Adicionales" del wizard) — NO se prorratean entre insumos
+ * (a diferencia de compras); su suma alimenta production_orders.overhead_base_cents.
+ */
+export const productionOverheadItems = pgTable(
+  "production_overhead_items",
+  {
+    id: id(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => productionOrders.id),
+    concept: text("concept").notNull(),
+    amountCents: bigint("amount_cents", { mode: "bigint" }).notNull(),
+  },
+  (t) => [
+    index("production_overhead_items_order_idx").on(t.orderId),
+    check("production_overhead_items_amount_check", sql`${t.amountCents} >= 0`),
+  ],
+);
