@@ -12,10 +12,12 @@ const q = async (t, p) => {
 const apply = process.argv.includes("--apply");
 
 // candidatas por patrón de los specs E2E, nunca la real
+// (org-ad-%: spec del asistente directivo; org-f%: specs F5+)
 const orgs = await q(`
   select id, slug from organization
   where slug <> 'daseo'
-    and (slug like 'e2e-%' or slug like 'org-m%' or slug = 'daseo-demo')
+    and (slug like 'e2e-%' or slug like 'org-m%' or slug like 'org-f%'
+         or slug like 'org-ad-%' or slug = 'daseo-demo')
 `);
 
 // seguridad: si alguna tiene un miembro con email que NO es @daseo.test, se excluye
@@ -87,6 +89,11 @@ if (apply) {
   // audit_logs de eventos de auth (org_id null) referencian usuarios
   await q(
     `delete from audit_logs where user_id in
+       (select id from "user" where email like '%@daseo.test')`,
+  );
+  // assistant_followups.user_id también referencia usuarios (FK sin cascade)
+  await q(
+    `update assistant_followups set user_id = null where user_id in
        (select id from "user" where email like '%@daseo.test')`,
   );
   const delUsers = await q(

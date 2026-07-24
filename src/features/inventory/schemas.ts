@@ -7,6 +7,12 @@ export const productInputSchema = z.object({
   sku: z.string().trim().max(50).optional(),
   description: z.string().trim().max(1000).optional(),
   unit: z.enum(PRODUCT_UNITS).default("unit"),
+  // precio de venta en moneda base (decimal); vacío = 0 (sin precio)
+  price: z
+    .string()
+    .trim()
+    .regex(/^\d+(?:[.,]\d{1,2})?$/)
+    .optional(),
   isSellable: z.coerce.boolean().default(true),
   isComponent: z.coerce.boolean().default(false),
   isProducible: z.coerce.boolean().default(false),

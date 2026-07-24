@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PRODUCT_UNITS } from "./schemas";
+import { centsToDecimalString } from "@/lib/money";
 import type { ActionState } from "./actions";
 import type { ProductRow } from "./queries";
 
@@ -57,14 +58,30 @@ export function ProductForm({
           </select>
         </div>
       </div>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="stockMin">{t("stockMin")}</Label>
-        <Input
-          id="stockMin"
-          name="stockMin"
-          inputMode="decimal"
-          defaultValue={initial?.stockMin ?? ""}
-        />
+      <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="price">{t("price")}</Label>
+          <Input
+            id="price"
+            name="price"
+            inputMode="decimal"
+            placeholder="0.00"
+            defaultValue={
+              initial?.priceCents && initial.priceCents > 0n
+                ? centsToDecimalString(initial.priceCents)
+                : ""
+            }
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="stockMin">{t("stockMin")}</Label>
+          <Input
+            id="stockMin"
+            name="stockMin"
+            inputMode="decimal"
+            defaultValue={initial?.stockMin ?? ""}
+          />
+        </div>
       </div>
       <fieldset className="flex flex-col gap-2">
         {flags.map((f) => (

@@ -3,6 +3,7 @@ import { products, inventoryMovements } from "@/db/schema";
 import { assertOwnedByOrg, notDeleted } from "@/lib/tenant";
 import { logAudit } from "@/lib/audit";
 import { parseQtyToMilli, milliToQtyString, weightedAvgCents } from "@/lib/qty";
+import { parseDecimalToCents } from "@/lib/money";
 import { productInputSchema } from "./schemas";
 import type { ProductInput, MovementInput } from "./schemas";
 
@@ -55,11 +56,12 @@ export async function createProduct(
   userId: UserId,
   input: ProductInput,
 ): Promise<ProductRow> {
-  const data = productInputSchema.parse(input);
+  const { price, ...data } = productInputSchema.parse(input);
   const [row] = await db
     .insert(products)
     .values({
       ...data,
+      priceCents: price ? parseDecimalToCents(price) : 0n,
       stockMin: data.stockMin?.replace(",", ".") ?? "0",
       orgId,
     })
@@ -83,11 +85,12 @@ export async function updateProduct(
   input: ProductInput,
 ): Promise<ProductRow> {
   await getOwnedProduct(db, orgId, id);
-  const data = productInputSchema.parse(input);
+  const { price, ...data } = productInputSchema.parse(input);
   const [row] = await db
     .update(products)
     .set({
       ...data,
+      priceCents: price ? parseDecimalToCents(price) : 0n,
       stockMin: data.stockMin?.replace(",", ".") ?? "0",
       updatedAt: new Date(),
     })

@@ -620,6 +620,7 @@
         "sku": "SKU",
         "unit": "Unidade",
         "units": { "kg": "kg", "L": "L", "unit": "un" },
+        "price": "Preço de venda",
         "stockMin": "Estoque mínimo (alerta)",
         "isSellable": "É vendido",
         "isComponent": "É insumo / matéria-prima",

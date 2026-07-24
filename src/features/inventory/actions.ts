@@ -27,6 +27,7 @@ function productFromForm(form: FormData) {
     isComponent: form.get("isComponent") === "on",
     isProducible: form.get("isProducible") === "on",
     stockMin: String(form.get("stockMin") ?? "") || undefined,
+    price: String(form.get("price") ?? "") || undefined,
   };
 }
 
