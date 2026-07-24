@@ -148,6 +148,13 @@
       "when": 1784899951828,
       "tag": "0020_military_jack_murdock",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1784920322191,
+      "tag": "0021_parallel_smiling_tiger",
+      "breakpoints": true
     }
   ]
 }

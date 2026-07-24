@@ -8,11 +8,21 @@ import {
   bigserial,
   boolean,
   numeric,
+  integer,
   check,
   uniqueIndex,
   index,
 } from "drizzle-orm/pg-core";
 import { id, timestamps, organizations } from "./core";
+
+// ≈ categoria del ERP: agrupador visual que fija los defaults de los flags
+// es_vendible/es_componente/es_producible al crear (no una jerarquía real)
+export const PRODUCT_CATEGORIES = [
+  "insumo",
+  "semi_elaborado",
+  "producto_final",
+  "servicio",
+] as const;
 
 export const products = pgTable(
   "products",
@@ -23,6 +33,9 @@ export const products = pgTable(
       .references(() => organizations.id),
     name: text("name").notNull(),
     sku: text("sku"),
+    // ≈ codigo_barras del ERP: obligatorio salvo categoría 'servicio'
+    barcode: text("barcode"),
+    category: text("category"),
     description: text("description"),
     unit: text("unit").notNull().default("unit"),
     priceCents: bigint("price_cents", { mode: "bigint" })
@@ -35,6 +48,17 @@ export const products = pgTable(
     stockMin: numeric("stock_min", { precision: 14, scale: 3 })
       .notNull()
       .default("0"),
+    // ≈ stock_minimo_modo del ERP: 'manual' (default) o 'auto' (cron ROP)
+    stockMinMode: text("stock_min_mode").notNull().default("manual"),
+    leadDays: integer("lead_days").notNull().default(7),
+    safetyDays: integer("safety_days").notNull().default(3),
+    stockMinCalculated: numeric("stock_min_calculated", {
+      precision: 14,
+      scale: 3,
+    }),
+    stockMinCalculatedAt: timestamp("stock_min_calculated_at", {
+      withTimezone: true,
+    }),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
     ...timestamps,
   },
@@ -45,6 +69,14 @@ export const products = pgTable(
     index("products_org_idx").on(t.orgId, t.name),
     check("products_price_check", sql`${t.priceCents} >= 0`),
     check("products_unit_check", sql`${t.unit} in ('kg','L','unit')`),
+    check(
+      "products_category_check",
+      sql`${t.category} is null or ${t.category} in ('insumo','semi_elaborado','producto_final','servicio')`,
+    ),
+    check(
+      "products_stock_min_mode_check",
+      sql`${t.stockMinMode} in ('manual','auto')`,
+    ),
   ],
 );
 

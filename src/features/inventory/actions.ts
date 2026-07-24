@@ -21,6 +21,8 @@ function productFromForm(form: FormData) {
   return {
     name: String(form.get("name") ?? ""),
     sku: String(form.get("sku") ?? "") || undefined,
+    barcode: String(form.get("barcode") ?? "") || undefined,
+    category: String(form.get("category") ?? "") || undefined,
     description: String(form.get("description") ?? "") || undefined,
     unit: String(form.get("unit") ?? "unit"),
     isSellable: form.get("isSellable") === "on",
@@ -28,6 +30,11 @@ function productFromForm(form: FormData) {
     isProducible: form.get("isProducible") === "on",
     stockMin: String(form.get("stockMin") ?? "") || undefined,
     price: String(form.get("price") ?? "") || undefined,
+    // el select siempre viaja explícito (evita el default 'manual' del
+    // schema pisando un producto que ya estaba en modo 'auto')
+    stockMinMode: String(form.get("stockMinMode") ?? "manual"),
+    leadDays: String(form.get("leadDays") ?? "7"),
+    safetyDays: String(form.get("safetyDays") ?? "3"),
   };
 }
 
