@@ -176,6 +176,13 @@
       "when": 1784928005278,
       "tag": "0024_equal_agent_brand",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1784930623292,
+      "tag": "0025_jazzy_warbound",
+      "breakpoints": true
     }
   ]
 }

@@ -22,6 +22,7 @@ export function FiscalSettingsForm({
     payroll: string;
     quota: string;
     minExempt: string;
+    exentoFotovoltaico: boolean;
   };
 }>) {
   const t = useTranslations("app.fiscal");
@@ -90,6 +91,14 @@ export function FiscalSettingsForm({
           className="w-32"
         />
       </div>
+      <label className="flex items-center gap-2 pb-2 text-sm">
+        <input
+          type="checkbox"
+          name="exentoFotovoltaico"
+          defaultChecked={initial.exentoFotovoltaico}
+        />
+        {t("exentoFotovoltaico")}
+      </label>
       <Button type="submit" disabled={pending}>
         {pending ? "…" : t("save")}
       </Button>

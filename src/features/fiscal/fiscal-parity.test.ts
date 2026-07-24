@@ -18,6 +18,7 @@ import {
   incomeSourceDetail,
   deductibleExpensesFromBank,
   gapAnalysis,
+  onatApartarEstimate,
 } from "./queries";
 
 let db: TestDb;
@@ -250,5 +251,32 @@ describe("gapAnalysis — brecha ventas internas vs banco (transparencia)", () =
     expect(m.porcentajeBancarizado).toBe(60);
     expect(totals.ventasInternasCents).toBe(2_000_000n);
     expect(totals.brechaCents).toBe(800_000n);
+  });
+});
+
+describe("onatApartarEstimate — ≈ onatApartar del PanelNegocio.tsx (informativo)", () => {
+  it("11% por defecto, 7% si exentoFotovoltaico — sobre los ingresos del mes", async () => {
+    const org = await makeOrg("fp-apartar");
+    await db.insert(consolidatedEntries).values({
+      orgId: org,
+      fechaContable: iso(5),
+      mes: MONTH,
+      anio: YEAR,
+      tipoTransaccion: "CR",
+      importe: "10000.00",
+      categoria: "Ventas Minoristas",
+    });
+    const normal = await onatApartarEstimate(db, org, YEAR, MONTH);
+    expect(normal.incomeCents).toBe(1_000_000n);
+    expect(normal.rate).toBe(0.11);
+    expect(normal.apartarCents).toBe(110_000n);
+
+    await saveFiscalSettings(db, org, USER, "CU", {
+      regime: "TCP_GENERAL",
+      exentoFotovoltaico: true,
+    });
+    const exento = await onatApartarEstimate(db, org, YEAR, MONTH);
+    expect(exento.rate).toBe(0.07);
+    expect(exento.apartarCents).toBe(70_000n);
   });
 });

@@ -13,3 +13,4 @@ export * from "./raffles";
 export * from "./internal-outflows";
 export * from "./consolidado";
 export * from "./assistant";
+export * from "./vehicles";

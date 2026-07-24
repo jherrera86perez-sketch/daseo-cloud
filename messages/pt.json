@@ -80,6 +80,7 @@
       "suppliers": "Fornecedores",
       "banking": "Banco",
       "fiscal": "Fiscal",
+      "vehicles": "Veículos",
       "employees": "Funcionários",
       "audit": "Auditoria",
       "production": "Produção",
@@ -1101,6 +1102,10 @@
       "taxedBase": "Base na faixa",
       "tax": "Imposto",
       "djNote": "Escala progressiva 2026. Os pagamentos por conta marcados como pagos são descontados do saldo. Projeção referencial — confirme com seu contador antes de declarar.",
+      "exentoFotovoltaico": "Isento fotovoltaico (7% em vez de 11%)",
+      "apartarTitle": "ONAT a reservar este mês (estimado)",
+      "apartarRate": "Taxa",
+      "apartarAmount": "A reservar",
       "gapTitle": "Brecha fiscal {year}",
       "gapMonth": "Mês",
       "gapVentas": "Vendas internas",
@@ -1108,6 +1113,29 @@
       "gapBrecha": "Brecha",
       "gapPct": "% bancarizado",
       "gapNote": "Dinheiro que foi vendido mas não aparece no banco — normalmente dinheiro retido fora do sistema bancário. Útil para saber quanta margem fiscal você tem e decidir conscientemente como conciliar. Não altera a base declarada acima."
+    },
+    "vehicles": {
+      "title": "Veículos",
+      "hint": "Imposto sobre o Transporte Terrestre (ONAT 071012, \"A Chapa\") — registro informativo, não gera obrigações automáticas.",
+      "empty": "Você ainda não tem veículos registrados.",
+      "annualFee": "Taxa anual",
+      "status": "Status",
+      "retire": "Dar baixa",
+      "totalAnnual": "Total anual (ativos)",
+      "statuses": {
+        "ACTIVE": "Ativo",
+        "SOLD": "Vendido",
+        "JUNK": "Baixa"
+      },
+      "form": {
+        "plate": "Placa",
+        "brand": "Marca",
+        "model": "Modelo",
+        "category": "Categoria fiscal",
+        "acquisitionDate": "Data de aquisição",
+        "save": "Adicionar",
+        "created": "Veículo adicionado"
+      }
     },
     "banking": {
       "title": "Contas bancárias",

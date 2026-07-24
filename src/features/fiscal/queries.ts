@@ -27,6 +27,9 @@ export type CuFiscalSettings = {
   monthlyPayrollCents?: string; // bigint serializado
   fixedQuotaCents?: string;
   minExemptCents?: string;
+  // ≈ PanelNegocio.tsx del ERP: "ONAT a apartar" = ingresos × 7% (exento
+  // fotovoltaico) u 11% (normal) — estimado informativo, no genera obligación.
+  exentoFotovoltaico?: boolean;
 };
 
 export async function getFiscalSettings(
@@ -196,6 +199,22 @@ export async function incomeSourceDetail(
     };
   }
   return { totalCents: 0n, source: "none", confidence: "sin_datos" };
+}
+
+/** ≈ onatApartar del PanelNegocio.tsx del ERP: estimado informativo de
+ * cuánto apartar del mes — NO genera ninguna obligación (igual que el ERP). */
+export async function onatApartarEstimate(
+  db: Db,
+  orgId: string,
+  year: number,
+  month: number,
+): Promise<{ incomeCents: bigint; rate: number; apartarCents: bigint }> {
+  const { settings } = await getFiscalSettings(db, orgId);
+  const rate = settings.exentoFotovoltaico ? 0.07 : 0.11;
+  const income = await incomeSourceDetail(db, orgId, year, month);
+  const apartarCents =
+    (income.totalCents * BigInt(Math.round(rate * 10000))) / 10000n;
+  return { incomeCents: income.totalCents, rate, apartarCents };
 }
 
 /**

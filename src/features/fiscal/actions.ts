@@ -34,6 +34,7 @@ export async function saveFiscalSettingsAction(
         .string()
         .regex(/^\d+(?:[.,]\d{1,2})?$/)
         .or(z.literal("")),
+      exentoFotovoltaico: z.coerce.boolean(),
     })
     .safeParse({
       regime: form.get("regime"),
@@ -41,6 +42,7 @@ export async function saveFiscalSettingsAction(
       payroll: String(form.get("payroll") ?? ""),
       quota: String(form.get("quota") ?? ""),
       minExempt: String(form.get("minExempt") ?? ""),
+      exentoFotovoltaico: form.get("exentoFotovoltaico") === "on",
     });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "invalid" };
@@ -56,6 +58,7 @@ export async function saveFiscalSettingsAction(
     minExemptCents: d.minExempt
       ? parseDecimalToCents(d.minExempt).toString()
       : "0",
+    exentoFotovoltaico: d.exentoFotovoltaico,
   });
   revalidatePath("/[locale]/fiscal", "page");
   return null;

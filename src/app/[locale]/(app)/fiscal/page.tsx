@@ -7,6 +7,7 @@ import {
   dj08Projection,
   incomeSourceDetail,
   gapAnalysis,
+  onatApartarEstimate,
 } from "@/features/fiscal/queries";
 import {
   FiscalSettingsForm,
@@ -39,6 +40,9 @@ export default async function FiscalPage() {
     ? await incomeSourceDetail(db, orgId, year, month)
     : null;
   const gap = country ? await gapAnalysis(db, orgId, year) : null;
+  const apartar = country
+    ? await onatApartarEstimate(db, orgId, year, month)
+    : null;
 
   const pendingTotal = obligations
     .filter((o) => o.status === "pending")
@@ -66,10 +70,43 @@ export default async function FiscalPage() {
               minExempt: settings.minExemptCents
                 ? centsToDecimalString(BigInt(settings.minExemptCents))
                 : "",
+              exentoFotovoltaico: settings.exentoFotovoltaico ?? false,
             }}
           />
         </CardContent>
       </Card>
+
+      {apartar && apartar.incomeCents > 0n && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("apartarTitle")}</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap items-center gap-6 text-sm">
+            <div>
+              <p className="text-xs text-muted-foreground">{t("income")}</p>
+              <p className="font-bold" data-numeric="">
+                {centsToDecimalString(apartar.incomeCents)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">
+                {t("apartarRate")}
+              </p>
+              <p className="font-bold" data-numeric="">
+                {(apartar.rate * 100).toFixed(0)}%
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">
+                {t("apartarAmount")}
+              </p>
+              <p className="font-bold text-primary" data-numeric="">
+                {centsToDecimalString(apartar.apartarCents)}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
