@@ -9,11 +9,25 @@ import { getDb } from "@/db";
 import { parseDecimalToCents } from "@/lib/money";
 import { addRate } from "@/features/rates/queries";
 import { documentAllowance, FREE_LIMIT_ERROR } from "@/features/admin/limits";
-import { createSale, confirmSale, cancelSale, addPayment } from "./queries";
+import { orgSettings } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import {
+  createSale,
+  createCashSale,
+  confirmSale,
+  cancelSale,
+  addPayment,
+} from "./queries";
+import { PAYMENT_METHODS } from "./constants";
 
 export type ActionState = { error?: string } | null;
 
 const CURRENCY = z.enum(["CUP", "USD", "BRL"]);
+
+const decimalOpt = z
+  .string()
+  .regex(/^\d+(?:[.,]\d{1,2})?$/)
+  .or(z.literal(""));
 
 const saleFormSchema = z.object({
   customerId: z.string().uuid(),
@@ -30,7 +44,36 @@ const saleFormSchema = z.object({
       }),
     )
     .min(1),
+  // Paridad ERP: borrador / crédito (confirma sin cobrar) / contado (cobra ya)
+  mode: z.enum(["draft", "credit", "cash"]).default("draft"),
+  discount: decimalOpt.optional(),
+  soldAt: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .or(z.literal(""))
+    .optional(),
+  poNumber: z.string().max(100).optional(),
+  note: z.string().max(1000).optional(),
+  payments: z
+    .array(
+      z.object({
+        method: z.enum(PAYMENT_METHODS),
+        amount: decimalOpt,
+      }),
+    )
+    .optional(),
 });
+
+/** ERP: fecha elegida + hora actual (retroactiva permitida, max hoy). */
+function soldAtFromInput(dateStr?: string): Date | undefined {
+  if (!dateStr) return undefined;
+  const now = new Date();
+  const hoy = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  if (dateStr === hoy) return undefined; // hoy = comportamiento actual (now)
+  const d = new Date(`${dateStr}T12:00:00`);
+  d.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+  return d;
+}
 
 export async function createSaleAction(
   _prev: ActionState,
@@ -43,14 +86,28 @@ export async function createSaleAction(
   } catch {
     return { error: "payload inválido" };
   }
-  const parsed = saleFormSchema.safeParse(payload);
+  // el modo llega en el botón de submit (Guardar borrador / Cobrar Ahora /
+  // Guardar Crédito) — el submitter viaja en el FormData
+  const parsed = saleFormSchema.safeParse({
+    ...(payload as object),
+    mode: String(form.get("mode") ?? "draft"),
+  });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "invalid" };
   }
   const d = parsed.data;
+  const db = getDb();
   let sale;
   try {
-    sale = await createSale(getDb(), orgId, userId, {
+    // IVA global del ERP (config.impuesto): vive en fiscal_settings de la org
+    const [settings] = await db
+      .select({ fiscal: orgSettings.fiscalSettings })
+      .from(orgSettings)
+      .where(eq(orgSettings.orgId, orgId));
+    const taxPct = (settings?.fiscal as { salesTaxPct?: string } | null)
+      ?.salesTaxPct;
+
+    const input = {
       customerId: d.customerId,
       currency: d.currency,
       rateToBase: d.rateToBase,
@@ -61,7 +118,37 @@ export async function createSaleAction(
         qty: i.qty,
         unitPriceCents: parseDecimalToCents(i.unitPrice),
       })),
-    });
+      discountCents: d.discount ? parseDecimalToCents(d.discount) : undefined,
+      taxPct,
+      soldAt: soldAtFromInput(d.soldAt || undefined),
+      poNumber: d.poNumber || undefined,
+      note: d.note || undefined,
+    };
+
+    if (d.mode === "cash" || d.mode === "credit") {
+      // ambos confirman → respetar el tope del plan gratuito (F7)
+      const allowance = await documentAllowance(db, orgId);
+      if (allowance.limited && !allowance.allowed) {
+        return { error: FREE_LIMIT_ERROR };
+      }
+    }
+    if (d.mode === "cash") {
+      sale = await createCashSale(db, orgId, userId, {
+        ...input,
+        payments: (d.payments ?? [])
+          .filter((p) => p.amount)
+          .map((p) => ({
+            method: p.method,
+            amountCents: parseDecimalToCents(p.amount),
+          })),
+      });
+    } else {
+      sale = await createSale(db, orgId, userId, input);
+      if (d.mode === "credit" && sale.status === "draft") {
+        // ERP: "Guardar Crédito" = venta confirmada con saldo abierto
+        sale = await confirmSale(db, orgId, userId, sale.id);
+      }
+    }
   } catch (e) {
     return { error: e instanceof Error ? e.message : "error" };
   }

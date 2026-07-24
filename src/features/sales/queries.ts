@@ -8,7 +8,11 @@ import {
 } from "@/db/schema";
 import { assertOwnedByOrg, notDeleted } from "@/lib/tenant";
 import { logAudit } from "@/lib/audit";
-import { convertToBase } from "@/lib/money";
+import {
+  convertToBase,
+  parseDecimalToCents,
+  centsToDecimalString,
+} from "@/lib/money";
 import { parseQtyToMilli } from "@/lib/qty";
 import {
   registerMovement,
@@ -37,6 +41,13 @@ export type SaleInput = {
   idempotencyKey: string;
   dueDate?: Date;
   items: SaleItemInput[];
+  // Paridad ERP: descuento (MONTO en moneda del doc), IVA (% global),
+  // fecha retroactiva (max hoy), No. Pedido/OC y notas
+  discountCents?: bigint;
+  taxPct?: string;
+  soldAt?: Date;
+  poNumber?: string;
+  note?: string;
 };
 
 /**
@@ -51,7 +62,12 @@ export async function createSale(
   input: SaleInput,
 ): Promise<SaleRow> {
   if (input.items.length === 0) {
-    throw new Error("La venta necesita al menos una línea");
+    // Mensaje literal del ERP
+    throw new Error("Debe agregar al menos un producto");
+  }
+  if (input.soldAt && input.soldAt.getTime() > Date.now()) {
+    // Literal del modal de cobro/venta del ERP
+    throw new Error("La fecha no puede ser futura");
   }
   // idempotencia: si el key ya existe, devolver la venta original
   const [existing] = await db
@@ -84,7 +100,13 @@ export async function createSale(
     const totalCents = (qtyMilli * item.unitPriceCents + 500n) / 1000n;
     return { ...item, totalCents };
   });
-  const totalCents = lines.reduce((acc, l) => acc + l.totalCents, 0n);
+  const subtotalCents = lines.reduce((acc, l) => acc + l.totalCents, 0n);
+  // ERP: total = max(0, subtotal + IVA(config %) − descuento)
+  const taxBp = input.taxPct ? parseDecimalToCents(input.taxPct) : 0n; // % en "cents" = basis points
+  const taxCents = (subtotalCents * taxBp + 5000n) / 10000n;
+  const discountCents = input.discountCents ?? 0n;
+  const gross = subtotalCents + taxCents - discountCents;
+  const totalCents = gross > 0n ? gross : 0n;
   const totalBaseCents = convertToBase(totalCents, input.rateToBase);
 
   return db.transaction(async (tx: Db) => {
@@ -98,6 +120,11 @@ export async function createSale(
         rateToBaseFixed: input.rateToBase.replace(",", "."),
         totalCents,
         totalBaseCents,
+        discountCents,
+        taxCents,
+        poNumber: input.poNumber,
+        note: input.note,
+        soldAt: input.soldAt,
         dueDate: input.dueDate,
         idempotencyKey: input.idempotencyKey,
       })
@@ -223,7 +250,8 @@ export async function confirmSale(
       .set({
         status: "confirmed",
         number,
-        soldAt: new Date(),
+        // fecha retroactiva del ERP: si la venta trae fecha propia, se respeta
+        soldAt: sale.soldAt ?? new Date(),
         updatedAt: new Date(),
       })
       .where(eq(sales.id, id))
@@ -414,4 +442,173 @@ export async function accountsReceivable(
       const dbb = b.dueDate?.getTime() ?? Infinity;
       return da - dbb;
     });
+}
+
+// ─────────────── Paridad ERP: estado de cobro, contado, CxC ───────────────
+
+export type EstadoCobro =
+  "BORRADOR" | "PENDIENTE" | "PARCIAL" | "PAGADA" | "CANCELADA";
+
+/**
+ * Estado de cobro del ERP (PAGADA/PARCIAL/PENDIENTE), derivado del saldo en
+ * vez de persistido — así el bug de casing del ERP no puede existir aquí.
+ */
+export function paymentStatus(
+  sale: Pick<SaleRow, "status" | "totalCents">,
+  paidCents: bigint,
+): EstadoCobro {
+  if (sale.status === "cancelled") return "CANCELADA";
+  if (sale.status === "draft") return "BORRADOR";
+  if (sale.totalCents > 0n && paidCents >= sale.totalCents) return "PAGADA";
+  if (paidCents > 0n) return "PARCIAL";
+  return "PENDIENTE";
+}
+
+export type CashPaymentInput = {
+  method: string; // cash|card|transfer|qr|mlc|usd (métodos del ERP)
+  amountCents: bigint;
+  note?: string;
+};
+
+/**
+ * Venta de CONTADO en UN paso (POST /ventas del ERP con pagos[]): crea,
+ * confirma (kardex + numeración) y registra los pagos, todo en una
+ * transacción. >1 método = el "MIXTO" del ERP (aquí, varios payments).
+ * Los pagos van en la moneda de la venta (tasa 1, applied = amount).
+ */
+export async function createCashSale(
+  db: Db,
+  orgId: string,
+  userId: UserId,
+  input: SaleInput & { payments: CashPaymentInput[] },
+): Promise<SaleRow> {
+  return db.transaction(async (tx: Db) => {
+    const draft = await createSale(tx, orgId, userId, input);
+    if (draft.status !== "draft") {
+      // idempotencia: la venta ya fue confirmada antes (literal del ERP)
+      return draft;
+    }
+    const confirmed = await confirmSale(tx, orgId, userId, draft.id);
+
+    // ERP (front): un pago sin monto se autocompleta con el total
+    const pagos =
+      input.payments.length > 0
+        ? input.payments
+        : [{ method: "cash", amountCents: confirmed.totalCents }];
+    const totalPagos = pagos.reduce((s, p) => s + p.amountCents, 0n);
+    if (totalPagos < confirmed.totalCents) {
+      const falta = confirmed.totalCents - totalPagos;
+      throw new Error(
+        `Faltan ${centsToDecimalString(falta)} por cubrir en los pagos`,
+      );
+    }
+    if (totalPagos > confirmed.totalCents) {
+      const exceso = totalPagos - confirmed.totalCents;
+      throw new Error(
+        `Los pagos exceden el total por ${centsToDecimalString(exceso)}`,
+      );
+    }
+    for (const p of pagos) {
+      if (p.amountCents <= 0n) continue;
+      await addPayment(tx, orgId, userId, confirmed.id, {
+        amountCents: p.amountCents,
+        currency: confirmed.currency,
+        rateFixed: "1",
+        appliedCents: p.amountCents,
+        method: p.method,
+        note: p.note,
+      });
+    }
+    return confirmed;
+  });
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Días de atraso del ERP: desde la FECHA DE VENTA (no el vencimiento). */
+function diasAtraso(s: SaleRow): number {
+  const base = s.soldAt ?? s.createdAt;
+  return Math.floor((Date.now() - base.getTime()) / DAY_MS);
+}
+
+export type CobrosResumen = {
+  total_adeudado_base_cents: bigint;
+  num_ventas: number;
+  num_clientes: number;
+  max_dias_atraso: number;
+  num_vencidas: number;
+};
+
+/**
+ * GET /cobros/resumen del ERP. "Vencida" = >14 días desde la venta
+ * (7 normales + 7 de tregua). Adaptación multi-moneda: el total adeudado se
+ * consolida a base con la tasa fijada de cada documento.
+ */
+export async function cobrosResumen(
+  db: Db,
+  orgId: string,
+): Promise<CobrosResumen> {
+  const ar = await accountsReceivable(db, orgId);
+  const dias = ar.map(diasAtraso);
+  return {
+    total_adeudado_base_cents: ar.reduce(
+      (s, v) => s + convertToBase(v.balanceCents, v.rateToBaseFixed),
+      0n,
+    ),
+    num_ventas: ar.length,
+    num_clientes: new Set(ar.map((v) => v.customerId)).size,
+    max_dias_atraso: dias.length ? Math.max(...dias) : 0,
+    num_vencidas: dias.filter((d) => d > 14).length,
+  };
+}
+
+export type CxcCliente = {
+  customerId: string;
+  customerName: string;
+  ventas: Array<
+    SaleRow & {
+      customerName: string;
+      paidCents: bigint;
+      balanceCents: bigint;
+      dias_atraso: number;
+    }
+  >;
+  saldo_base_cents: bigint;
+  max_dias_atraso: number;
+};
+
+/**
+ * GET /cobros/cuentas-por-cobrar del ERP: ventas con saldo agrupadas POR
+ * CLIENTE, ordenadas por días de atraso desc (dentro, venta más vieja
+ * primero). El saldo del grupo se consolida a base con tasas fijadas.
+ */
+export async function accountsReceivableGrouped(
+  db: Db,
+  orgId: string,
+): Promise<CxcCliente[]> {
+  const ar = await accountsReceivable(db, orgId);
+  const grupos = new Map<string, CxcCliente>();
+  for (const v of ar) {
+    const dias = diasAtraso(v);
+    const g = grupos.get(v.customerId) ?? {
+      customerId: v.customerId,
+      customerName: v.customerName,
+      ventas: [],
+      saldo_base_cents: 0n,
+      max_dias_atraso: 0,
+    };
+    g.ventas.push({ ...v, dias_atraso: dias });
+    g.saldo_base_cents += convertToBase(v.balanceCents, v.rateToBaseFixed);
+    if (dias > g.max_dias_atraso) g.max_dias_atraso = dias;
+    grupos.set(v.customerId, g);
+  }
+  const out = [...grupos.values()];
+  for (const g of out) {
+    g.ventas.sort(
+      (a, b) =>
+        b.dias_atraso - a.dias_atraso ||
+        (a.soldAt?.getTime() ?? 0) - (b.soldAt?.getTime() ?? 0),
+    );
+  }
+  return out.sort((a, b) => b.max_dias_atraso - a.max_dias_atraso);
 }

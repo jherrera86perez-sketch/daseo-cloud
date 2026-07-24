@@ -101,6 +101,18 @@ export const sales = pgTable(
     number: integer("number"),
     status: text("status").notNull().default("draft"),
     ...moneyDoc,
+    // ≈ descuento_aplicado del ERP: MONTO absoluto en moneda del documento
+    discountCents: bigint("discount_cents", { mode: "bigint" })
+      .notNull()
+      .default(sql`0`),
+    // IVA del ERP (config.impuesto % global aplicado al subtotal)
+    taxCents: bigint("tax_cents", { mode: "bigint" })
+      .notNull()
+      .default(sql`0`),
+    // ≈ numero_pedido del ERP (orden de compra del cliente)
+    poNumber: text("po_number"),
+    // ≈ notas del ERP (observaciones internas)
+    note: text("note"),
     soldAt: timestamp("sold_at", { withTimezone: true }),
     dueDate: timestamp("due_date", { withTimezone: true }),
     // doble clic jamás duplica una venta (unique parcial por org)
@@ -122,6 +134,10 @@ export const sales = pgTable(
       sql`${t.status} in ('draft','confirmed','cancelled')`,
     ),
     check("sales_totals_check", sql`${t.totalCents} >= 0`),
+    check(
+      "sales_discount_check",
+      sql`${t.discountCents} >= 0 and ${t.taxCents} >= 0`,
+    ),
   ],
 );
 
@@ -178,9 +194,11 @@ export const payments = pgTable(
     index("payments_org_sale_idx").on(t.orgId, t.saleId),
     check("payments_amount_check", sql`${t.amountCents} > 0`),
     check("payments_applied_check", sql`${t.appliedCents} > 0`),
+    // Métodos del ERP (Efectivo/Tarjeta/Transferencia/QR/MLC/USD) + other.
+    // Solo 'transfer' entra a la conciliación bancaria (como en el ERP).
     check(
       "payments_method_check",
-      sql`${t.method} in ('cash','transfer','other')`,
+      sql`${t.method} in ('cash','card','transfer','qr','mlc','usd','other')`,
     ),
   ],
 );

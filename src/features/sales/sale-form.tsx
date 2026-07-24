@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createSaleAction, type ActionState } from "./actions";
+import { PAYMENT_METHODS, type PaymentMethod } from "./constants";
 
 type ProductOpt = {
   id: string;
@@ -23,6 +24,8 @@ type Line = {
   unitPrice: string;
 };
 
+type PayLine = { method: PaymentMethod; amount: string };
+
 export function SaleForm({
   customers,
   products,
@@ -31,6 +34,8 @@ export function SaleForm({
   action = createSaleAction,
   submitLabel,
   dealId,
+  saleExtras = false,
+  taxPct = "0",
 }: Readonly<{
   customers: CustomerOpt[];
   products: ProductOpt[];
@@ -39,6 +44,10 @@ export function SaleForm({
   action?: (prev: ActionState, form: FormData) => Promise<ActionState>;
   submitLabel?: string;
   dealId?: string;
+  /** Paridad ERP: contado/crédito, fecha, descuento, OC, pagos múltiples */
+  saleExtras?: boolean;
+  /** IVA global (config.impuesto del ERP), % desde la config de la org */
+  taxPct?: string;
 }>) {
   const t = useTranslations("app.sales");
   const [state, formAction, pending] = useActionState(action, null);
@@ -48,7 +57,20 @@ export function SaleForm({
   const [lines, setLines] = useState<Line[]>([
     { description: "", qty: "1", unitPrice: "" },
   ]);
+  // Extras ERP
+  const [saleType, setSaleType] = useState<"cash" | "credit">("cash");
+  const [soldAt, setSoldAt] = useState("");
+  const [discount, setDiscount] = useState("");
+  const [poNumber, setPoNumber] = useState("");
+  const [note, setNote] = useState("");
+  const [payLines, setPayLines] = useState<PayLine[]>([
+    { method: "cash", amount: "" },
+  ]);
   const idempotencyKey = useMemo(() => crypto.randomUUID(), []);
+  const hoyStr = useMemo(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }, []);
 
   function setLine(i: number, patch: Partial<Line>) {
     setLines((ls) => ls.map((l, j) => (j === i ? { ...l, ...patch } : l)));
@@ -68,11 +90,23 @@ export function SaleForm({
     setRate(c === baseCurrency ? "1" : (rates[c] ?? ""));
   }
 
-  const total = lines.reduce((acc, l) => {
+  const subtotal = lines.reduce((acc, l) => {
     const q = parseFloat(l.qty.replace(",", ".")) || 0;
     const p = parseFloat(l.unitPrice.replace(",", ".")) || 0;
     return acc + q * p;
   }, 0);
+  // ERP: total = max(0, subtotal + IVA(config %) − descuento)
+  const ivaPct = saleExtras ? parseFloat(taxPct.replace(",", ".")) || 0 : 0;
+  const iva = Math.round(subtotal * ivaPct) / 100;
+  const desc = saleExtras ? parseFloat(discount.replace(",", ".")) || 0 : 0;
+  const total = Math.max(0, subtotal + iva - desc);
+
+  const pagado = payLines.reduce(
+    (s, p) => s + (parseFloat(p.amount.replace(",", ".")) || 0),
+    0,
+  );
+  const conPagos = payLines.some((p) => p.amount);
+  const diff = Math.round((total - pagado) * 100) / 100;
 
   const payload = JSON.stringify({
     customerId,
@@ -81,6 +115,15 @@ export function SaleForm({
     idempotencyKey,
     dealId,
     items: lines.filter((l) => l.description && l.qty && l.unitPrice),
+    ...(saleExtras
+      ? {
+          discount,
+          soldAt,
+          poNumber,
+          note,
+          payments: saleType === "cash" ? payLines.filter((p) => p.amount) : [],
+        }
+      : {}),
   });
 
   return (
@@ -205,18 +248,234 @@ export function SaleForm({
         </Button>
       </div>
 
-      <p className="text-right text-lg font-bold" data-numeric="">
-        {t("total")}: {total.toFixed(2)} {currency}
-      </p>
+      {saleExtras && (
+        <>
+          {/* Tipo de venta + fecha + descuento + OC (paridad ERP) */}
+          <div className="grid gap-3 sm:grid-cols-4">
+            <div className="flex flex-col gap-2">
+              <Label>{t("saleType")}</Label>
+              <div className="flex rounded-md border p-0.5">
+                <button
+                  type="button"
+                  className={`flex-1 rounded px-2 py-1 text-sm ${saleType === "cash" ? "bg-primary text-primary-foreground" : ""}`}
+                  onClick={() => setSaleType("cash")}
+                >
+                  {t("cashSale")}
+                </button>
+                <button
+                  type="button"
+                  className={`flex-1 rounded px-2 py-1 text-sm ${saleType === "credit" ? "bg-primary text-primary-foreground" : ""}`}
+                  onClick={() => setSaleType("credit")}
+                >
+                  {t("creditSale")}
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="soldAt">{t("saleDate")}</Label>
+              <Input
+                id="soldAt"
+                type="date"
+                max={hoyStr}
+                value={soldAt || hoyStr}
+                onChange={(e) => setSoldAt(e.target.value)}
+              />
+              {soldAt && soldAt !== hoyStr && (
+                <span className="text-xs text-amber-600 dark:text-amber-400">
+                  {t("backdated")}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="discount">{t("discount")}</Label>
+              <Input
+                id="discount"
+                inputMode="decimal"
+                placeholder="0.00"
+                value={discount}
+                onChange={(e) => setDiscount(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="po">{t("poNumber")}</Label>
+              <Input
+                id="po"
+                value={poNumber}
+                onChange={(e) => setPoNumber(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Pagos múltiples, solo Contado (>1 método = MIXTO del ERP) */}
+          {saleType === "cash" && (
+            <div className="flex flex-col gap-2 rounded-md border p-3">
+              <Label>{t("payments")}</Label>
+              {payLines.map((p, i) => (
+                <div key={i} className="flex flex-wrap items-center gap-2">
+                  <select
+                    aria-label={t("payMethod")}
+                    value={p.method}
+                    onChange={(e) =>
+                      setPayLines((ps) =>
+                        ps.map((x, j) =>
+                          j === i
+                            ? {
+                                ...x,
+                                method: e.target.value as PayLine["method"],
+                              }
+                            : x,
+                        ),
+                      )
+                    }
+                    className="border-input h-9 w-40 rounded-md border bg-transparent px-2 text-sm"
+                  >
+                    {PAYMENT_METHODS.map((m) => (
+                      <option key={m} value={m}>
+                        {t(`methods.${m}`)}
+                      </option>
+                    ))}
+                  </select>
+                  <Input
+                    aria-label={t("payAmount")}
+                    inputMode="decimal"
+                    placeholder={t("payAmount")}
+                    value={p.amount}
+                    onChange={(e) =>
+                      setPayLines((ps) =>
+                        ps.map((x, j) =>
+                          j === i ? { ...x, amount: e.target.value } : x,
+                        ),
+                      )
+                    }
+                    className="w-28"
+                  />
+                  {payLines.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      aria-label={t("removeLine")}
+                      onClick={() =>
+                        setPayLines((ps) => ps.filter((_, j) => j !== i))
+                      }
+                    >
+                      <Trash2 className="size-4 text-destructive" aria-hidden />
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <div className="flex flex-wrap items-center gap-3 text-sm">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setPayLines((ps) => [...ps, { method: "cash", amount: "" }])
+                  }
+                >
+                  <Plus className="size-4" aria-hidden /> {t("addPayment")}
+                </Button>
+                {payLines.filter((p) => p.amount).length > 1 && (
+                  <span className="text-muted-foreground">· MIXTO</span>
+                )}
+                {conPagos && (
+                  <span data-numeric="">
+                    {t("paidIndicator", {
+                      paid: pagado.toFixed(2),
+                      total: total.toFixed(2),
+                    })}{" "}
+                    {diff === 0 ? (
+                      <span className="text-emerald-600 dark:text-emerald-400">
+                        ✅ {t("covered")}
+                      </span>
+                    ) : diff > 0 ? (
+                      <span className="text-amber-600 dark:text-amber-400">
+                        ⚠️ {t("missing", { amount: diff.toFixed(2) })}
+                      </span>
+                    ) : (
+                      <span className="text-amber-600 dark:text-amber-400">
+                        ⚠️ {t("exceeds", { amount: Math.abs(diff).toFixed(2) })}
+                      </span>
+                    )}
+                  </span>
+                )}
+                {!conPagos && (
+                  <span className="text-xs text-muted-foreground">
+                    {t("autoFillHint")}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="note">{t("notes")}</Label>
+            <Input
+              id="note"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
+          </div>
+        </>
+      )}
+
+      <div className="text-right" data-numeric="">
+        {saleExtras && (ivaPct > 0 || desc > 0) && (
+          <p className="text-sm text-muted-foreground">
+            {t("subtotal")}: {subtotal.toFixed(2)}
+            {ivaPct > 0 && (
+              <>
+                {" "}
+                · IVA ({ivaPct}%): {iva.toFixed(2)}
+              </>
+            )}
+            {desc > 0 && (
+              <>
+                {" "}
+                · {t("discount")}: −{desc.toFixed(2)}
+              </>
+            )}
+          </p>
+        )}
+        <p className="text-lg font-bold">
+          {t("total")}: {total.toFixed(2)} {currency}
+        </p>
+      </div>
 
       {state?.error && (
         <p role="alert" className="text-sm text-destructive">
           {state.error}
         </p>
       )}
-      <Button type="submit" disabled={pending || !customerId}>
-        {pending ? "…" : (submitLabel ?? t("saveDraft"))}
-      </Button>
+      {saleExtras ? (
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="submit"
+            name="mode"
+            value="draft"
+            variant="outline"
+            disabled={pending || !customerId}
+          >
+            {pending ? "…" : `💾 ${t("saveDraft")}`}
+          </Button>
+          <Button
+            type="submit"
+            name="mode"
+            value={saleType}
+            disabled={pending || !customerId}
+          >
+            {pending
+              ? "…"
+              : saleType === "cash"
+                ? t("chargeNow")
+                : t("saveCredit")}
+          </Button>
+        </div>
+      ) : (
+        <Button type="submit" disabled={pending || !customerId}>
+          {pending ? "…" : (submitLabel ?? t("saveDraft"))}
+        </Button>
+      )}
     </form>
   );
 }

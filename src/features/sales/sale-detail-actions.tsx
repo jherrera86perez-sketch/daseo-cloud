@@ -80,15 +80,20 @@ export function PaymentForm({
   saleId,
   saleCurrency,
   action,
+  balance,
 }: Readonly<{
   saleId: string;
   saleCurrency: string;
   // pre-enlazada al documento; por defecto, cobro de venta
   action?: (prev: ActionState, form: FormData) => Promise<ActionState>;
+  /** saldo pendiente (decimal) — habilita "Cobrar saldo completo" del ERP */
+  balance?: string;
 }>) {
   const t = useTranslations("app.sales");
   const ref = useRef<HTMLFormElement>(null);
   const [currency, setCurrency] = useState(saleCurrency);
+  const [amount, setAmount] = useState("");
+  const [method, setMethod] = useState("cash");
   const boundAction = action ?? addPaymentAction.bind(null, saleId);
   const [state, formAction, pending] = useActionState(
     async (prev: ActionState, form: FormData) => {
@@ -101,6 +106,8 @@ export function PaymentForm({
       if (!res?.error) {
         ref.current?.reset();
         setCurrency(saleCurrency);
+        setAmount("");
+        setMethod("cash");
         toast.success(t("paymentSaved"));
       }
       return res;
@@ -120,10 +127,39 @@ export function PaymentForm({
       action={formAction}
       className="flex flex-wrap items-center gap-2"
     >
+      {/* Atajos del ERP: "Cobrar saldo completo" en efectivo o transferencia */}
+      {balance && (
+        <div className="flex w-full gap-2 text-xs">
+          <button
+            type="button"
+            className="rounded-md border px-2 py-1 hover:bg-accent"
+            onClick={() => {
+              setAmount(balance);
+              setMethod("cash");
+              setCurrency(saleCurrency);
+            }}
+          >
+            💵 {t("chargeFullBalance")}
+          </button>
+          <button
+            type="button"
+            className="rounded-md border px-2 py-1 hover:bg-accent"
+            onClick={() => {
+              setAmount(balance);
+              setMethod("transfer");
+              setCurrency(saleCurrency);
+            }}
+          >
+            🏦 {t("chargeFullBalanceTransfer")}
+          </button>
+        </div>
+      )}
       <Input
         name="amount"
         inputMode="decimal"
         placeholder={t("amount")}
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
         required
         className="w-28"
       />
@@ -160,12 +196,16 @@ export function PaymentForm({
       )}
       <select
         name="method"
+        aria-label={t("payMethod")}
         className="border-input h-9 rounded-md border bg-transparent px-2 text-sm"
-        defaultValue="cash"
+        value={method}
+        onChange={(e) => setMethod(e.target.value)}
       >
-        <option value="cash">{t("methods.cash")}</option>
-        <option value="transfer">{t("methods.transfer")}</option>
-        <option value="other">{t("methods.other")}</option>
+        {["cash", "card", "transfer", "qr", "mlc", "usd", "other"].map((m) => (
+          <option key={m} value={m}>
+            {t(`methods.${m}`)}
+          </option>
+        ))}
       </select>
       <Button type="submit" variant="outline" disabled={pending}>
         {pending ? "…" : t("registerPayment")}

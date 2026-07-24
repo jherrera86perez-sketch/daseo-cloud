@@ -1,11 +1,14 @@
 import { getTranslations, getFormatter } from "next-intl/server";
+import { eq } from "drizzle-orm";
 import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
-import { getSaleDetail } from "@/features/sales/queries";
+import { organizations, customers } from "@/db/schema";
+import { getSaleDetail, paymentStatus } from "@/features/sales/queries";
 import {
   ConfirmCancelButtons,
   PaymentForm,
 } from "@/features/sales/sale-detail-actions";
+import { PrintNoteButton } from "@/features/sales/print-note";
 import { centsToDecimalString } from "@/lib/money";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -16,23 +19,79 @@ export default async function SaleDetailPage({
   const { id } = await params;
   const t = await getTranslations("app.sales");
   const format = await getFormatter();
-  const { sale, items, payments, balanceCents } = await getSaleDetail(
-    getDb(),
-    orgId,
-    id,
-  );
+  const db = getDb();
+  const { sale, items, payments, paidCents, balanceCents } =
+    await getSaleDetail(db, orgId, id);
+  const [org] = await db
+    .select({ name: organizations.name })
+    .from(organizations)
+    .where(eq(organizations.id, orgId));
+  const [cust] = await db
+    .select({ name: customers.name })
+    .from(customers)
+    .where(eq(customers.id, sale.customerId));
+  const estadoCobro = paymentStatus(sale, paidCents);
+  const numero = sale.number ? `${sale.series}-${sale.number}` : t("draft");
+  const subtotalCents = sale.totalCents - sale.taxCents + sale.discountCents;
 
   return (
     <div className="flex max-w-2xl flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-2xl font-bold">
-          {sale.number ? `${sale.series}-${sale.number}` : t("draft")}
+          {numero}
           <span className="ml-3 align-middle rounded-full bg-secondary px-2 py-0.5 text-xs font-normal">
-            {t(`statuses.${sale.status}`)}
+            {t(`payStatus.${estadoCobro}`)}
           </span>
         </h1>
-        <ConfirmCancelButtons saleId={id} status={sale.status} />
+        <div className="flex items-center gap-2">
+          {sale.status === "confirmed" && (
+            <PrintNoteButton
+              data={{
+                numero,
+                fecha: format.dateTime(sale.soldAt ?? sale.createdAt, {
+                  dateStyle: "medium",
+                }),
+                cliente: cust?.name ?? "",
+                moneda: sale.currency,
+                lineas: items.map((i) => ({
+                  descripcion: i.description,
+                  qty: i.qty,
+                  precio: centsToDecimalString(i.unitPriceCents),
+                  total: centsToDecimalString(i.totalCents),
+                })),
+                subtotal: centsToDecimalString(subtotalCents),
+                iva:
+                  sale.taxCents > 0n
+                    ? centsToDecimalString(sale.taxCents)
+                    : null,
+                descuento:
+                  sale.discountCents > 0n
+                    ? centsToDecimalString(sale.discountCents)
+                    : null,
+                total: centsToDecimalString(sale.totalCents),
+                cobrado: centsToDecimalString(paidCents),
+                saldo: centsToDecimalString(balanceCents),
+                poNumber: sale.poNumber,
+                nota: sale.note,
+                org: org?.name ?? "Daseo Cloud",
+              }}
+            />
+          )}
+          <ConfirmCancelButtons saleId={id} status={sale.status} />
+        </div>
       </div>
+
+      {(sale.poNumber || sale.note) && (
+        <p className="text-sm text-muted-foreground">
+          {sale.poNumber && (
+            <>
+              {t("poNumber")}: <strong>{sale.poNumber}</strong>
+              {sale.note && " · "}
+            </>
+          )}
+          {sale.note}
+        </p>
+      )}
 
       <Card>
         <CardHeader>
@@ -57,6 +116,38 @@ export default async function SaleDetailPage({
               ))}
             </tbody>
             <tfoot>
+              {(sale.discountCents > 0n || sale.taxCents > 0n) && (
+                <>
+                  <tr className="border-t">
+                    <td colSpan={3} className="py-1 text-right text-xs">
+                      {t("subtotal")}
+                    </td>
+                    <td className="py-1 text-right text-xs" data-numeric="">
+                      {centsToDecimalString(subtotalCents)}
+                    </td>
+                  </tr>
+                  {sale.taxCents > 0n && (
+                    <tr>
+                      <td colSpan={3} className="py-1 text-right text-xs">
+                        IVA
+                      </td>
+                      <td className="py-1 text-right text-xs" data-numeric="">
+                        {centsToDecimalString(sale.taxCents)}
+                      </td>
+                    </tr>
+                  )}
+                  {sale.discountCents > 0n && (
+                    <tr>
+                      <td colSpan={3} className="py-1 text-right text-xs">
+                        {t("discount")}
+                      </td>
+                      <td className="py-1 text-right text-xs" data-numeric="">
+                        −{centsToDecimalString(sale.discountCents)}
+                      </td>
+                    </tr>
+                  )}
+                </>
+              )}
               <tr className="border-t">
                 <td colSpan={3} className="py-2 text-right font-medium">
                   {t("total")}
@@ -103,7 +194,11 @@ export default async function SaleDetailPage({
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             {balanceCents > 0n && (
-              <PaymentForm saleId={id} saleCurrency={sale.currency} />
+              <PaymentForm
+                saleId={id}
+                saleCurrency={sale.currency}
+                balance={centsToDecimalString(balanceCents)}
+              />
             )}
             {payments.length > 0 && (
               <ul className="divide-y text-sm">

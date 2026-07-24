@@ -48,6 +48,11 @@ export default async function NewSalePage() {
             }))}
           rates={rateMap}
           baseCurrency={settings?.baseCurrency ?? "CUP"}
+          saleExtras
+          taxPct={
+            (settings?.fiscalSettings as { salesTaxPct?: string } | null)
+              ?.salesTaxPct ?? "0"
+          }
         />
       )}
     </div>
