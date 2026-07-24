@@ -23,9 +23,7 @@ test.describe.serial("personas y análisis end-to-end", () => {
     await page.getByRole("button", { name: /^agregar$/i }).click();
     // rol cell: el nombre también existe como <option> oculta en el form de
     // observación del día (details colapsado)
-    await expect(
-      page.getByRole("cell", { name: "Obrero E2E" }),
-    ).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Obrero E2E" })).toBeVisible();
     await expect(page.getByText(/nómina activa/i)).toBeVisible();
 
     // cliente + compromiso semanal
