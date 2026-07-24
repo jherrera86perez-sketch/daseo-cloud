@@ -20,22 +20,46 @@ function atrasoBadge(dias: number): string {
   return "bg-secondary text-muted-foreground";
 }
 
-export default async function ReceivablesPage() {
+export default async function ReceivablesPage({
+  searchParams,
+}: Readonly<{ searchParams: Promise<{ tipo?: string }> }>) {
   const { orgId } = await requireOrg();
   const t = await getTranslations("app.receivables");
   const locale = await getLocale();
+  const sp = await searchParams;
+  const tipo = sp.tipo === "CLIENTE" || sp.tipo === "PDV" ? sp.tipo : undefined;
   const db = getDb();
   const [resumen, grupos] = await Promise.all([
     cobrosResumen(db, orgId),
-    accountsReceivableGrouped(db, orgId),
+    accountsReceivableGrouped(db, orgId, tipo),
   ]);
   const fmtDate = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h1 className="text-2xl font-bold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+        </div>
+        {/* ERP: tipo=CLIENTE|PDV agrupa CxC bajo su propio filtro */}
+        <div className="flex rounded-md border p-0.5 text-sm">
+          {(
+            [
+              [undefined, t("typeAll")],
+              ["CLIENTE", t("typeCliente")],
+              ["PDV", t("typePdv")],
+            ] as const
+          ).map(([v, label]) => (
+            <Link
+              key={label}
+              href={v ? `/receivables?tipo=${v}` : "/receivables"}
+              className={`rounded px-3 py-1 ${tipo === v ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Resumen de cobranza (GET /cobros/resumen del ERP) */}

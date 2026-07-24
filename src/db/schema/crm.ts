@@ -29,10 +29,32 @@ export const customers = pgTable(
     notes: text("notes"),
     // "aprendida" al vincular un cobro al banco (extraerPagador del ERP)
     referenciaBancaria: text("referencia_bancaria"),
+    // ≈ compradores.tipo del ERP: CONSUMIDO de verdad — filtra CxC
+    // (GET /cobros/cuentas-por-cobrar?tipo=CLIENTE|PDV). "Punto de Venta"
+    // agrupa sus cuentas por cobrar bajo su propio filtro.
+    customerType: text("customer_type").notNull().default("CLIENTE"),
+    // Resto de campos del tab Financiero/Otros del ERP: informativos, se
+    // muestran en la ficha, no se enforzan en ningún flujo (igual que el ERP)
+    commercialType: text("commercial_type"), // Persona/Empresa/Gobierno/ONG
+    paymentTerms: text("payment_terms"), // Contado/15 días/30 días/...
+    creditDays: integer("credit_days"),
+    creditLimitCents: bigint("credit_limit_cents", { mode: "bigint" }),
+    discountDefaultPct: text("discount_default_pct"),
+    category: text("category"), // VIP/Premium/Regular/Nuevo/Inactivo
+    active: boolean("active").notNull().default(true),
+    blocked: boolean("blocked").notNull().default(false),
+    blockReason: text("block_reason"),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
     ...timestamps,
   },
-  (t) => [index("customers_org_idx").on(t.orgId, t.name)],
+  (t) => [
+    index("customers_org_idx").on(t.orgId, t.name),
+    check("customers_type_check", sql`${t.customerType} in ('CLIENTE','PDV')`),
+    check(
+      "customers_credit_limit_check",
+      sql`${t.creditLimitCents} is null or ${t.creditLimitCents} >= 0`,
+    ),
+  ],
 );
 
 export const contacts = pgTable(

@@ -29,14 +29,39 @@ function fromForm(form: FormData, keys: string[]) {
   return out;
 }
 
+const CUSTOMER_FORM_KEYS = [
+  "name",
+  "taxId",
+  "email",
+  "phone",
+  "address",
+  "notes",
+  "customerType",
+  "commercialType",
+  "paymentTerms",
+  "creditDays",
+  "creditLimit",
+  "discountDefaultPct",
+  "category",
+  "blockReason",
+];
+
+function customerFromForm(form: FormData) {
+  return {
+    ...fromForm(form, CUSTOMER_FORM_KEYS),
+    // checkboxes: ausentes en el FormData si están desmarcados — no se
+    // pueden tratar como "vacío = usar default" (perdería el desmarcado)
+    active: form.get("active") === "on",
+    blocked: form.get("blocked") === "on",
+  };
+}
+
 export async function createCustomerAction(
   _prev: ActionState,
   form: FormData,
 ): Promise<ActionState> {
   const { orgId, userId } = await requireOrg();
-  const parsed = customerInputSchema.safeParse(
-    fromForm(form, ["name", "taxId", "email", "phone", "address", "notes"]),
-  );
+  const parsed = customerInputSchema.safeParse(customerFromForm(form));
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "invalid" };
   }
@@ -52,9 +77,7 @@ export async function updateCustomerAction(
   form: FormData,
 ): Promise<ActionState> {
   const { orgId, userId } = await requireOrg();
-  const parsed = customerInputSchema.safeParse(
-    fromForm(form, ["name", "taxId", "email", "phone", "address", "notes"]),
-  );
+  const parsed = customerInputSchema.safeParse(customerFromForm(form));
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "invalid" };
   }

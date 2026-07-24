@@ -527,7 +527,10 @@
       "daysLateCol": "Días",
       "saleDate": "Fecha de venta",
       "groupBalance": "Saldo del cliente (base)",
-      "consolidatedNote": "Los saldos por cliente se consolidan a moneda base con la tasa fijada de cada documento. Vencida = más de 14 días desde la venta (7 normales + 7 de tregua, como el ERP)."
+      "consolidatedNote": "Los saldos por cliente se consolidan a moneda base con la tasa fijada de cada documento. Vencida = más de 14 días desde la venta (7 normales + 7 de tregua, como el ERP).",
+      "typeAll": "Todos",
+      "typeCliente": "Cliente",
+      "typePdv": "Punto de Venta"
     },
     "payables": {
       "title": "Cuentas por Pagar",
@@ -610,7 +613,24 @@
         "phone": "Teléfono",
         "address": "Dirección",
         "notes": "Notas",
-        "save": "Guardar"
+        "save": "Guardar",
+        "customerType": "Clasificación operativa",
+        "typeCliente": "Cliente",
+        "typePdv": "Punto de Venta",
+        "typeHint": "Los Puntos de Venta agrupan cuentas por cobrar bajo su propio filtro en la página de Cuentas por Cobrar.",
+        "paymentTerms": "Condiciones de pago",
+        "paymentTermsNone": "Sin definir",
+        "creditDays": "Días de crédito",
+        "creditLimit": "Límite de crédito",
+        "discountDefault": "Descuento default (%)",
+        "category": "Categoría",
+        "categoryNone": "Sin categoría",
+        "commercialType": "Tipo de cliente",
+        "commercialTypePlaceholder": "Persona, Empresa, Gobierno, ONG…",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "blocked": "Bloqueado",
+        "blockReasonPlaceholder": "Motivo del bloqueo"
       }
     },
     "products": {

@@ -8,6 +8,7 @@ import {
   addInteractionAction,
 } from "@/features/customers/actions";
 import { InlineForm } from "@/features/customers/inline-forms";
+import { centsToDecimalString } from "@/lib/money";
 import { listCommitmentsWithStatus } from "@/features/people/queries";
 import {
   CommitmentForm,
@@ -36,12 +37,38 @@ export default async function CustomerDetailPage({
   return (
     <div className="flex max-w-2xl flex-col gap-6">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">{customer.name}</h1>
+        <h1 className="flex items-center gap-2 text-2xl font-bold">
+          {customer.name}
+          <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-normal">
+            {customer.customerType === "PDV"
+              ? `🏪 ${t("form.typePdv")}`
+              : `👤 ${t("form.typeCliente")}`}
+          </span>
+        </h1>
         <Button asChild variant="outline" size="sm">
           <Link href={`/customers/${id}/edit`}>
             <Pencil className="size-4" aria-hidden /> {t("edit")}
           </Link>
         </Button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <span
+          className={`rounded-full px-2 py-0.5 text-xs ${customer.active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-secondary text-muted-foreground"}`}
+        >
+          {customer.active ? t("form.active") : t("form.inactive")}
+        </span>
+        {customer.blocked && (
+          <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
+            {t("form.blocked")}
+            {customer.blockReason && `: ${customer.blockReason}`}
+          </span>
+        )}
+        {customer.category && (
+          <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">
+            {customer.category}
+          </span>
+        )}
       </div>
 
       <dl className="grid grid-cols-2 gap-2 text-sm">
@@ -63,6 +90,21 @@ export default async function CustomerDetailPage({
             <dd>{customer.address}</dd>
           </>
         )}
+        {customer.paymentTerms && (
+          <>
+            <dt className="text-muted-foreground">{t("form.paymentTerms")}</dt>
+            <dd>{customer.paymentTerms}</dd>
+          </>
+        )}
+        {customer.creditLimitCents != null &&
+          customer.creditLimitCents > 0n && (
+            <>
+              <dt className="text-muted-foreground">{t("form.creditLimit")}</dt>
+              <dd data-numeric="">
+                {centsToDecimalString(customer.creditLimitCents)}
+              </dd>
+            </>
+          )}
       </dl>
 
       <Card>

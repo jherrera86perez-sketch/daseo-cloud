@@ -405,11 +405,20 @@ export async function addPayment(
 export async function listSales(
   db: Db,
   orgId: string,
-): Promise<Array<SaleRow & { customerName: string; paidCents: bigint }>> {
+): Promise<
+  Array<
+    SaleRow & {
+      customerName: string;
+      customerType: string;
+      paidCents: bigint;
+    }
+  >
+> {
   const rows = await db
     .select({
       sale: sales,
       customerName: customers.name,
+      customerType: customers.customerType,
       paid: sql<string>`coalesce((select sum(p.applied_cents) from payments p where p.sale_id = ${sales.id}), 0)`,
     })
     .from(sales)
@@ -420,6 +429,7 @@ export async function listSales(
   return rows.map((r: any) => ({
     ...r.sale,
     customerName: r.customerName,
+    customerType: r.customerType,
     paidCents: BigInt(r.paid),
   }));
 }
@@ -430,7 +440,12 @@ export async function accountsReceivable(
   orgId: string,
 ): Promise<
   Array<
-    SaleRow & { customerName: string; paidCents: bigint; balanceCents: bigint }
+    SaleRow & {
+      customerName: string;
+      customerType: string;
+      paidCents: bigint;
+      balanceCents: bigint;
+    }
   >
 > {
   const all = await listSales(db, orgId);
@@ -582,11 +597,17 @@ export type CxcCliente = {
  * CLIENTE, ordenadas por días de atraso desc (dentro, venta más vieja
  * primero). El saldo del grupo se consolida a base con tasas fijadas.
  */
+/**
+ * ERP GET /cobros/cuentas-por-cobrar?tipo=CLIENTE|PDV: filtra por el tipo
+ * del cliente ("Punto de Venta agrupa sus cuentas bajo su propio filtro").
+ */
 export async function accountsReceivableGrouped(
   db: Db,
   orgId: string,
+  tipo?: "CLIENTE" | "PDV",
 ): Promise<CxcCliente[]> {
-  const ar = await accountsReceivable(db, orgId);
+  const all = await accountsReceivable(db, orgId);
+  const ar = tipo ? all.filter((v) => v.customerType === tipo) : all;
   const grupos = new Map<string, CxcCliente>();
   for (const v of ar) {
     const dias = diasAtraso(v);

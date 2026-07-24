@@ -2,6 +2,7 @@ import { and, desc, eq, ilike } from "drizzle-orm";
 import { customers, contacts, interactions } from "@/db/schema";
 import { assertOwnedByOrg, notDeleted } from "@/lib/tenant";
 import { logAudit } from "@/lib/audit";
+import { parseDecimalToCents } from "@/lib/money";
 import type { CustomerInput, ContactInput, InteractionInput } from "./schemas";
 
 /*
@@ -18,7 +19,7 @@ type UserId = string | null;
 export type CustomerRow = typeof customers.$inferSelect;
 export type CustomerListItem = Pick<
   CustomerRow,
-  "id" | "name" | "phone" | "email" | "createdAt"
+  "id" | "name" | "phone" | "email" | "createdAt" | "customerType"
 >;
 export type ContactRow = typeof contacts.$inferSelect;
 export type InteractionRow = typeof interactions.$inferSelect;
@@ -39,6 +40,7 @@ export async function listCustomers(
       phone: customers.phone,
       email: customers.email,
       createdAt: customers.createdAt,
+      customerType: customers.customerType,
     })
     .from(customers)
     .where(and(...filters))
@@ -86,6 +88,14 @@ export async function getCustomerDetail(
   return { customer, contacts: contactRows, interactions: interactionRows };
 }
 
+function toRow(input: CustomerInput) {
+  const { creditLimit, ...rest } = input;
+  return {
+    ...rest,
+    creditLimitCents: creditLimit ? parseDecimalToCents(creditLimit) : null,
+  };
+}
+
 export async function createCustomer(
   db: Db,
   orgId: string,
@@ -94,7 +104,7 @@ export async function createCustomer(
 ): Promise<CustomerRow> {
   const [row] = await db
     .insert(customers)
-    .values({ ...input, orgId })
+    .values({ ...toRow(input), orgId })
     .returning();
   await logAudit(db, {
     orgId,
@@ -117,7 +127,7 @@ export async function updateCustomer(
   const before = await getOwnedCustomer(db, orgId, id);
   const [row] = await db
     .update(customers)
-    .set({ ...input, updatedAt: new Date() })
+    .set({ ...toRow(input), updatedAt: new Date() })
     .where(and(eq(customers.id, id), eq(customers.orgId, orgId)))
     .returning();
   await logAudit(db, {
