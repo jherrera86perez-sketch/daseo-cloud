@@ -24,6 +24,7 @@ import {
   Banknote,
   Trophy,
   Gift,
+  HeartHandshake,
 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
 import { LocaleSwitcher } from "@/features/auth/locale-switcher";
@@ -94,6 +95,11 @@ export default async function AppLayout({
     { href: "/pipeline", label: t("pipeline"), icon: KanbanSquare },
     { href: "/recipes", label: t("recipes"), icon: FlaskConical },
     { href: "/production", label: t("production"), icon: Factory },
+    {
+      href: "/internal-outflows",
+      label: t("internalOutflows"),
+      icon: HeartHandshake,
+    },
     { href: "/settings", label: t("settings"), icon: Settings },
   ] as const;
 

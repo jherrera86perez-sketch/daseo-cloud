@@ -142,7 +142,7 @@ export async function getStock(
         eq(inventoryMovements.productId, productId),
       ),
     )
-    .orderBy(desc(inventoryMovements.createdAt), desc(inventoryMovements.id))
+    .orderBy(desc(inventoryMovements.seq))
     .limit(1);
   if (!last) {
     return { qtyMilli: 0n, avgCostCents: 0n };
@@ -260,7 +260,7 @@ export async function listMovements(
         eq(inventoryMovements.productId, productId),
       ),
     )
-    .orderBy(desc(inventoryMovements.createdAt), desc(inventoryMovements.id));
+    .orderBy(desc(inventoryMovements.seq));
 }
 
 /** Lista con el saldo actual de cada producto (para la tabla). */
@@ -268,17 +268,19 @@ export async function listProductsWithStock(
   db: Db,
   orgId: string,
   opts: { search?: string },
-): Promise<Array<ProductRow & { balance: string }>> {
+): Promise<Array<ProductRow & { balance: string; avg_cost_cents: string }>> {
   const searchClause = opts.search
     ? sql`and p.name ilike ${"%" + opts.search + "%"}`
     : sql``;
   const rows = await db.execute(sql`
-    select p.*, coalesce(m.balance_qty, '0') as balance
+    select p.*,
+      coalesce(m.balance_qty, '0') as balance,
+      coalesce(m.balance_avg_cost_base_cents, 0)::text as avg_cost_cents
     from products p
     left join lateral (
-      select balance_qty from inventory_movements im
+      select balance_qty, balance_avg_cost_base_cents from inventory_movements im
       where im.product_id = p.id and im.org_id = p.org_id
-      order by im.created_at desc, im.id desc limit 1
+      order by im.seq desc limit 1
     ) m on true
     where p.org_id = ${orgId} and p.deleted_at is null ${searchClause}
     order by p.name
@@ -297,7 +299,7 @@ export async function lowStockProducts(
     left join lateral (
       select balance_qty from inventory_movements im
       where im.product_id = p.id and im.org_id = p.org_id
-      order by im.created_at desc, im.id desc limit 1
+      order by im.seq desc limit 1
     ) m on true
     where p.org_id = ${orgId}
       and p.deleted_at is null

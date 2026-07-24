@@ -10,3 +10,4 @@ export * from "./people";
 export * from "./platform";
 export * from "./statements";
 export * from "./raffles";
+export * from "./internal-outflows";

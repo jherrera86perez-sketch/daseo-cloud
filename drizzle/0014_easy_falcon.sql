@@ -1,0 +1,1 @@
+ALTER TABLE "inventory_movements" ADD COLUMN "seq" bigserial NOT NULL;

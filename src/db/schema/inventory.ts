@@ -5,6 +5,7 @@ import {
   text,
   timestamp,
   bigint,
+  bigserial,
   boolean,
   numeric,
   check,
@@ -57,6 +58,9 @@ export const inventoryMovements = pgTable(
   "inventory_movements",
   {
     id: id(),
+    // Orden TOTAL de asiento: dentro de una transacción now() es constante y
+    // el id uuid no ordena — el saldo vigente es el de mayor seq.
+    seq: bigserial("seq", { mode: "bigint" }).notNull(),
     orgId: uuid("org_id")
       .notNull()
       .references(() => organizations.id),
