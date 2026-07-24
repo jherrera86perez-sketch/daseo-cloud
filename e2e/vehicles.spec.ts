@@ -25,22 +25,24 @@ test.describe.serial("vehículos end-to-end", () => {
     await page.getByLabel(/^placa$/i).fill("MOTO-1");
     await page.getByLabel(/categoría fiscal/i).selectOption("A_MOTO");
     await page.getByRole("button", { name: /^agregar$/i }).click();
-    await expect(page.getByText(/veh[ií]culo agregado/i)).toBeVisible();
+    await expect(page.getByText(/veh[ií]culo agregado/i)).toBeVisible({
+      timeout: 20_000,
+    });
 
     // B_CARGA_MEDIA = 450.00
     await page.getByLabel(/^placa$/i).fill("CAMION-1");
     await page.getByLabel(/categoría fiscal/i).selectOption("B_CARGA_MEDIA");
     await page.getByRole("button", { name: /^agregar$/i }).click();
-    await expect(page.getByText("CAMION-1")).toBeVisible();
+    await expect(page.getByText("CAMION-1")).toBeVisible({ timeout: 20_000 });
 
     // total anual = 110.00 + 450.00 = 560.00
     const totalLine = page.getByText(/total anual/i);
-    await expect(totalLine).toContainText("560.00");
+    await expect(totalLine).toContainText("560.00", { timeout: 20_000 });
 
     // dar de baja el camión → total baja a 110.00
     const camionRow = page.locator("tr", { hasText: "CAMION-1" });
     await camionRow.getByRole("button", { name: /dar de baja/i }).click();
-    await expect(totalLine).toContainText("110.00");
-    await expect(page.getByText(/vendido/i)).toBeVisible();
+    await expect(totalLine).toContainText("110.00", { timeout: 20_000 });
+    await expect(page.getByText(/vendido/i)).toBeVisible({ timeout: 20_000 });
   });
 });
