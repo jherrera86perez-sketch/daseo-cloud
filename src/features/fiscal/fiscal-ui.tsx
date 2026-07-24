@@ -119,6 +119,28 @@ export function ComputeMonthButton({
   );
 }
 
+/** ≈ badges de confianza del ERP (getIncomeSourceDetail): comunica de dónde
+ * salió la base imponible, sin bloquear el flujo si es de baja confianza. */
+export function ConfidenceBadge({
+  confidence,
+}: Readonly<{ confidence: "alta" | "media" | "baja" | "sin_datos" }>) {
+  const t = useTranslations("app.fiscal");
+  const styles: Record<string, string> = {
+    alta: "bg-success/10 text-success",
+    media: "bg-warning/10 text-warning",
+    baja: "bg-destructive/10 text-destructive",
+    sin_datos: "bg-muted text-muted-foreground",
+  };
+  return (
+    <span
+      title={t(`confidenceHint.${confidence}`)}
+      className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles[confidence]}`}
+    >
+      {t(`confidence.${confidence}`)}
+    </span>
+  );
+}
+
 export function MarkPaidButton({ id }: Readonly<{ id: string }>) {
   const t = useTranslations("app.fiscal");
   const [pending, start] = useTransition();

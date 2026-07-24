@@ -1,9 +1,7 @@
 // @vitest-environment node
 import { beforeAll, describe, expect, it } from "vitest";
 import { createTestDb, type TestDb } from "@/test/db";
-import { organizations, orgSettings } from "@/db/schema";
-import { createCustomer } from "@/features/customers/queries";
-import { createSale, confirmSale } from "@/features/sales/queries";
+import { organizations, orgSettings, consolidatedEntries } from "@/db/schema";
 import {
   saveFiscalSettings,
   computeMonthObligations,
@@ -37,20 +35,24 @@ beforeAll(async () => {
     monthlyPayrollCents: "0",
   });
 
-  // venta confirmada de 100,000.00 CUP este mes
-  const c = await createCustomer(db, orgA, USER, { name: "Cliente F4" });
-  const s = await createSale(db, orgA, USER, {
-    customerId: c.id,
-    currency: "CUP",
-    rateToBase: "1",
-    idempotencyKey: "f4f4f4f4-0000-4000-8000-000000000001",
-    items: [{ description: "d", qty: "1", unitPriceCents: 10_000_000n }],
+  // Paridad ERP: la base imponible sale del BANCO (consolidado), no de las
+  // ventas — un ingreso de 100,000.00 CUP categorizado como venta real
+  // (tier 1 / confianza "alta" de incomeSourceDetail).
+  await db.insert(consolidatedEntries).values({
+    orgId: orgA,
+    fechaContable: `${YEAR}-${String(MONTH).padStart(2, "0")}-15`,
+    dia: 15,
+    mes: MONTH,
+    anio: YEAR,
+    tipoTransaccion: "CR",
+    importe: "100000.00",
+    categoria: "Ventas Minoristas",
+    origen: "manual",
   });
-  await confirmSale(db, orgA, USER, s.id);
 });
 
 describe("obligaciones ONAT del mes", () => {
-  it("calcula desde las ventas confirmadas reales", async () => {
+  it("calcula desde el consolidado bancario real (paridad ERP)", async () => {
     const rows = await computeMonthObligations(db, orgA, USER, YEAR, MONTH);
     const ventas = rows.find((r) => r.conceptCode === "011402");
     expect(ventas?.amountCents).toBe(1_000_000n); // 10% de 100,000

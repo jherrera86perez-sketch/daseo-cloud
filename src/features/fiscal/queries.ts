@@ -1,8 +1,19 @@
-import { and, eq, gte, lt } from "drizzle-orm";
-import { taxObligations, sales, purchases, orgSettings } from "@/db/schema";
+import { and, eq, gte, lt, sql } from "drizzle-orm";
+import {
+  taxObligations,
+  sales,
+  orgSettings,
+  statementMovements,
+} from "@/db/schema";
 import { assertOwnedByOrg } from "@/lib/tenant";
 import { logAudit } from "@/lib/audit";
+import { parseDecimalToCents } from "@/lib/money";
 import { getFiscalEngine, type AnnualProjection } from "@/lib/fiscal";
+import {
+  SALES_CATEGORIES,
+  NON_OPERATING_INCOME_CATEGORIES,
+  DEDUCTIBLE_EXPENSE_CATEGORIES,
+} from "@/lib/fiscal-categories";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Db = any;
@@ -78,24 +89,213 @@ async function salesBaseOfPeriod(
   return rows.reduce((acc: bigint, r: { total: bigint }) => acc + r.total, 0n);
 }
 
-async function purchasesBaseOfPeriod(
+// ─────────────── Paridad ERP: base imponible desde el BANCO ───────────────
+// TaxEngine.js del ERP: "Fuentes de ingresos (en orden de prioridad):
+// 1. consolidado_bancario  2. movimientos_cuenta" — la tabla `ventas` NUNCA
+// alimenta el cálculo real (solo el análisis de brecha, más abajo).
+
+export type IncomeSource =
+  "consolidado_ventas" | "consolidado_bancario" | "movimientos_cuenta" | "none";
+export type IncomeConfidence = "alta" | "media" | "baja" | "sin_datos";
+export type IncomeSourceDetail = {
+  totalCents: bigint;
+  source: IncomeSource;
+  confidence: IncomeConfidence;
+};
+
+async function sumConsolidated(
   db: Db,
   orgId: string,
-  from: Date,
-  to: Date,
+  year: number,
+  month: number | undefined,
+  categoriaFilter: ReturnType<typeof sql> | undefined,
 ): Promise<bigint> {
+  const monthClause = month ? sql`and c.mes = ${month}` : sql``;
+  const res = await db.execute(sql`
+    select coalesce(sum(c.importe), 0)::text as total
+    from consolidated_entries c
+    where c.org_id = ${orgId} and c.anio = ${year} and c.tipo_transaccion = 'CR'
+      ${monthClause} ${categoriaFilter ?? sql``}
+  `);
+  const rows = (res.rows ?? res) as Array<{ total: string }>;
+  return parseDecimalToCents(rows[0]?.total ?? "0");
+}
+
+async function sumStatementMovements(
+  db: Db,
+  orgId: string,
+  year: number,
+  month: number | undefined,
+): Promise<bigint> {
+  const filters = [
+    eq(statementMovements.orgId, orgId),
+    eq(statementMovements.anio, year),
+    eq(statementMovements.operacion, "CR"),
+  ];
+  if (month) filters.push(eq(statementMovements.mes, month));
   const rows = await db
-    .select({ total: purchases.totalBaseCents })
-    .from(purchases)
-    .where(
-      and(
-        eq(purchases.orgId, orgId),
-        eq(purchases.status, "confirmed"),
-        gte(purchases.receivedAt, from),
-        lt(purchases.receivedAt, to),
-      ),
+    .select({
+      total: sql<string>`coalesce(sum(${statementMovements.importe}), 0)::text`,
+    })
+    .from(statementMovements)
+    .where(and(...filters));
+  return parseDecimalToCents(rows[0]?.total ?? "0");
+}
+
+/**
+ * ≈ getIncomeSourceDetail del ERP: cascada de 3 niveles de confianza.
+ * 1 (alta): consolidado filtrado por categorías de venta reales.
+ * 2 (media): consolidado, todos los CR salvo los no-operativos (préstamos,
+ *    transferencias internas, aportes de capital...).
+ * 3 (baja): estados de cuenta crudos (BPA sin conciliar/categorizar).
+ */
+export async function incomeSourceDetail(
+  db: Db,
+  orgId: string,
+  year: number,
+  month?: number,
+): Promise<IncomeSourceDetail> {
+  const salesCategoriaIn = sql`and c.categoria in (${sql.join(
+    SALES_CATEGORIES.map((c) => sql`${c}`),
+    sql`, `,
+  )})`;
+  const tier1 = await sumConsolidated(db, orgId, year, month, salesCategoriaIn);
+  if (tier1 > 0n) {
+    return {
+      totalCents: tier1,
+      source: "consolidado_ventas",
+      confidence: "alta",
+    };
+  }
+
+  const nonOperatingNotIn = sql`and (c.categoria is null or c.categoria not in (${sql.join(
+    NON_OPERATING_INCOME_CATEGORIES.map((c) => sql`${c}`),
+    sql`, `,
+  )}))`;
+  const tier2 = await sumConsolidated(
+    db,
+    orgId,
+    year,
+    month,
+    nonOperatingNotIn,
+  );
+  if (tier2 > 0n) {
+    return {
+      totalCents: tier2,
+      source: "consolidado_bancario",
+      confidence: "media",
+    };
+  }
+
+  const tier3 = await sumStatementMovements(db, orgId, year, month);
+  if (tier3 > 0n) {
+    return {
+      totalCents: tier3,
+      source: "movimientos_cuenta",
+      confidence: "baja",
+    };
+  }
+  return { totalCents: 0n, source: "none", confidence: "sin_datos" };
+}
+
+/**
+ * ≈ getMonthlyDeductibleExpenses/getAnnualDeductibleExpenses del ERP: 100%
+ * banco (consolidado, tipo DB, categorías deducibles) — NO desde compras.
+ */
+export async function deductibleExpensesFromBank(
+  db: Db,
+  orgId: string,
+  year: number,
+  month?: number,
+): Promise<bigint> {
+  const monthClause = month ? sql`and c.mes = ${month}` : sql``;
+  const categoriaIn = sql`and c.categoria in (${sql.join(
+    DEDUCTIBLE_EXPENSE_CATEGORIES.map((c) => sql`${c}`),
+    sql`, `,
+  )})`;
+  const res = await db.execute(sql`
+    select coalesce(sum(c.importe), 0)::text as total
+    from consolidated_entries c
+    where c.org_id = ${orgId} and c.anio = ${year} and c.tipo_transaccion = 'DB'
+      ${monthClause} ${categoriaIn}
+  `);
+  const rows = (res.rows ?? res) as Array<{ total: string }>;
+  return parseDecimalToCents(rows[0]?.total ?? "0");
+}
+
+export type GapMonth = {
+  mes: number;
+  anio: number;
+  ventasInternasCents: bigint;
+  ingresosBancariosCents: bigint;
+  brechaCents: bigint;
+  porcentajeBancarizado: number | null;
+};
+
+/**
+ * ≈ getGapAnalysis del ERP: ventas internas (no canceladas) vs TODOS los CR
+ * del banco (sin categorizar), mes a mes. Herramienta de TRANSPARENCIA para
+ * el operador — NO altera la base declarada (esa sale de incomeSourceDetail).
+ * Literal del ERP: "dinero que se vendió pero NO aparece en el banco —
+ * típicamente efectivo retenido fuera del sistema bancario".
+ */
+export async function gapAnalysis(
+  db: Db,
+  orgId: string,
+  year: number,
+): Promise<{ months: GapMonth[]; totals: GapMonth }> {
+  const months: GapMonth[] = [];
+  for (let mes = 1; mes <= 12; mes++) {
+    const from = new Date(Date.UTC(year, mes - 1, 1));
+    const to = new Date(Date.UTC(year, mes, 1));
+    const ventasInternasCents = await salesBaseOfPeriod(db, orgId, from, to);
+    const ingresosBancariosCents = await sumConsolidated(
+      db,
+      orgId,
+      year,
+      mes,
+      undefined,
     );
-  return rows.reduce((acc: bigint, r: { total: bigint }) => acc + r.total, 0n);
+    const brechaCents = ventasInternasCents - ingresosBancariosCents;
+    const porcentajeBancarizado =
+      ventasInternasCents > 0n
+        ? Number((ingresosBancariosCents * 10000n) / ventasInternasCents) / 100
+        : null;
+    months.push({
+      mes,
+      anio: year,
+      ventasInternasCents,
+      ingresosBancariosCents,
+      brechaCents,
+      porcentajeBancarizado,
+    });
+  }
+  const totals = months.reduce(
+    (acc, m) => ({
+      mes: 0,
+      anio: year,
+      ventasInternasCents: acc.ventasInternasCents + m.ventasInternasCents,
+      ingresosBancariosCents:
+        acc.ingresosBancariosCents + m.ingresosBancariosCents,
+      brechaCents: acc.brechaCents + m.brechaCents,
+      porcentajeBancarizado: null,
+    }),
+    {
+      mes: 0,
+      anio: year,
+      ventasInternasCents: 0n,
+      ingresosBancariosCents: 0n,
+      brechaCents: 0n,
+      porcentajeBancarizado: null as number | null,
+    },
+  );
+  totals.porcentajeBancarizado =
+    totals.ventasInternasCents > 0n
+      ? Number(
+          (totals.ingresosBancariosCents * 10000n) / totals.ventasInternasCents,
+        ) / 100
+      : null;
+  return { months, totals };
 }
 
 /**
@@ -114,9 +314,8 @@ export async function computeMonthObligations(
   if (!engine) {
     throw new Error("Configura el país fiscal primero (CU disponible)");
   }
-  const from = new Date(Date.UTC(year, month - 1, 1));
-  const to = new Date(Date.UTC(year, month, 1));
-  const salesBase = await salesBaseOfPeriod(db, orgId, from, to);
+  const income = await incomeSourceDetail(db, orgId, year, month);
+  const salesBase = income.totalCents;
 
   // nómina: empleados activos primero; si no hay, el valor manual de settings
   const { activePayrollCents } = await import("@/features/people/queries");
@@ -238,17 +437,21 @@ export async function dj08Projection(
   orgId: string,
   year: number,
 ): Promise<
-  AnnualProjection & { incomeCents: bigint; deductibleCents: bigint }
+  AnnualProjection & {
+    incomeCents: bigint;
+    deductibleCents: bigint;
+    incomeSource: IncomeSource;
+    incomeConfidence: IncomeConfidence;
+  }
 > {
   const { country, settings } = await getFiscalSettings(db, orgId);
   const engine = getFiscalEngine(country);
   if (!engine) {
     throw new Error("Configura el país fiscal primero (CU disponible)");
   }
-  const from = new Date(Date.UTC(year, 0, 1));
-  const to = new Date(Date.UTC(year + 1, 0, 1));
-  const incomeCents = await salesBaseOfPeriod(db, orgId, from, to);
-  const deductibleCents = await purchasesBaseOfPeriod(db, orgId, from, to);
+  const income = await incomeSourceDetail(db, orgId, year);
+  const incomeCents = income.totalCents;
+  const deductibleCents = await deductibleExpensesFromBank(db, orgId, year);
   const advances: ObligationRow[] = await db
     .select()
     .from(taxObligations)
@@ -270,5 +473,11 @@ export async function dj08Projection(
     advancesPaidCents,
     minExemptCents: BigInt(settings.minExemptCents ?? "0"),
   });
-  return { ...projection, incomeCents, deductibleCents };
+  return {
+    ...projection,
+    incomeCents,
+    deductibleCents,
+    incomeSource: income.source,
+    incomeConfidence: income.confidence,
+  };
 }

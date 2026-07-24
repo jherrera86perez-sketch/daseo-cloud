@@ -1,7 +1,10 @@
 import { test, expect } from "@playwright/test";
 
-// F4: venta 100,000 CUP → fiscal → calcular mes → 10% ONAT visible →
-// marcar anticipo pagado → DJ-08 lo descuenta.
+// Paridad ERP: la base imponible sale del BANCO (consolidado), no de las
+// ventas. Flujo: venta 100,000 CUP (para la brecha) + entrada manual de
+// banco 100,000 CUP categorizada como venta real → fiscal → calcular mes →
+// 10% ONAT visible con confianza "alta" → marcar anticipo pagado → DJ-08
+// lo descuenta.
 const unique = `f4-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
 
 test.describe.serial("fiscal ONAT end-to-end", () => {
@@ -44,19 +47,33 @@ test.describe.serial("fiscal ONAT end-to-end", () => {
       timeout: 20_000,
     });
 
-    // fiscal: guardar configuración (país CU) y calcular
+    // paridad ERP: la base imponible sale del banco — registrar el ingreso
+    // en Control de Caja (entrada manual, categoría de venta real)
+    await page.getByRole("link", { name: /control de caja/i }).click();
+    await page.getByRole("button", { name: /entrada manual/i }).click();
+    await page.getByRole("button", { name: /solo ingresos/i }).click();
+    await page.getByPlaceholder("0.00").fill("100000.00");
+    await page
+      .locator("select")
+      .filter({ has: page.locator("option", { hasText: "Ventas Minoristas" }) })
+      .selectOption("Ventas Minoristas");
+    await page.getByRole("button", { name: /^guardar$/i }).click();
+    await expect(page.getByText(/entrada manual creada/i)).toBeVisible();
+
+    // fiscal: guardar configuración (país CU) y calcular desde el banco
     await page.getByRole("link", { name: /^fiscal$/i }).click();
     await page.getByRole("button", { name: /^guardar$/i }).click();
     await expect(
       page.getByText(/configuración fiscal guardada/i),
     ).toBeVisible();
     await page
-      .getByRole("button", { name: /calcular con las ventas/i })
+      .getByRole("button", { name: /calcular desde el banco/i })
       .click();
 
-    // 10% de ventas = 10,000.00 con código ONAT real
+    // 10% de ingresos = 10,000.00 con código ONAT real, confianza alta
     await expect(page.getByText("011402")).toBeVisible({ timeout: 20_000 });
     await expect(page.getByText("10000.00").first()).toBeVisible();
+    await expect(page.getByText("Ventas ✓").first()).toBeVisible();
 
     // marcar pagado el pago a cuenta (051012, 5,000.00)
     const anticipoRow = page.locator("tr", { hasText: "051012" });
@@ -66,5 +83,9 @@ test.describe.serial("fiscal ONAT end-to-end", () => {
     // DJ-08 visible con la escala
     await expect(page.getByText(/proyección dj-08/i)).toBeVisible();
     await expect(page.getByText(/50%/)).toBeVisible();
+
+    // brecha fiscal: venta interna = ingreso bancario este mes → 0% de brecha
+    await expect(page.getByText(/brecha fiscal/i)).toBeVisible();
+    await expect(page.getByText("100.0%").first()).toBeVisible();
   });
 });

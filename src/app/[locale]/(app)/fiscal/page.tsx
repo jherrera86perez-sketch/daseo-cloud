@@ -5,14 +5,23 @@ import {
   getFiscalSettings,
   listMonthObligations,
   dj08Projection,
+  incomeSourceDetail,
+  gapAnalysis,
 } from "@/features/fiscal/queries";
 import {
   FiscalSettingsForm,
   ComputeMonthButton,
   MarkPaidButton,
+  ConfidenceBadge,
 } from "@/features/fiscal/fiscal-ui";
 import { centsToDecimalString } from "@/lib/money";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+function formatSignedCents(cents: bigint): string {
+  return cents < 0n
+    ? `-${centsToDecimalString(-cents)}`
+    : centsToDecimalString(cents);
+}
 
 export default async function FiscalPage() {
   const { orgId } = await requireOrg();
@@ -26,6 +35,10 @@ export default async function FiscalPage() {
     ? await listMonthObligations(db, orgId, year, month)
     : [];
   const dj = country ? await dj08Projection(db, orgId, year) : null;
+  const income = country
+    ? await incomeSourceDetail(db, orgId, year, month)
+    : null;
+  const gap = country ? await gapAnalysis(db, orgId, year) : null;
 
   const pendingTotal = obligations
     .filter((o) => o.status === "pending")
@@ -61,7 +74,10 @@ export default async function FiscalPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex flex-wrap items-center justify-between gap-2">
-            {t("monthTitle", { month, year })}
+            <span className="flex items-center gap-2">
+              {t("monthTitle", { month, year })}
+              {income && <ConfidenceBadge confidence={income.confidence} />}
+            </span>
             <ComputeMonthButton year={year} month={month} />
           </CardTitle>
         </CardHeader>
@@ -133,7 +149,10 @@ export default async function FiscalPage() {
           <CardContent className="flex flex-col gap-3">
             <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
               <div>
-                <p className="text-xs text-muted-foreground">{t("income")}</p>
+                <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                  {t("income")}
+                  <ConfidenceBadge confidence={dj.incomeConfidence} />
+                </p>
                 <p className="font-bold" data-numeric="">
                   {centsToDecimalString(dj.incomeCents)}
                 </p>
@@ -200,6 +219,84 @@ export default async function FiscalPage() {
               </table>
             </div>
             <p className="text-xs text-muted-foreground">{t("djNote")}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {gap && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("gapTitle", { year })}</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="border-b text-left text-xs text-muted-foreground">
+                  <tr>
+                    <th className="py-1 pr-3 font-medium">{t("gapMonth")}</th>
+                    <th className="py-1 pr-3 text-right font-medium">
+                      {t("gapVentas")}
+                    </th>
+                    <th className="py-1 pr-3 text-right font-medium">
+                      {t("gapBanco")}
+                    </th>
+                    <th className="py-1 pr-3 text-right font-medium">
+                      {t("gapBrecha")}
+                    </th>
+                    <th className="py-1 text-right font-medium">
+                      {t("gapPct")}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {gap.months
+                    .filter(
+                      (m) =>
+                        m.ventasInternasCents > 0n ||
+                        m.ingresosBancariosCents > 0n,
+                    )
+                    .map((m) => (
+                      <tr key={m.mes}>
+                        <td className="py-1 pr-3" data-numeric="">
+                          {m.mes}/{m.anio}
+                        </td>
+                        <td className="py-1 pr-3 text-right" data-numeric="">
+                          {centsToDecimalString(m.ventasInternasCents)}
+                        </td>
+                        <td className="py-1 pr-3 text-right" data-numeric="">
+                          {centsToDecimalString(m.ingresosBancariosCents)}
+                        </td>
+                        <td className="py-1 pr-3 text-right" data-numeric="">
+                          {formatSignedCents(m.brechaCents)}
+                        </td>
+                        <td className="py-1 text-right" data-numeric="">
+                          {m.porcentajeBancarizado === null
+                            ? "—"
+                            : `${m.porcentajeBancarizado.toFixed(1)}%`}
+                        </td>
+                      </tr>
+                    ))}
+                  <tr className="font-bold">
+                    <td className="py-1 pr-3">Total</td>
+                    <td className="py-1 pr-3 text-right" data-numeric="">
+                      {centsToDecimalString(gap.totals.ventasInternasCents)}
+                    </td>
+                    <td className="py-1 pr-3 text-right" data-numeric="">
+                      {centsToDecimalString(gap.totals.ingresosBancariosCents)}
+                    </td>
+                    <td className="py-1 pr-3 text-right" data-numeric="">
+                      {formatSignedCents(gap.totals.brechaCents)}
+                    </td>
+                    <td className="py-1 text-right" data-numeric="">
+                      {gap.totals.porcentajeBancarizado === null
+                        ? "—"
+                        : `${gap.totals.porcentajeBancarizado.toFixed(1)}%`}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-muted-foreground">{t("gapNote")}</p>
           </CardContent>
         </Card>
       )}

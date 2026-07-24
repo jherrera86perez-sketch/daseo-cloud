@@ -1063,9 +1063,9 @@
       "save": "Guardar",
       "saved": "Configuración fiscal guardada",
       "monthTitle": "Obligaciones del mes {month}/{year}",
-      "compute": "Calcular con las ventas del mes",
+      "compute": "Calcular desde el banco",
       "computed": "Obligaciones calculadas",
-      "noObligations": "Sin obligaciones calculadas. Pulsa \"Calcular\" cuando tengas ventas del mes.",
+      "noObligations": "Sin obligaciones calculadas. Pulsa \"Calcular\" cuando tengas ingresos bancarios del mes.",
       "code": "Código",
       "concept": "Concepto",
       "base": "Base",
@@ -1074,6 +1074,19 @@
       "paid": "Pagada",
       "markPaid": "Marcar pagada",
       "pendingTotal": "Total pendiente",
+      "incomeSource": "Fuente de ingresos",
+      "confidence": {
+        "alta": "🟢 Ventas ✓",
+        "media": "🟡 Contabilidad",
+        "baja": "🔴 BPA raw",
+        "sin_datos": "Sin datos"
+      },
+      "confidenceHint": {
+        "alta": "Ventas conciliadas, categorías fiscales válidas",
+        "media": "Consolidado — todos los ingresos, puede incluir no-ventas",
+        "baja": "Estado de cuenta sin conciliar, puede tener ruido",
+        "sin_datos": "No hay datos bancarios para este período"
+      },
       "djTitle": "Proyección DJ-08 {year}",
       "income": "Ingresos YTD",
       "deductible": "Gastos deducibles",
@@ -1082,7 +1095,14 @@
       "bracket": "Tramo",
       "taxedBase": "Base en tramo",
       "tax": "Impuesto",
-      "djNote": "Escala progresiva 2026. Los pagos a cuenta marcados como pagados se descuentan del saldo. Proyección referencial — confírmala con tu contador antes de declarar."
+      "djNote": "Escala progresiva 2026. Los pagos a cuenta marcados como pagados se descuentan del saldo. Proyección referencial — confírmala con tu contador antes de declarar.",
+      "gapTitle": "Brecha fiscal {year}",
+      "gapMonth": "Mes",
+      "gapVentas": "Ventas internas",
+      "gapBanco": "Ingresos bancarios",
+      "gapBrecha": "Brecha",
+      "gapPct": "% bancarizado",
+      "gapNote": "Dinero que se vendió pero no aparece en el banco — típicamente efectivo retenido fuera del sistema bancario. Útil para saber cuánto margen fiscal tienes y decidir conscientemente cómo conciliar. No altera la base declarada arriba."
     },
     "banking": {
       "title": "Cuentas bancarias",
