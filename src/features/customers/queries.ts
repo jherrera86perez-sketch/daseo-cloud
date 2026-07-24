@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike } from "drizzle-orm";
+import { and, desc, eq, ilike, sql } from "drizzle-orm";
 import { customers, contacts, interactions } from "@/db/schema";
 import { assertOwnedByOrg, notDeleted } from "@/lib/tenant";
 import { logAudit } from "@/lib/audit";
@@ -47,6 +47,27 @@ export async function listCustomers(
     .orderBy(customers.name);
 }
 
+/**
+ * ≈ clientes con fecha_nacimiento = hoy del ERP (cumpleanios-cron.js):
+ * coincide por mes-día, cualquier año de nacimiento.
+ */
+export async function birthdaysToday(
+  db: Db,
+  orgId: string,
+  month: number,
+  day: number,
+): Promise<Array<{ id: string; name: string }>> {
+  const res = await db.execute(sql`
+    select id, name from customers
+    where org_id = ${orgId} and deleted_at is null and birth_date is not null
+      and extract(month from birth_date)::int = ${month}
+      and extract(day from birth_date)::int = ${day}
+    order by name
+  `);
+  const rows = (res.rows ?? res) as Array<{ id: string; name: string }>;
+  return rows;
+}
+
 async function getOwnedCustomer(
   db: Db,
   orgId: string,
@@ -89,10 +110,11 @@ export async function getCustomerDetail(
 }
 
 function toRow(input: CustomerInput) {
-  const { creditLimit, ...rest } = input;
+  const { creditLimit, birthDate, ...rest } = input;
   return {
     ...rest,
     creditLimitCents: creditLimit ? parseDecimalToCents(creditLimit) : null,
+    birthDate: birthDate || null,
   };
 }
 

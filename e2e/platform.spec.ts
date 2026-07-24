@@ -58,5 +58,25 @@ test.describe.serial("API pública end-to-end", () => {
       headers: { authorization: `Bearer ${plainKey}` },
     });
     expect(revoked.status()).toBe(401);
+
+    // Telegram: umbrales de cobranza (paridad ERP cobranza_dias_min/monto_min)
+    // se guardan junto al token/chat en el mismo notify_settings
+    const tgForm = page
+      .locator("form")
+      .filter({ has: page.getByPlaceholder(/token del bot/i) });
+    await tgForm.getByPlaceholder(/token del bot/i).fill("123456:e2e-fake");
+    await tgForm.getByPlaceholder(/chat id/i).fill("-100999");
+    await tgForm.getByPlaceholder("7").fill("10");
+    await tgForm.getByPlaceholder("100.00").fill("50.00");
+    await tgForm.getByRole("button", { name: /^guardar$/i }).click();
+    await expect(page.getByText(/configuración guardada/i)).toBeVisible();
+    await page.reload();
+    const tgFormReloaded = page
+      .locator("form")
+      .filter({ has: page.getByPlaceholder(/token del bot/i) });
+    await expect(tgFormReloaded.getByPlaceholder("7")).toHaveValue("10");
+    await expect(tgFormReloaded.getByPlaceholder("100.00")).toHaveValue(
+      "50.00",
+    );
   });
 });

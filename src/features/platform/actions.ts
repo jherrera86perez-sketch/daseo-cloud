@@ -7,8 +7,15 @@ import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
 import { orgSettings } from "@/db/schema";
 import { logAudit } from "@/lib/audit";
+import { parseDecimalToCents } from "@/lib/money";
 import { createApiKey, revokeApiKey } from "./queries";
-import { buildCollectionsSummary, sendTelegramMessage } from "./notify";
+import {
+  buildCollectionsSummary,
+  buildBirthdaySummary,
+  logBirthdaysSent,
+  sendTelegramMessage,
+  type NotifySettings,
+} from "./notify";
 
 export type ActionState = {
   error?: string;
@@ -57,8 +64,20 @@ export async function saveTelegramAction(
     .object({
       botToken: z.string().trim().max(100),
       chatId: z.string().trim().max(50),
+      cobranzaDiasMin: z.coerce.number().int().min(0).max(365).optional(),
+      cobranzaMontoMin: z
+        .string()
+        .trim()
+        .regex(/^\d+(?:[.,]\d{1,2})?$/)
+        .optional()
+        .or(z.literal("")),
     })
-    .safeParse({ botToken: form.get("botToken"), chatId: form.get("chatId") });
+    .safeParse({
+      botToken: form.get("botToken"),
+      chatId: form.get("chatId"),
+      cobranzaDiasMin: form.get("cobranzaDiasMin") || undefined,
+      cobranzaMontoMin: form.get("cobranzaMontoMin") || undefined,
+    });
   if (!parsed.success) return { error: "Datos inválidos" };
   const db = getDb();
   // Merge: notify_settings también guarda los umbrales del asistente (F5).
@@ -74,6 +93,10 @@ export async function saveTelegramAction(
         ...current,
         telegramBotToken: parsed.data.botToken || undefined,
         telegramChatId: parsed.data.chatId || undefined,
+        cobranzaDiasMin: parsed.data.cobranzaDiasMin,
+        cobranzaMontoMinCents: parsed.data.cobranzaMontoMin
+          ? parseDecimalToCents(parsed.data.cobranzaMontoMin).toString()
+          : undefined,
       },
       updatedAt: new Date(),
     })
@@ -100,18 +123,46 @@ export async function sendSummaryNowAction(): Promise<ActionState> {
     .select()
     .from(orgSettings)
     .where(eq(orgSettings.orgId, orgId));
-  const notify = row?.notifySettings as {
-    telegramBotToken?: string;
-    telegramChatId?: string;
-  } | null;
+  const notify = row?.notifySettings as NotifySettings | null;
   if (!notify?.telegramBotToken || !notify?.telegramChatId) {
     return { error: "Configura el bot y el chat primero" };
   }
-  const text = await buildCollectionsSummary(db, orgId);
+  const text = await buildCollectionsSummary(db, orgId, {
+    diasMin: notify.cobranzaDiasMin,
+    montoMinCents: notify.cobranzaMontoMinCents
+      ? BigInt(notify.cobranzaMontoMinCents)
+      : undefined,
+  });
   const ok = await sendTelegramMessage(
     notify.telegramBotToken,
     notify.telegramChatId,
     text,
   );
+  return ok ? { ok: "enviado" } : { error: "Telegram rechazó el envío" };
+}
+
+export async function sendBirthdaysNowAction(): Promise<ActionState> {
+  const { orgId, role } = await requireOrg();
+  if (role !== "owner" && role !== "admin") {
+    return { error: "Solo administradores" };
+  }
+  const db = getDb();
+  const [row] = await db
+    .select()
+    .from(orgSettings)
+    .where(eq(orgSettings.orgId, orgId));
+  const notify = row?.notifySettings as NotifySettings | null;
+  if (!notify?.telegramBotToken || !notify?.telegramChatId) {
+    return { error: "Configura el bot y el chat primero" };
+  }
+  const now = new Date();
+  const { text, customerIds } = await buildBirthdaySummary(db, orgId, now);
+  if (!text) return { error: "Sin cumpleaños pendientes de saludar hoy" };
+  const ok = await sendTelegramMessage(
+    notify.telegramBotToken,
+    notify.telegramChatId,
+    text,
+  );
+  if (ok) await logBirthdaysSent(db, orgId, customerIds, now.getUTCFullYear());
   return ok ? { ok: "enviado" } : { error: "Telegram rechazó el envío" };
 }

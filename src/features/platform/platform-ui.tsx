@@ -17,6 +17,7 @@ import {
   revokeApiKeyAction,
   saveTelegramAction,
   sendSummaryNowAction,
+  sendBirthdaysNowAction,
   type ActionState,
 } from "./actions";
 
@@ -114,9 +115,17 @@ export function ApiKeysCard({
 
 export function TelegramCard({
   initial,
-}: Readonly<{ initial: { botToken: string; chatId: string } }>) {
+}: Readonly<{
+  initial: {
+    botToken: string;
+    chatId: string;
+    cobranzaDiasMin: string;
+    cobranzaMontoMin: string;
+  };
+}>) {
   const t = useTranslations("app.telegram");
   const [sendPending, startSend] = useTransition();
+  const [birthdayPending, startBirthday] = useTransition();
   const [state, formAction, pending] = useActionState(
     async (prev: ActionState, form: FormData) => {
       const res = await saveTelegramAction(prev, form);
@@ -131,7 +140,7 @@ export function TelegramCard({
 
   return (
     <div className="flex flex-col gap-3">
-      <form action={formAction} className="flex flex-wrap items-center gap-2">
+      <form action={formAction} className="flex flex-wrap items-end gap-2">
         <Input
           name="botToken"
           placeholder={t("botToken")}
@@ -145,6 +154,31 @@ export function TelegramCard({
           defaultValue={initial.chatId}
           className="w-40"
         />
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-muted-foreground">
+            {t("cobranzaDiasMin")}
+          </label>
+          <Input
+            name="cobranzaDiasMin"
+            type="number"
+            min={0}
+            placeholder="7"
+            defaultValue={initial.cobranzaDiasMin}
+            className="w-24"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-muted-foreground">
+            {t("cobranzaMontoMin")}
+          </label>
+          <Input
+            name="cobranzaMontoMin"
+            inputMode="decimal"
+            placeholder="100.00"
+            defaultValue={initial.cobranzaMontoMin}
+            className="w-28"
+          />
+        </div>
         <Button type="submit" variant="outline" disabled={pending}>
           {pending ? "…" : t("save")}
         </Button>
@@ -161,8 +195,23 @@ export function TelegramCard({
         >
           {sendPending ? "…" : t("sendNow")}
         </Button>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={birthdayPending}
+          onClick={() =>
+            startBirthday(async () => {
+              const res = await sendBirthdaysNowAction();
+              if (res?.error) toast.error(res.error);
+              else toast.success(t("sent"));
+            })
+          }
+        >
+          {birthdayPending ? "…" : t("sendBirthdaysNow")}
+        </Button>
       </form>
       <p className="text-xs text-muted-foreground">{t("hint")}</p>
+      <p className="text-xs text-muted-foreground">{t("cobranzaHint")}</p>
     </div>
   );
 }

@@ -627,6 +627,7 @@
         "categoryNone": "Sem categoria",
         "commercialType": "Tipo de cliente",
         "commercialTypePlaceholder": "Pessoa, Empresa, Governo, ONG…",
+        "birthDate": "Data de nascimento",
         "active": "Ativo",
         "inactive": "Inativo",
         "blocked": "Bloqueado",
@@ -921,11 +922,15 @@
       "title": "Resumo de cobrança por Telegram",
       "botToken": "Token do bot (BotFather)",
       "chatId": "Chat ID destino",
+      "cobranzaDiasMin": "Dias mín. atraso",
+      "cobranzaMontoMin": "Valor mín.",
       "save": "Salvar",
       "saved": "Configuração salva",
       "sendNow": "Enviar resumo agora",
+      "sendBirthdaysNow": "Testar aniversários",
       "sent": "Resumo enviado pelo Telegram",
-      "hint": "Enviado automaticamente todo dia ao meio-dia (UTC): contas a receber com vencidas marcadas + compromissos não cumpridos."
+      "hint": "Enviado automaticamente todo dia ao meio-dia (UTC): contas a receber que superem os dias/valor mínimos (7 dias / $100 por padrão) + compromissos não cumpridos.",
+      "cobranzaHint": "🎂 O mesmo cron cumprimenta pelo Telegram os clientes cujo aniversário (ficha do cliente) é hoje, uma vez por ano."
     },
     "assistant": {
       "title": "Assistente executivo",

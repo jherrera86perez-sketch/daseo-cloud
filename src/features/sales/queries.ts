@@ -541,7 +541,7 @@ export async function createCashSale(
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Días de atraso del ERP: desde la FECHA DE VENTA (no el vencimiento). */
-function diasAtraso(s: SaleRow): number {
+export function diasAtraso(s: SaleRow): number {
   const base = s.soldAt ?? s.createdAt;
   return Math.floor((Date.now() - base.getTime()) / DAY_MS);
 }

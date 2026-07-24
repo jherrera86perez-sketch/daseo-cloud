@@ -156,6 +156,15 @@ export function CustomerForm({
             defaultValue={initial?.commercialType ?? ""}
           />
         </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="birthDate">{t("birthDate")}</Label>
+          <Input
+            id="birthDate"
+            name="birthDate"
+            type="date"
+            defaultValue={initial?.birthDate ?? ""}
+          />
+        </div>
       </div>
       <div className="flex flex-col gap-2">
         <label className="flex items-center gap-2 text-sm">

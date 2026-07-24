@@ -40,6 +40,13 @@ export const customerInputSchema = z.object({
     .regex(/^\d+(?:[.,]\d{1,2})?$/)
     .optional(),
   category: z.enum(CUSTOMER_CATEGORIES).optional(),
+  // ≈ clientes.fecha_nacimiento del ERP: alimenta el saludo de cumpleaños
+  birthDate: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional()
+    .or(z.literal("")),
   active: z.coerce.boolean().default(true),
   blocked: z.coerce.boolean().default(false),
   blockReason: z.string().trim().max(500).optional(),

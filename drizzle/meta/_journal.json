@@ -169,6 +169,13 @@
       "when": 1784923624514,
       "tag": "0023_careful_puppet_master",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1784928005278,
+      "tag": "0024_equal_agent_brand",
+      "breakpoints": true
     }
   ]
 }

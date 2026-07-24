@@ -10,6 +10,8 @@ import { listApiKeys } from "@/features/platform/queries";
 import { listStagesWithDeals } from "@/features/pipeline/queries";
 import { StagesEditor } from "@/features/pipeline/stages-ui";
 import { ApiKeysCard, TelegramCard } from "@/features/platform/platform-ui";
+import type { NotifySettings } from "@/features/platform/notify";
+import { centsToDecimalString } from "@/lib/money";
 import { AssistantCard } from "@/features/assistant/assistant-ui";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -56,12 +58,7 @@ export default async function SettingsPage() {
   const tg = await getTranslations("app.telegram");
   const ts = await getTranslations("app.stages");
   const board = isAdmin ? await listStagesWithDeals(db, orgId) : [];
-  const notify = (settings?.notifySettings ?? {}) as {
-    telegramBotToken?: string;
-    telegramChatId?: string;
-    salesGoalBase?: string;
-    overdueLimitBase?: string;
-  };
+  const notify = (settings?.notifySettings ?? {}) as NotifySettings;
   const ta = await getTranslations("app.assistant");
 
   return (
@@ -196,6 +193,10 @@ export default async function SettingsPage() {
               initial={{
                 botToken: notify.telegramBotToken ?? "",
                 chatId: notify.telegramChatId ?? "",
+                cobranzaDiasMin: notify.cobranzaDiasMin?.toString() ?? "",
+                cobranzaMontoMin: notify.cobranzaMontoMinCents
+                  ? centsToDecimalString(BigInt(notify.cobranzaMontoMinCents))
+                  : "",
               }}
             />
           </CardContent>

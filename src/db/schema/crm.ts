@@ -41,6 +41,8 @@ export const customers = pgTable(
     creditLimitCents: bigint("credit_limit_cents", { mode: "bigint" }),
     discountDefaultPct: text("discount_default_pct"),
     category: text("category"), // VIP/Premium/Regular/Nuevo/Inactivo
+    // ≈ clientes.fecha_nacimiento del ERP: alimenta el saludo de cumpleaños
+    birthDate: date("birth_date"),
     active: boolean("active").notNull().default(true),
     blocked: boolean("blocked").notNull().default(false),
     blockReason: text("block_reason"),
