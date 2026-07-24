@@ -88,19 +88,26 @@ export function PanelNegocioView({
   const locale = useLocale();
   const router = useRouter();
   const [tab, setTab] = useState<"todos" | Cat>("todos");
-  const mesLabel = new Intl.DateTimeFormat(
-    locale === "pt" ? "pt-BR" : "es",
-    { month: "long" },
-  ).format(new Date(y, m - 1, 1));
+  const mesLabel = new Intl.DateTimeFormat(locale === "pt" ? "pt-BR" : "es", {
+    month: "long",
+  }).format(new Date(y, m - 1, 1));
 
   const go = (params: Record<string, string>) => {
     const qs = new URLSearchParams(params).toString();
     router.replace(`/assistant${qs ? `?${qs}` : ""}`);
   };
   const mesAnterior = () =>
-    go(m === 1 ? { y: String(y - 1), m: "12" } : { y: String(y), m: String(m - 1) });
+    go(
+      m === 1
+        ? { y: String(y - 1), m: "12" }
+        : { y: String(y), m: String(m - 1) },
+    );
   const mesSiguiente = () =>
-    go(m === 12 ? { y: String(y + 1), m: "1" } : { y: String(y), m: String(m + 1) });
+    go(
+      m === 12
+        ? { y: String(y + 1), m: "1" }
+        : { y: String(y), m: String(m + 1) },
+    );
 
   // Agrupar por categoría; grupos por urgencia máxima; dentro urgencia→score
   const grupos = useMemo(() => {
@@ -278,7 +285,10 @@ export function PanelNegocioView({
         ))
       )}
 
-      <SeguimientoTable recomendaciones={recomendaciones} followups={followups} />
+      <SeguimientoTable
+        recomendaciones={recomendaciones}
+        followups={followups}
+      />
     </div>
   );
 }

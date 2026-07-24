@@ -157,8 +157,8 @@ describe("observaciones diarias de empleados (empleado_evaluaciones ricas)", () 
     const target = list.find((l) => l.date === hoy)!;
     const r = await deleteDayEvaluation(db, orgId, USER, target.id);
     expect(r.message).toBe("Evaluación eliminada");
-    await expect(deleteDayEvaluation(db, orgId, USER, target.id)).rejects.toThrow(
-      "Evaluación no encontrada",
-    );
+    await expect(
+      deleteDayEvaluation(db, orgId, USER, target.id),
+    ).rejects.toThrow("Evaluación no encontrada");
   });
 });

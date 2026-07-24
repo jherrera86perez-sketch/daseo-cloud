@@ -36,9 +36,7 @@ test.describe.serial("asistente directivo: recomendación → seguimiento", () =
     // el Panel del Negocio muestra la recomendación literal del ERP
     await page.getByRole("link", { name: /^asistente$/i }).click();
     await page.waitForURL(/\/assistant/);
-    await expect(
-      page.getByText("Stock bajo: Jabón AD").first(),
-    ).toBeVisible();
+    await expect(page.getByText("Stock bajo: Jabón AD").first()).toBeVisible();
     await expect(page.getByText(/alertas/).first()).toBeVisible();
 
     // seguimiento: completar la recomendación (upsert por recomendacion_id)

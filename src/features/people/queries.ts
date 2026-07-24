@@ -644,7 +644,10 @@ export async function evaluacionAuto(
     horas: dias.reduce((s, d) => s + d.horas, 0),
     devengado: dias.reduce((s, d) => s + d.devengado, 0),
     unidades: dias.reduce((s, d) => s + d.unidades, 0),
-    merma_total: dias.reduce((s, d) => s + d.merma_orden + d.merma_observada, 0),
+    merma_total: dias.reduce(
+      (s, d) => s + d.merma_orden + d.merma_observada,
+      0,
+    ),
     defectos_total: dias.reduce((s, d) => s + d.defectos, 0),
     dias_trabajados: dias.length,
   };

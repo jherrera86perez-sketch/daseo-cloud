@@ -46,7 +46,10 @@ export function ConfirmOrderForm({
   const [cancelPending, startCancel] = useTransition();
 
   const laborTotal = laborLines.reduce(
-    (s, l) => s + (Number(l.hours.replace(",", ".")) || 0) * (Number(l.costHour.replace(",", ".")) || 0),
+    (s, l) =>
+      s +
+      (Number(l.hours.replace(",", ".")) || 0) *
+        (Number(l.costHour.replace(",", ".")) || 0),
     0,
   );
 

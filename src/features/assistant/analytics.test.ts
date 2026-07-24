@@ -316,14 +316,16 @@ beforeAll(async () => {
     clientName,
     panOrigen,
   });
-  await db.insert(statementMovements).values([
-    mov(1, D1, "JUANA PEÑA", "92351111", "2000.00"),
-    mov(2, D1, "JUANA PE A", "92351111", "1500.00"),
-    mov(3, D1, "", "92351111", "600.00"),
-    mov(4, D2, "JUANA PEÑA", "92351111", "900.00"),
-    mov(5, D2, "JUANA PEÑA", "92351111", "800.00"),
-    mov(6, D2, "OTRO CLIENTE", "", "3000.00"),
-  ]);
+  await db
+    .insert(statementMovements)
+    .values([
+      mov(1, D1, "JUANA PEÑA", "92351111", "2000.00"),
+      mov(2, D1, "JUANA PE A", "92351111", "1500.00"),
+      mov(3, D1, "", "92351111", "600.00"),
+      mov(4, D2, "JUANA PEÑA", "92351111", "900.00"),
+      mov(5, D2, "JUANA PEÑA", "92351111", "800.00"),
+      mov(6, D2, "OTRO CLIENTE", "", "3000.00"),
+    ]);
 }, 120_000);
 
 describe("asistente directivo — analisisInventario", () => {
@@ -401,9 +403,7 @@ describe("asistente directivo — analisisPrecios", () => {
     expect(r.margenBajo.map((p) => p.id).sort()).toEqual(
       [ids["MargenBajo"], ids["CaroProd"]].sort(),
     );
-    expect(r.oportunidadAumento.map((p) => p.id)).toEqual([
-      ids["Oportunidad"],
-    ]);
+    expect(r.oportunidadAumento.map((p) => p.id)).toEqual([ids["Oportunidad"]]);
     expect(r.topMargenes[0].id).toBe(ids["Jabón"]);
     expect(r.topMargenes[0].margen_porcentaje).toBeCloseTo(50, 2);
     expect(r.alertasCount).toBe(2);
@@ -443,9 +443,7 @@ describe("asistente directivo — generarRecomendaciones", () => {
       `emp_sobrecarga_${ids["Naydit"]}`,
       `precio_suba_${ids["Oportunidad"]}`,
     ]);
-    expect(recs.map((r) => r.posicion)).toEqual(
-      recs.map((_, i) => i + 1),
-    );
+    expect(recs.map((r) => r.posicion)).toEqual(recs.map((_, i) => i + 1));
 
     const byId = new Map(recs.map((r) => [r.id, r]));
     expect(byId.get(`inv_${ids["Jabón"]}`)).toMatchObject({

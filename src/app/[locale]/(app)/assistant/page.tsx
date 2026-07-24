@@ -36,7 +36,10 @@ export default async function AssistantPage({
     rango = { desde: d, hasta: d };
   } else if (periodo === "mes") {
     const ultimoDia = new Date(y, m, 0).getDate();
-    rango = { desde: `${y}-${pad(m)}-01`, hasta: `${y}-${pad(m)}-${pad(ultimoDia)}` };
+    rango = {
+      desde: `${y}-${pad(m)}-01`,
+      hasta: `${y}-${pad(m)}-${pad(ultimoDia)}`,
+    };
   }
 
   const db = getDb();

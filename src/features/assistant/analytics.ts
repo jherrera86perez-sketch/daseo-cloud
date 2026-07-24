@@ -73,7 +73,11 @@ export function resolverRango(opts: Rango & { diasDefault?: number } = {}): {
     1,
   );
 
-  return { desdeISO: desdeDate.toISOString(), hastaISO: hastaDate.toISOString(), dias };
+  return {
+    desdeISO: desdeDate.toISOString(),
+    hastaISO: hastaDate.toISOString(),
+    dias,
+  };
 }
 
 // ───────────────────────── INVENTARIO ─────────────────────────
@@ -209,7 +213,8 @@ export async function analisisInventario(
     }
 
     // Consumo efectivo: actividad reciente o fallback al histórico
-    const consumoEfectivo = consumoPeriodo > 0 ? consumoPeriodo : consumoHistorico;
+    const consumoEfectivo =
+      consumoPeriodo > 0 ? consumoPeriodo : consumoHistorico;
 
     const diasStock = consumoEfectivo > 0 ? p.stock / consumoEfectivo : null;
     const stockMin = p.stock_minimo || 0;
@@ -265,7 +270,9 @@ export async function analisisInventario(
   const sinMovimiento = productosAnotados.filter(
     (p) => p.estado === "SIN_MOVIMIENTO" && p.stock > 0,
   );
-  const sinPrecio = productosAnotados.filter((p) => p.sin_precio && p.stock > 0);
+  const sinPrecio = productosAnotados.filter(
+    (p) => p.sin_precio && p.stock > 0,
+  );
 
   const valorTotalInventario = productosAnotados.reduce(
     (sum, p) => sum + (p.valor_inventario || 0),
@@ -696,7 +703,13 @@ export async function analisisPrecios(
   db: Db,
   orgId: string,
 ): Promise<AnalisisPrecios> {
-  type Row = { id: string; nombre: string; precio: number; costo: number; stock: number };
+  type Row = {
+    id: string;
+    nombre: string;
+    precio: number;
+    costo: number;
+    stock: number;
+  };
   const margenes: MargenProducto[] = (
     await q<Row>(
       db,
@@ -852,7 +865,9 @@ export async function detectarFraccionamientoTransferencias(
         : "";
       const tarjeta = (grupo.find((x) => x.tarjeta) || {}).tarjeta || "";
       if (!nombre)
-        nombre = tarjeta ? `Tarjeta …${tarjeta.slice(-4)}` : "Cliente sin nombre";
+        nombre = tarjeta
+          ? `Tarjeta …${tarjeta.slice(-4)}`
+          : "Cliente sin nombre";
       const total = round2(
         grupo.reduce((s, x) => s + (Number(x.importe) || 0), 0),
       );
@@ -925,7 +940,8 @@ export async function generarRecomendaciones(
   if (inventario.stockBajo.length > 0) {
     inventario.stockBajo.forEach((p) => {
       const consumo = p.consumo_diario || 0.1;
-      const diasStock = p.dias_stock !== null ? p.dias_stock : p.stock / consumo;
+      const diasStock =
+        p.dias_stock !== null ? p.dias_stock : p.stock / consumo;
       const score = diasStock < 7 ? 9 : diasStock < 14 ? 8 : 7;
       recomendaciones.push({
         id: `inv_${p.id}`,
