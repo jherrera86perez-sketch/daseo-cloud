@@ -10,6 +10,7 @@ import {
   NewEmployeeForm,
   EmployeeRowActions,
   EvaluationCell,
+  DayObservationForm,
 } from "@/features/people/people-ui";
 import { centsToDecimalString } from "@/lib/money";
 
@@ -32,6 +33,11 @@ export default async function EmployeesPage() {
         </p>
       </div>
       <NewEmployeeForm />
+      <DayObservationForm
+        employees={rows
+          .filter((e) => e.active === "yes")
+          .map((e) => ({ id: e.id, name: e.name }))}
+      />
       {rows.length === 0 ? (
         <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
           {t("empty")}

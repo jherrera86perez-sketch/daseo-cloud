@@ -120,6 +120,20 @@
       "when": 1784853385109,
       "tag": "0016_misty_lionheart",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1784892317322,
+      "tag": "0017_high_swarm",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1784892583581,
+      "tag": "0018_wandering_mad_thinker",
+      "breakpoints": true
     }
   ]
 }

@@ -142,3 +142,75 @@ export async function addEvaluationAction(
   revalidatePath("/[locale]/employees", "page");
   return null;
 }
+
+// ─── Observación del día (empleado_evaluaciones ricas del ERP) ───
+
+const decimalOpt = z
+  .string()
+  .trim()
+  .regex(/^\d+(?:[.,]\d{1,3})?$/)
+  .or(z.literal(""));
+
+const dayObservationSchema = z.object({
+  employeeId: z.string().uuid(),
+  fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  ordenes: z.string().regex(/^\d*$/).optional(),
+  merma: decimalOpt.optional(),
+  defectos: z.string().regex(/^\d*$/).optional(),
+  horas: decimalOpt.optional(),
+  notas: z.string().max(1000).optional(),
+});
+
+export async function saveDayObservationAction(
+  _prev: ActionState,
+  form: FormData,
+): Promise<ActionState & { ok?: string }> {
+  const { orgId, userId } = await requireOrg();
+  const parsed = dayObservationSchema.safeParse({
+    employeeId: form.get("employeeId"),
+    fecha: form.get("fecha"),
+    ordenes: String(form.get("ordenes") ?? ""),
+    merma: String(form.get("merma") ?? ""),
+    defectos: String(form.get("defectos") ?? ""),
+    horas: String(form.get("horas") ?? ""),
+    notas: String(form.get("notas") ?? ""),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "invalid" };
+  }
+  const d = parsed.data;
+  let result;
+  try {
+    const { addDayObservation } = await import("./queries");
+    result = await addDayObservation(getDb(), orgId, userId, {
+      employeeId: d.employeeId,
+      fecha: d.fecha,
+      ordenesProducidas: d.ordenes ? Number(d.ordenes) : undefined,
+      mermaProducida: d.merma || undefined,
+      defectos: d.defectos ? Number(d.defectos) : undefined,
+      horasTrabajadas: d.horas || undefined,
+      notas: d.notas || undefined,
+    });
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "error" };
+  }
+  revalidatePath("/[locale]/employees", "page");
+  return { ok: result.message };
+}
+
+export async function deleteDayEvaluationAction(
+  id: string,
+): Promise<ActionState> {
+  const { orgId, userId, role } = await requireOrg();
+  if (role !== "owner" && role !== "admin") {
+    return { error: "Solo administradores" };
+  }
+  try {
+    const { deleteDayEvaluation } = await import("./queries");
+    await deleteDayEvaluation(getDb(), orgId, userId, id);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "error" };
+  }
+  revalidatePath("/[locale]/employees", "page");
+  return null;
+}

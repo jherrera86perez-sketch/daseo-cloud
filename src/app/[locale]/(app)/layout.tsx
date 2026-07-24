@@ -26,6 +26,7 @@ import {
   Gift,
   HeartHandshake,
   BookOpenCheck,
+  Sparkles,
 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
 import { LocaleSwitcher } from "@/features/auth/locale-switcher";
@@ -78,6 +79,7 @@ export default async function AppLayout({
 
   const nav = [
     { href: "/dashboard", label: t("dashboard"), icon: LayoutDashboard },
+    { href: "/assistant", label: t("assistant"), icon: Sparkles },
     { href: "/customers", label: t("customers"), icon: Users },
     { href: "/products", label: t("products"), icon: Package },
     { href: "/sales", label: t("sales"), icon: Receipt },

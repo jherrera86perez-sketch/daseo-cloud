@@ -68,6 +68,7 @@
     },
     "nav": {
       "dashboard": "Panel",
+      "assistant": "Asistente",
       "customers": "Clientes",
       "products": "Productos",
       "inventory": "Inventario",
@@ -685,8 +686,16 @@
       "planned": "plan",
       "actual": "Real",
       "producedQty": "Producido",
+      "waste": "Merma",
       "labor": "Mano de obra",
       "overhead": "Costos indirectos",
+      "laborLines": "Mano de obra por empleado",
+      "laborEmployee": "Empleado",
+      "laborHours": "Horas",
+      "laborCostHour": "Costo/hora",
+      "addLaborLine": "Añadir empleado",
+      "removeLine": "Quitar línea",
+      "laborTotal": "Devengado",
       "confirm": "Confirmar producción",
       "confirmed": "Producción confirmada — inventario actualizado",
       "cancel": "Cancelar orden",
@@ -777,6 +786,69 @@
       "belowGoal": "Ventas del mes por debajo de la meta: {actual} de {goal} {base}.",
       "overLimit": "CxC vencida por encima del tope: {actual} {base} (tope {limit})."
     },
+    "assistantPanel": {
+      "title": "Panel del Negocio",
+      "subtitle": "Asistente directivo: análisis y recomendaciones calculados al vuelo desde tus datos",
+      "today": "Hoy",
+      "allMonths": "Todos los meses",
+      "prevMonth": "Mes anterior",
+      "nextMonth": "Mes siguiente",
+      "alertsBadge": "{count} alertas",
+      "tabAll": "Todos",
+      "cats": {
+        "inventario": "Inventario",
+        "produccion": "Producción",
+        "empleados": "Empleados",
+        "precios": "Precios y márgenes",
+        "clientes": "Clientes y cobros"
+      },
+      "urgency": {
+        "urgent": "Urgente",
+        "important": "Importante",
+        "suggestion": "Sugerencia"
+      },
+      "impact": {
+        "Alto": "Alto",
+        "Medio": "Medio",
+        "Bajo": "Bajo"
+      },
+      "action": "Acción",
+      "emptyTitle": "Sin acciones urgentes",
+      "emptyBody": "El asistente no detectó recomendaciones prioritarias en este período.",
+      "followupTitle": "Seguimiento de recomendaciones",
+      "colImpact": "Impacto",
+      "colRec": "Recomendación",
+      "colCat": "Categoría",
+      "colScore": "Score",
+      "colStatus": "Estado",
+      "colActions": "Acciones",
+      "status": {
+        "PENDIENTE": "Pendiente",
+        "EN_PROGRESO": "En progreso",
+        "COMPLETADA": "Completada",
+        "DESCARTADA": "Descartada"
+      },
+      "markInProgress": "En progreso",
+      "markDone": "Completar",
+      "markDiscarded": "Descartar",
+      "reopen": "Reabrir",
+      "recAction": "Acción recomendada",
+      "notesLabel": "Notas de seguimiento",
+      "kpi": {
+        "stockBajo": "Stock bajo",
+        "obsoletos": "Obsoletos",
+        "inversionParalizada": "Inversión paralizada",
+        "ordenesPendientes": "Órdenes pendientes",
+        "costoPendiente": "Costo pendiente",
+        "merma": "Merma",
+        "totalEmpleados": "Empleados",
+        "produccionPromedio": "Producción promedio",
+        "bajoRendimiento": "Bajo rendimiento",
+        "margenPromedio": "Margen promedio",
+        "margenBajo": "Margen bajo",
+        "oportunidades": "Oportunidades"
+      }
+    },
     "evaluations": {
       "summary": "Última: {last} · prom. {avg} ({count})",
       "none": "Sin evaluaciones",
@@ -801,7 +873,13 @@
       "deactivate": "Desactivar",
       "remove": "Eliminar",
       "payrollTotal": "Nómina activa",
-      "fiscalNote": "La nómina de empleados activos alimenta automáticamente los impuestos de nómina en Fiscal (fuerza de trabajo, retención, seguridad social)."
+      "fiscalNote": "La nómina de empleados activos alimenta automáticamente los impuestos de nómina en Fiscal (fuerza de trabajo, retención, seguridad social).",
+      "dayObservation": "Observación del día (merma, defectos, horas)",
+      "obsDate": "Fecha",
+      "obsOrders": "Órdenes",
+      "obsWaste": "Merma",
+      "obsDefects": "Defectos",
+      "obsHours": "Horas"
     },
     "commitments": {
       "title": "Compromisos recurrentes",

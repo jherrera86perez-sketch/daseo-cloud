@@ -3,6 +3,7 @@ import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
 import { getOrderDetail } from "@/features/production/queries";
 import { getRecipeDetail } from "@/features/recipes/queries";
+import { listEmployees } from "@/features/people/queries";
 import { ConfirmOrderForm } from "@/features/production/confirm-form";
 import { centsToDecimalString } from "@/lib/money";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +17,8 @@ export default async function ProductionOrderPage({
   const db = getDb();
   const { order, inputs } = await getOrderDetail(db, orgId, id);
   const recipe = await getRecipeDetail(db, orgId, order.recipeId);
+  const employees =
+    order.status === "draft" ? await listEmployees(db, orgId) : [];
 
   return (
     <div className="flex max-w-2xl flex-col gap-6">
@@ -41,6 +44,9 @@ export default async function ProductionOrderPage({
                 plannedQty: i.plannedQty,
               }))}
               defaultOutput={recipe.recipe.outputQty}
+              employees={employees
+                .filter((e) => e.active === "yes")
+                .map((e) => ({ id: e.id, name: e.name }))}
             />
           </CardContent>
         </Card>

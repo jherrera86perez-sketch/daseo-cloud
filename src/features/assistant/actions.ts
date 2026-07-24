@@ -64,3 +64,35 @@ export async function saveAssistantAction(
   revalidatePath("/[locale]/dashboard", "page");
   return { ok: "guardado" };
 }
+
+// ─── Seguimiento de recomendaciones (asistente_seguimiento del ERP) ───
+
+const followupSchema = z.object({
+  recommendationId: z.string().trim().min(1).max(200),
+  title: z.string().trim().min(1).max(300),
+  category: z.string().trim().max(50).optional(),
+  status: z
+    .enum(["PENDIENTE", "EN_PROGRESO", "COMPLETADA", "DESCARTADA"])
+    .optional(),
+  notes: z.string().max(2000).optional(),
+});
+
+export async function saveFollowupAction(input: {
+  recommendationId: string;
+  title: string;
+  category?: string;
+  status?: string;
+  notes?: string;
+}): Promise<ActionState> {
+  const { orgId, userId } = await requireOrg();
+  const parsed = followupSchema.safeParse(input);
+  if (!parsed.success) return { error: "Datos inválidos" };
+  try {
+    const { upsertFollowup } = await import("./followups");
+    await upsertFollowup(getDb(), orgId, userId, parsed.data);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "error" };
+  }
+  revalidatePath("/[locale]/assistant", "page");
+  return { ok: "Seguimiento actualizado" };
+}

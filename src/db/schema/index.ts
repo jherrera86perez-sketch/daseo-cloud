@@ -12,3 +12,4 @@ export * from "./statements";
 export * from "./raffles";
 export * from "./internal-outflows";
 export * from "./consolidado";
+export * from "./assistant";

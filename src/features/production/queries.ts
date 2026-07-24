@@ -2,8 +2,10 @@ import { and, desc, eq } from "drizzle-orm";
 import {
   productionOrders,
   productionInputs,
+  productionLabor,
   products,
   recipes,
+  employees,
 } from "@/db/schema";
 import { assertOwnedByOrg } from "@/lib/tenant";
 import { logAudit } from "@/lib/audit";
@@ -88,6 +90,11 @@ export async function confirmOrder(
     laborCostBaseCents: bigint;
     overheadBaseCents: bigint;
     inputs: Array<{ inputId: string; actualQty: string }>;
+    /** ≈ merma_registrada del ERP: unidades del terminado perdidas */
+    wasteQty?: string;
+    /** Mano de obra por empleado (produccion_mano_obra del ERP). Si viene,
+     * laborCostBaseCents se CALCULA como Σ horas×costo_hora. */
+    labor?: Array<{ employeeId: string; hours: string; costHourCents: bigint }>;
   },
 ): Promise<OrderRow> {
   return db.transaction(async (tx: Db) => {
@@ -99,6 +106,31 @@ export async function confirmOrder(
       throw new Error("Los costos no pueden ser negativos");
     }
     const producedMilli = parseQtyToMilli(input.producedQty);
+
+    // Líneas de mano de obra: validan pertenencia y fijan el devengado real
+    let laborCents = input.laborCostBaseCents;
+    if (input.labor && input.labor.length > 0) {
+      laborCents = 0n;
+      for (const line of input.labor) {
+        const [emp] = await tx
+          .select({ id: employees.id, orgId: employees.orgId })
+          .from(employees)
+          .where(eq(employees.id, line.employeeId));
+        assertOwnedByOrg(emp, orgId);
+        if (line.costHourCents < 0n) {
+          throw new Error("Los costos no pueden ser negativos");
+        }
+        const hoursMilli = parseQtyToMilli(line.hours);
+        laborCents += (hoursMilli * line.costHourCents + 500n) / 1000n;
+        await tx.insert(productionLabor).values({
+          orgId,
+          orderId: id,
+          employeeId: line.employeeId,
+          hours: line.hours.replace(",", "."),
+          costHourCents: line.costHourCents,
+        });
+      }
+    }
 
     const rows: OrderInputRow[] = await tx
       .select()
@@ -131,7 +163,7 @@ export async function confirmOrder(
     }
 
     const totalCostCents =
-      inputsCostCents + input.laborCostBaseCents + input.overheadBaseCents;
+      inputsCostCents + laborCents + input.overheadBaseCents;
     const unitCostCents =
       (totalCostCents * 1000n + producedMilli / 2n) / producedMilli;
 
@@ -149,7 +181,8 @@ export async function confirmOrder(
       .set({
         status: "confirmed",
         producedQty: input.producedQty.replace(",", "."),
-        laborCostBaseCents: input.laborCostBaseCents,
+        wasteQty: input.wasteQty ? input.wasteQty.replace(",", ".") : null,
+        laborCostBaseCents: laborCents,
         overheadBaseCents: input.overheadBaseCents,
         updatedAt: new Date(),
       })

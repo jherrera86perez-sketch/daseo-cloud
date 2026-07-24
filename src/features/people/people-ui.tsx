@@ -13,6 +13,7 @@ import {
   createCommitmentAction,
   deactivateCommitmentAction,
   addEvaluationAction,
+  saveDayObservationAction,
   type ActionState,
 } from "./actions";
 
@@ -217,5 +218,90 @@ export function EvaluationCell({
         </Button>
       </form>
     </div>
+  );
+}
+
+/**
+ * Observación manual del día (POST /observacion-dia del ERP): UPSERT por
+ * (empleado, fecha) — merma/defectos/horas/órdenes que la producción no
+ * registra por empleado. Complementa la evaluación automática.
+ */
+export function DayObservationForm({
+  employees,
+}: Readonly<{ employees: Array<{ id: string; name: string }> }>) {
+  const t = useTranslations("app.employees");
+  const ref = useRef<HTMLFormElement>(null);
+  const [state, formAction, pending] = useActionState(
+    async (prev: ActionState, form: FormData) => {
+      const res = await saveDayObservationAction(prev, form);
+      if (res?.error) toast.error(res.error);
+      else {
+        // mensaje literal del ERP: 'Observación creada' / 'Observación actualizada'
+        toast.success((res as { ok?: string })?.ok ?? "");
+        ref.current?.reset();
+      }
+      return res;
+    },
+    null,
+  );
+  void state;
+
+  if (employees.length === 0) return null;
+  const hoy = new Date();
+  const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
+
+  return (
+    <details className="rounded-md border p-3">
+      <summary className="cursor-pointer text-sm font-medium">
+        {t("dayObservation")}
+      </summary>
+      <form
+        ref={ref}
+        action={formAction}
+        className="mt-3 flex flex-wrap items-end gap-2"
+      >
+        <label className="flex flex-col gap-1 text-xs">
+          {t("name")}
+          <select
+            name="employeeId"
+            required
+            className="border-input h-9 rounded-md border bg-transparent px-2 text-sm"
+          >
+            {employees.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 text-xs">
+          {t("obsDate")}
+          <Input name="fecha" type="date" defaultValue={hoyStr} required />
+        </label>
+        <label className="flex flex-col gap-1 text-xs">
+          {t("obsOrders")}
+          <Input name="ordenes" inputMode="numeric" className="w-20" />
+        </label>
+        <label className="flex flex-col gap-1 text-xs">
+          {t("obsWaste")}
+          <Input name="merma" inputMode="decimal" className="w-20" />
+        </label>
+        <label className="flex flex-col gap-1 text-xs">
+          {t("obsDefects")}
+          <Input name="defectos" inputMode="numeric" className="w-20" />
+        </label>
+        <label className="flex flex-col gap-1 text-xs">
+          {t("obsHours")}
+          <Input name="horas" inputMode="decimal" className="w-20" />
+        </label>
+        <label className="flex flex-1 flex-col gap-1 text-xs">
+          {t("notes")}
+          <Input name="notas" />
+        </label>
+        <Button type="submit" size="sm" disabled={pending}>
+          {pending ? "…" : t("save")}
+        </Button>
+      </form>
+    </details>
   );
 }

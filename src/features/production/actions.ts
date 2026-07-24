@@ -51,6 +51,22 @@ const confirmSchema = z.object({
       }),
     )
     .min(1),
+  // ≈ merma_registrada del ERP (opcional)
+  wasteQty: z
+    .string()
+    .regex(/^\d+(?:[.,]\d{1,3})?$/)
+    .or(z.literal(""))
+    .optional(),
+  // mano de obra por empleado (produccion_mano_obra del ERP)
+  laborLines: z
+    .array(
+      z.object({
+        employeeId: z.string().uuid(),
+        hours: z.string().regex(/^\d+(?:[.,]\d{1,2})?$/),
+        costHour: z.string().regex(/^\d+(?:[.,]\d{1,2})?$/),
+      }),
+    )
+    .optional(),
 });
 
 export async function confirmOrderAction(
@@ -75,6 +91,12 @@ export async function confirmOrderAction(
       laborCostBaseCents: d.labor ? parseDecimalToCents(d.labor) : 0n,
       overheadBaseCents: d.overhead ? parseDecimalToCents(d.overhead) : 0n,
       inputs: d.inputs,
+      wasteQty: d.wasteQty || undefined,
+      labor: d.laborLines?.map((l) => ({
+        employeeId: l.employeeId,
+        hours: l.hours,
+        costHourCents: parseDecimalToCents(l.costHour),
+      })),
     });
   } catch (e) {
     return { error: e instanceof Error ? e.message : "error" };

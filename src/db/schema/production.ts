@@ -69,6 +69,8 @@ export const productionOrders = pgTable(
       .references(() => products.id),
     status: text("status").notNull().default("draft"),
     producedQty: numeric("produced_qty", { precision: 14, scale: 3 }),
+    // ≈ merma_registrada del ERP: unidades del terminado perdidas en la orden.
+    wasteQty: numeric("waste_qty", { precision: 14, scale: 3 }),
     laborCostBaseCents: bigint("labor_cost_base_cents", { mode: "bigint" })
       .notNull()
       .default(sql`0`),
