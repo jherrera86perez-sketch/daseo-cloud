@@ -42,6 +42,16 @@ export type PurchaseInput = {
   idempotencyKey: string;
   dueDate?: Date;
   items: PurchaseItemInput[];
+  // Paridad ERP: gastos adicionales (se prorratean al costo en la recepción),
+  // condiciones de pago ('Contado' queda fuera de CxP), factura del proveedor,
+  // notas y fecha retroactiva (max hoy)
+  transportCents?: bigint;
+  allowanceCents?: bigint;
+  otherCostsCents?: bigint;
+  paymentTerms?: string;
+  supplierInvoice?: string;
+  note?: string;
+  receivedAt?: Date;
 };
 
 // ---------- proveedores (patrón clientes) ----------
@@ -56,6 +66,7 @@ export async function createSupplier(
     email?: string;
     phone?: string;
     address?: string;
+    bankAccount?: string;
     notes?: string;
   },
 ): Promise<SupplierRow> {
@@ -107,6 +118,7 @@ export async function updateSupplier(
     email?: string;
     phone?: string;
     address?: string;
+    bankAccount?: string;
     notes?: string;
   },
 ): Promise<SupplierRow> {
@@ -156,7 +168,11 @@ export async function createPurchase(
   input: PurchaseInput,
 ): Promise<PurchaseRow> {
   if (input.items.length === 0) {
-    throw new Error("La compra necesita al menos una línea");
+    // Literal del ERP
+    throw new Error("Debe agregar al menos un producto");
+  }
+  if (input.receivedAt && input.receivedAt.getTime() > Date.now()) {
+    throw new Error("La fecha no puede ser futura");
   }
   const [existing] = await db
     .select()
@@ -179,7 +195,13 @@ export async function createPurchase(
     const totalCents = (qtyMilli * item.unitCostCents + 500n) / 1000n;
     return { ...item, totalCents };
   });
-  const totalCents = lines.reduce((acc, l) => acc + l.totalCents, 0n);
+  const subtotalCents = lines.reduce((acc, l) => acc + l.totalCents, 0n);
+  // ERP: total = subtotal_productos + gastos (transportación + dietas + otros)
+  const gastosCents =
+    (input.transportCents ?? 0n) +
+    (input.allowanceCents ?? 0n) +
+    (input.otherCostsCents ?? 0n);
+  const totalCents = subtotalCents + gastosCents;
   const totalBaseCents = convertToBase(totalCents, input.rateToBase);
 
   return db.transaction(async (tx: Db) => {
@@ -193,6 +215,13 @@ export async function createPurchase(
         rateToBaseFixed: input.rateToBase.replace(",", "."),
         totalCents,
         totalBaseCents,
+        transportCents: input.transportCents ?? 0n,
+        allowanceCents: input.allowanceCents ?? 0n,
+        otherCostsCents: input.otherCostsCents ?? 0n,
+        paymentTerms: input.paymentTerms,
+        supplierInvoice: input.supplierInvoice,
+        note: input.note,
+        receivedAt: input.receivedAt,
         dueDate: input.dueDate,
         idempotencyKey: input.idempotencyKey,
       })
@@ -292,13 +321,29 @@ export async function confirmPurchase(
       .from(purchaseItems)
       .where(eq(purchaseItems.purchaseId, id));
 
+    // Prorrateo del ERP: los gastos adicionales (transportación + dietas +
+    // otros) se reparten proporcional al subtotal de cada línea con producto
+    // y se suman al costo unitario ANTES de entrar al kardex.
+    const gastosCents =
+      purchase.transportCents +
+      purchase.allowanceCents +
+      purchase.otherCostsCents;
+    const subtotalProductos = items
+      .filter((i) => i.productId)
+      .reduce((s, i) => s + i.totalCents, 0n);
+
     for (const item of items) {
       if (!item.productId) continue;
+      const qtyMilli = parseQtyToMilli(item.qty);
+      let unitCost = item.unitCostCents;
+      if (gastosCents > 0n && subtotalProductos > 0n) {
+        const extraLinea =
+          (gastosCents * item.totalCents + subtotalProductos / 2n) /
+          subtotalProductos;
+        unitCost += (extraLinea * 1000n + qtyMilli / 2n) / qtyMilli;
+      }
       // costo unitario en base con la tasa fijada del documento
-      const unitCostBase = convertToBase(
-        item.unitCostCents,
-        purchase.rateToBaseFixed,
-      );
+      const unitCostBase = convertToBase(unitCost, purchase.rateToBaseFixed);
       await registerMovement(tx, orgId, userId, {
         productId: item.productId,
         kind: "in",
@@ -345,7 +390,8 @@ export async function confirmPurchase(
       .set({
         status: "confirmed",
         number,
-        receivedAt: new Date(),
+        // fecha retroactiva del ERP: si la compra trae fecha propia, se respeta
+        receivedAt: purchase.receivedAt ?? new Date(),
         updatedAt: new Date(),
       })
       .where(eq(purchases.id, id))
@@ -523,7 +569,10 @@ export async function listPurchases(
   }));
 }
 
-/** Compras confirmadas con saldo pendiente (CxP), vencidas primero. */
+/**
+ * Compras confirmadas con saldo pendiente (CxP), vencidas primero.
+ * ERP: las compras de CONTADO (condiciones_pago='Contado') quedan FUERA.
+ */
 export async function accountsPayable(
   db: Db,
   orgId: string,
@@ -538,13 +587,162 @@ export async function accountsPayable(
 > {
   const all = await listPurchases(db, orgId);
   return all
-    .filter((p) => p.status === "confirmed" && p.totalCents - p.paidCents > 0n)
+    .filter(
+      (p) =>
+        p.status === "confirmed" &&
+        p.paymentTerms !== "Contado" &&
+        p.totalCents - p.paidCents > 0n,
+    )
     .map((p) => ({ ...p, balanceCents: p.totalCents - p.paidCents }))
     .sort((a, b) => {
       const da = a.dueDate?.getTime() ?? Infinity;
       const dbb = b.dueDate?.getTime() ?? Infinity;
       return da - dbb;
     });
+}
+
+// ───────────── Paridad ERP: CxP agrupada, resumen, sin deuda ─────────────
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+/** Días de atraso del ERP: desde la FECHA DE COMPRA (no el vencimiento). */
+function diasAtrasoCompra(p: PurchaseRow): number {
+  const base = p.receivedAt ?? p.createdAt;
+  return Math.floor((Date.now() - base.getTime()) / DAY_MS);
+}
+
+export type CxpProveedor = {
+  supplierId: string;
+  supplierName: string;
+  bankAccount: string | null;
+  compras: Array<
+    PurchaseRow & {
+      supplierName: string;
+      paidCents: bigint;
+      balanceCents: bigint;
+      dias_atraso: number;
+    }
+  >;
+  total_adeudado_base_cents: bigint;
+  num_compras: number;
+  max_dias_atraso: number;
+};
+
+/**
+ * GET /compras/cuentas-por-pagar del ERP: compras con saldo agrupadas POR
+ * PROVEEDOR (con su referencia bancaria), ordenadas por total adeudado desc.
+ * Adaptación multi-moneda: el total del grupo se consolida a base.
+ */
+export async function accountsPayableGrouped(
+  db: Db,
+  orgId: string,
+): Promise<CxpProveedor[]> {
+  const ap = await accountsPayable(db, orgId);
+  const bancos = new Map<string, string | null>();
+  for (const s of await listSuppliers(db, orgId, {})) {
+    bancos.set(s.id, s.bankAccount);
+  }
+  const grupos = new Map<string, CxpProveedor>();
+  for (const p of ap) {
+    const dias = diasAtrasoCompra(p);
+    const g = grupos.get(p.supplierId) ?? {
+      supplierId: p.supplierId,
+      supplierName: p.supplierName,
+      bankAccount: bancos.get(p.supplierId) ?? null,
+      compras: [],
+      total_adeudado_base_cents: 0n,
+      num_compras: 0,
+      max_dias_atraso: 0,
+    };
+    g.compras.push({ ...p, dias_atraso: dias });
+    g.total_adeudado_base_cents += convertToBase(
+      p.balanceCents,
+      p.rateToBaseFixed,
+    );
+    g.num_compras += 1;
+    if (dias > g.max_dias_atraso) g.max_dias_atraso = dias;
+    grupos.set(p.supplierId, g);
+  }
+  const out = [...grupos.values()];
+  for (const g of out) {
+    g.compras.sort((a, b) => b.dias_atraso - a.dias_atraso);
+  }
+  return out.sort((a, b) =>
+    b.total_adeudado_base_cents > a.total_adeudado_base_cents ? 1 : -1,
+  );
+}
+
+export type ResumenPagos = {
+  num_compras: number;
+  compras_total_base_cents: bigint;
+  pagado_total_base_cents: bigint;
+  saldo_total_base_cents: bigint;
+  pct_pagado: number;
+  num_compras_sin_pago: number;
+};
+
+/**
+ * GET /compras/resumen-pagos del ERP (tarjeta "salud fiscal"): excluye
+ * canceladas y Contado; filtra por mes/año de recepción.
+ */
+export async function resumenPagos(
+  db: Db,
+  orgId: string,
+  opts: { mes: number; anio: number },
+): Promise<ResumenPagos> {
+  const all = await listPurchases(db, orgId);
+  const enPeriodo = all.filter((p) => {
+    if (p.status === "cancelled" || p.paymentTerms === "Contado") return false;
+    const f = p.receivedAt ?? p.createdAt;
+    return f.getFullYear() === opts.anio && f.getMonth() + 1 === opts.mes;
+  });
+  const totalBase = enPeriodo.reduce(
+    (s, p) => s + convertToBase(p.totalCents, p.rateToBaseFixed),
+    0n,
+  );
+  const pagadoBase = enPeriodo.reduce(
+    (s, p) => s + convertToBase(p.paidCents, p.rateToBaseFixed),
+    0n,
+  );
+  return {
+    num_compras: enPeriodo.length,
+    compras_total_base_cents: totalBase,
+    pagado_total_base_cents: pagadoBase,
+    saldo_total_base_cents: totalBase - pagadoBase,
+    pct_pagado: totalBase > 0n ? Number((pagadoBase * 100n) / totalBase) : 0,
+    num_compras_sin_pago: enPeriodo.filter((p) => p.paidCents === 0n).length,
+  };
+}
+
+/**
+ * POST /compras/:id/marcar-sin-deuda del ERP: fija condiciones 'Contado'
+ * (sale de CxP sin registrar pago; el stock recibido se conserva).
+ */
+export async function marcarSinDeuda(
+  db: Db,
+  orgId: string,
+  userId: UserId,
+  id: string,
+): Promise<{ message: string }> {
+  const purchase = await getOwnedPurchase(db, orgId, id);
+  if (purchase.status === "cancelled") {
+    throw new Error("La compra está cancelada");
+  }
+  await db
+    .update(purchases)
+    .set({ paymentTerms: "Contado", updatedAt: new Date() })
+    .where(and(eq(purchases.id, id), eq(purchases.orgId, orgId)));
+  await logAudit(db, {
+    orgId,
+    userId,
+    entity: "purchase",
+    entityId: id,
+    action: "update",
+    after: { paymentTerms: "Contado", sinDeuda: true },
+  });
+  return {
+    message:
+      "Compra marcada como sin deuda: sale de Cuentas por Pagar y el stock recibido se conserva.",
+  };
 }
 
 export async function listLots(

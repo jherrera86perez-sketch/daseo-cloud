@@ -28,6 +28,8 @@ export const suppliers = pgTable(
     email: text("email"),
     phone: text("phone"),
     address: text("address"),
+    // ≈ cuenta_bancaria del ERP: referencia para pagos por transferencia
+    bankAccount: text("bank_account"),
     notes: text("notes"),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
     ...timestamps,
@@ -84,6 +86,22 @@ export const purchases = pgTable(
     totalBaseCents: bigint("total_base_cents", { mode: "bigint" })
       .notNull()
       .default(sql`0`),
+    // Gastos adicionales del ERP (transportacion/dietas/otros_gastos): se
+    // prorratean al costo unitario en la recepción, proporcional al subtotal
+    transportCents: bigint("transport_cents", { mode: "bigint" })
+      .notNull()
+      .default(sql`0`),
+    allowanceCents: bigint("allowance_cents", { mode: "bigint" })
+      .notNull()
+      .default(sql`0`),
+    otherCostsCents: bigint("other_costs_cents", { mode: "bigint" })
+      .notNull()
+      .default(sql`0`),
+    // ≈ condiciones_pago del ERP: 'Contado' queda FUERA de CxP
+    paymentTerms: text("payment_terms"),
+    // ≈ numero_factura_proveedor (3-way matching informativo)
+    supplierInvoice: text("supplier_invoice"),
+    note: text("note"),
     receivedAt: timestamp("received_at", { withTimezone: true }),
     dueDate: timestamp("due_date", { withTimezone: true }),
     idempotencyKey: uuid("idempotency_key"),
@@ -103,6 +121,10 @@ export const purchases = pgTable(
       sql`${t.status} in ('draft','confirmed','cancelled')`,
     ),
     check("purchases_totals_check", sql`${t.totalCents} >= 0`),
+    check(
+      "purchases_extras_check",
+      sql`${t.transportCents} >= 0 and ${t.allowanceCents} >= 0 and ${t.otherCostsCents} >= 0`,
+    ),
   ],
 );
 
@@ -158,9 +180,11 @@ export const supplierPayments = pgTable(
     index("supplier_payments_org_purchase_idx").on(t.orgId, t.purchaseId),
     check("supplier_payments_amount_check", sql`${t.amountCents} > 0`),
     check("supplier_payments_applied_check", sql`${t.appliedCents} > 0`),
+    // Métodos del ERP para pagos a proveedor (Efectivo/Transferencia/QR/
+    // Cheque/Otro) + los compartidos con cobros
     check(
       "supplier_payments_method_check",
-      sql`${t.method} in ('cash','transfer','other')`,
+      sql`${t.method} in ('cash','card','transfer','qr','cheque','mlc','usd','other')`,
     ),
   ],
 );

@@ -24,6 +24,7 @@ export function SupplierForm({
     { name: "email", label: t("email"), type: "email" },
     { name: "phone", label: t("phone"), type: "tel" },
     { name: "address", label: t("address") },
+    { name: "bankAccount", label: t("bankAccount") },
     { name: "notes", label: t("notes") },
   ] as const;
 

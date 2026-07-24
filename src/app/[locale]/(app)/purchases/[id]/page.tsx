@@ -34,7 +34,23 @@ export default async function PurchaseDetailPage({
         </h1>
         <PurchaseDetailActions purchaseId={id} status={purchase.status} />
       </div>
-      <p className="text-sm text-muted-foreground">{purchase.supplierName}</p>
+      <p className="text-sm text-muted-foreground">
+        {purchase.supplierName}
+        {purchase.paymentTerms && ` · ${purchase.paymentTerms}`}
+        {purchase.supplierInvoice &&
+          ` · ${t("supplierInvoice")}: ${purchase.supplierInvoice}`}
+      </p>
+      {purchase.note && (
+        <p className="text-sm text-muted-foreground">{purchase.note}</p>
+      )}
+      {purchase.status === "confirmed" && (
+        // 3-way matching del ERP (informativo, no bloquea)
+        <p
+          className={`text-xs ${purchase.supplierInvoice ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}
+        >
+          {purchase.supplierInvoice ? t("threeWayOk") : t("threeWayWarn")}
+        </p>
+      )}
 
       <Card>
         <CardHeader>
@@ -59,6 +75,23 @@ export default async function PurchaseDetailPage({
               ))}
             </tbody>
             <tfoot>
+              {purchase.transportCents +
+                purchase.allowanceCents +
+                purchase.otherCostsCents >
+                0n && (
+                <tr className="border-t">
+                  <td colSpan={3} className="py-1 text-right text-xs">
+                    {t("expensesBreakdown")}
+                  </td>
+                  <td className="py-1 text-right text-xs" data-numeric="">
+                    {centsToDecimalString(
+                      purchase.transportCents +
+                        purchase.allowanceCents +
+                        purchase.otherCostsCents,
+                    )}
+                  </td>
+                </tr>
+              )}
               <tr className="border-t">
                 <td colSpan={3} className="py-2 text-right font-medium">
                   {t("total")}
@@ -93,6 +126,7 @@ export default async function PurchaseDetailPage({
                 saleId={id}
                 saleCurrency={purchase.currency}
                 action={addSupplierPaymentAction.bind(null, id)}
+                balance={centsToDecimalString(balanceCents)}
               />
             )}
             {payments.length > 0 && (

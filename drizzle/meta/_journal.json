@@ -141,6 +141,13 @@
       "when": 1784898112097,
       "tag": "0019_third_peter_parker",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1784899951828,
+      "tag": "0020_military_jack_murdock",
+      "breakpoints": true
     }
   ]
 }

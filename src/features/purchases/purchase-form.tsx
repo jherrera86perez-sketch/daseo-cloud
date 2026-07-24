@@ -49,17 +49,35 @@ export function PurchaseForm({
   const [currency, setCurrency] = useState(baseCurrency);
   const [rate, setRate] = useState("1");
   const [lines, setLines] = useState<Line[]>([emptyLine()]);
+  // Paridad ERP: Contado/Crédito, fecha retroactiva, factura, gastos, notas
+  const [payType, setPayType] = useState<"cash" | "credit">("cash");
+  const [terms, setTerms] = useState("30 días");
+  const [receivedAt, setReceivedAt] = useState("");
+  const [supplierInvoice, setSupplierInvoice] = useState("");
+  const [transport, setTransport] = useState("");
+  const [allowance, setAllowance] = useState("");
+  const [otherCosts, setOtherCosts] = useState("");
+  const [note, setNote] = useState("");
   const idempotencyKey = useMemo(() => crypto.randomUUID(), []);
+  const hoyStr = useMemo(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }, []);
 
   function setLine(i: number, patch: Partial<Line>) {
     setLines((ls) => ls.map((l, j) => (j === i ? { ...l, ...patch } : l)));
   }
 
-  const total = lines.reduce((acc, l) => {
+  const subtotal = lines.reduce((acc, l) => {
     const q = parseFloat(l.qty.replace(",", ".")) || 0;
     const c = parseFloat(l.unitCost.replace(",", ".")) || 0;
     return acc + q * c;
   }, 0);
+  const gastos =
+    (parseFloat(transport.replace(",", ".")) || 0) +
+    (parseFloat(allowance.replace(",", ".")) || 0) +
+    (parseFloat(otherCosts.replace(",", ".")) || 0);
+  const total = subtotal + gastos;
 
   const payload = JSON.stringify({
     supplierId,
@@ -76,6 +94,13 @@ export function PurchaseForm({
         lotCode: l.lotCode || undefined,
         expiryDate: l.expiryDate || undefined,
       })),
+    transport,
+    allowance,
+    otherCosts,
+    paymentTerms: payType === "credit" ? terms : undefined,
+    supplierInvoice,
+    note,
+    receivedAt,
   });
 
   return (
@@ -228,18 +253,152 @@ export function PurchaseForm({
         </Button>
       </div>
 
-      <p className="text-right text-lg font-bold" data-numeric="">
-        {t("total")}: {total.toFixed(2)} {currency}
-      </p>
+      {/* Tipo de pago + fecha + factura (paridad ERP) */}
+      <div className="grid gap-3 sm:grid-cols-4">
+        <div className="flex flex-col gap-2">
+          <Label>{t("payType")}</Label>
+          <div className="flex rounded-md border p-0.5">
+            <button
+              type="button"
+              className={`flex-1 rounded px-2 py-1 text-sm ${payType === "cash" ? "bg-primary text-primary-foreground" : ""}`}
+              onClick={() => setPayType("cash")}
+            >
+              💵 {t("cashType")}
+            </button>
+            <button
+              type="button"
+              className={`flex-1 rounded px-2 py-1 text-sm ${payType === "credit" ? "bg-primary text-primary-foreground" : ""}`}
+              onClick={() => setPayType("credit")}
+            >
+              📋 {t("creditType")}
+            </button>
+          </div>
+          <span className="text-xs text-muted-foreground">
+            {payType === "cash" ? t("cashHint") : t("creditHint")}
+          </span>
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="p-date">{t("purchaseDate")}</Label>
+          <Input
+            id="p-date"
+            type="date"
+            max={hoyStr}
+            value={receivedAt || hoyStr}
+            onChange={(e) => setReceivedAt(e.target.value)}
+          />
+          {receivedAt && receivedAt !== hoyStr && (
+            <span className="text-xs text-amber-600 dark:text-amber-400">
+              {t("backdated")}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="p-inv">{t("supplierInvoice")}</Label>
+          <Input
+            id="p-inv"
+            placeholder={t("supplierInvoicePlaceholder")}
+            value={supplierInvoice}
+            onChange={(e) => setSupplierInvoice(e.target.value)}
+          />
+        </div>
+        {payType === "credit" && (
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="p-terms">{t("terms")}</Label>
+            <select
+              id="p-terms"
+              value={terms}
+              onChange={(e) => setTerms(e.target.value)}
+              className="border-input h-9 rounded-md border bg-transparent px-2 text-sm"
+            >
+              {["15 días", "30 días", "60 días", "90 días"].map((x) => (
+                <option key={x} value={x}>
+                  {x}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+
+      {/* Gastos adicionales (se prorratean al costo en la recepción) */}
+      <div className="grid gap-3 sm:grid-cols-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="p-transport">{t("transport")}</Label>
+          <Input
+            id="p-transport"
+            inputMode="decimal"
+            placeholder="0.00"
+            value={transport}
+            onChange={(e) => setTransport(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="p-allowance">{t("allowance")}</Label>
+          <Input
+            id="p-allowance"
+            inputMode="decimal"
+            placeholder="0.00"
+            value={allowance}
+            onChange={(e) => setAllowance(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="p-other">{t("otherCosts")}</Label>
+          <Input
+            id="p-other"
+            inputMode="decimal"
+            placeholder="0.00"
+            value={otherCosts}
+            onChange={(e) => setOtherCosts(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="p-note">{t("notes")}</Label>
+          <Input
+            id="p-note"
+            placeholder={t("notesPlaceholder")}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="text-right" data-numeric="">
+        {gastos > 0 && (
+          <p className="text-sm text-muted-foreground">
+            {t("subtotalLabel")}: {subtotal.toFixed(2)} · {t("expenses")}:{" "}
+            {gastos.toFixed(2)}
+          </p>
+        )}
+        <p className="text-lg font-bold">
+          {t("total")}: {total.toFixed(2)} {currency}
+        </p>
+      </div>
 
       {state?.error && (
         <p role="alert" className="text-sm text-destructive">
           {state.error}
         </p>
       )}
-      <Button type="submit" disabled={pending || !supplierId}>
-        {pending ? "…" : t("saveDraft")}
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="submit"
+          name="mode"
+          value="draft"
+          variant="outline"
+          disabled={pending || !supplierId}
+        >
+          {pending ? "…" : `💾 ${t("saveDraft")}`}
+        </Button>
+        <Button
+          type="submit"
+          name="mode"
+          value={payType}
+          disabled={pending || !supplierId}
+        >
+          {pending ? "…" : t("confirmPurchase")}
+        </Button>
+      </div>
     </form>
   );
 }
