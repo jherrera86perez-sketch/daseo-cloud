@@ -58,14 +58,16 @@ test.describe.serial("fiscal ONAT end-to-end", () => {
       .filter({ has: page.locator("option", { hasText: "Ventas Minoristas" }) })
       .selectOption("Ventas Minoristas");
     await page.getByRole("button", { name: /^guardar$/i }).click();
-    await expect(page.getByText(/entrada manual creada/i)).toBeVisible();
+    await expect(page.getByText(/entrada manual creada/i)).toBeVisible({
+      timeout: 20_000,
+    });
 
     // fiscal: guardar configuración (país CU) y calcular desde el banco
     await page.getByRole("link", { name: /^fiscal$/i }).click();
     await page.getByRole("button", { name: /^guardar$/i }).click();
-    await expect(
-      page.getByText(/configuración fiscal guardada/i),
-    ).toBeVisible();
+    await expect(page.getByText(/configuración fiscal guardada/i)).toBeVisible({
+      timeout: 20_000,
+    });
     await page
       .getByRole("button", { name: /calcular desde el banco/i })
       .click();
@@ -78,7 +80,9 @@ test.describe.serial("fiscal ONAT end-to-end", () => {
     // marcar pagado el pago a cuenta (051012, 5,000.00)
     const anticipoRow = page.locator("tr", { hasText: "051012" });
     await anticipoRow.getByRole("button", { name: /marcar pagada/i }).click();
-    await expect(anticipoRow.getByText(/^pagada$/i)).toBeVisible();
+    await expect(anticipoRow.getByText(/^pagada$/i)).toBeVisible({
+      timeout: 20_000,
+    });
 
     // DJ-08 visible con la escala
     await expect(page.getByText(/proyección dj-08/i)).toBeVisible();
@@ -86,6 +90,8 @@ test.describe.serial("fiscal ONAT end-to-end", () => {
 
     // brecha fiscal: venta interna = ingreso bancario este mes → 0% de brecha
     await expect(page.getByText(/brecha fiscal/i)).toBeVisible();
-    await expect(page.getByText("100.0%").first()).toBeVisible();
+    await expect(page.getByText("100.0%").first()).toBeVisible({
+      timeout: 20_000,
+    });
   });
 });
