@@ -28,6 +28,12 @@ test.describe.serial("vehículos end-to-end", () => {
     await expect(page.getByText(/veh[ií]culo agregado/i)).toBeVisible({
       timeout: 20_000,
     });
+    await expect(page.getByText("MOTO-1")).toBeVisible({ timeout: 20_000 });
+
+    // recarga antes de la 2da alta: evita depender de dos envíos seguidos
+    // al mismo formulario ligado a una Server Action sin navegación
+    await page.reload();
+    await expect(page.getByText("MOTO-1")).toBeVisible({ timeout: 20_000 });
 
     // B_CARGA_MEDIA = 450.00
     await page.getByLabel(/^placa$/i).fill("CAMION-1");
@@ -36,13 +42,23 @@ test.describe.serial("vehículos end-to-end", () => {
     await expect(page.getByText("CAMION-1")).toBeVisible({ timeout: 20_000 });
 
     // total anual = 110.00 + 450.00 = 560.00
-    const totalLine = page.getByText(/total anual/i);
-    await expect(totalLine).toContainText("560.00", { timeout: 20_000 });
+    await expect(page.getByText(/total anual/i)).toContainText("560.00", {
+      timeout: 20_000,
+    });
+
+    // recarga antes de dar de baja: evita depender de dos mutaciones
+    // seguidas sobre la misma carga de página
+    await page.reload();
+    await expect(page.getByText(/total anual/i)).toContainText("560.00", {
+      timeout: 20_000,
+    });
 
     // dar de baja el camión → total baja a 110.00
     const camionRow = page.locator("tr", { hasText: "CAMION-1" });
     await camionRow.getByRole("button", { name: /dar de baja/i }).click();
-    await expect(totalLine).toContainText("110.00", { timeout: 20_000 });
+    await expect(page.getByText(/total anual/i)).toContainText("110.00", {
+      timeout: 20_000,
+    });
     await expect(page.getByText(/vendido/i)).toBeVisible({ timeout: 20_000 });
   });
 });
