@@ -25,6 +25,7 @@ import {
   Trophy,
   Gift,
   HeartHandshake,
+  BookOpenCheck,
 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
 import { LocaleSwitcher } from "@/features/auth/locale-switcher";
@@ -86,6 +87,11 @@ export default async function AppLayout({
     { href: "/suppliers", label: t("suppliers"), icon: Truck },
     { href: "/banking", label: t("banking"), icon: Landmark },
     { href: "/statements", label: t("statements"), icon: Banknote },
+    {
+      href: "/reconciliation",
+      label: t("reconciliation"),
+      icon: BookOpenCheck,
+    },
     { href: "/top-clients", label: t("topClients"), icon: Trophy },
     { href: "/raffles", label: t("raffles"), icon: Gift },
     { href: "/fiscal", label: t("fiscal"), icon: Scale },

@@ -27,6 +27,8 @@ export const customers = pgTable(
     phone: text("phone"),
     address: text("address"),
     notes: text("notes"),
+    // "aprendida" al vincular un cobro al banco (extraerPagador del ERP)
+    referenciaBancaria: text("referencia_bancaria"),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
     ...timestamps,
   },

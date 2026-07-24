@@ -25,7 +25,6 @@ const outflowSchema = z.object({
   destinoNombre: z.string().max(300).nullish(),
   employeeId: z.string().uuid().nullish(),
   montoEfectivo: z.string().default("0"),
-  bankAccountId: z.string().uuid().nullish(),
   motivo: z.string().max(500).nullish(),
   notas: z.string().max(1000).nullish(),
   items: z.array(itemSchema).default([]),

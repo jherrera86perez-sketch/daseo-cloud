@@ -78,6 +78,8 @@ export const statementMovements = pgTable(
     tipoTransaccion: text("tipo_transaccion"),
     telefono: text("telefono"),
     conciliado: boolean("conciliado").notNull().default(false),
+    // fila del consolidado_bancario creada al conciliar (referencia blanda)
+    consolidadoId: uuid("consolidado_id"),
     ...timestamps,
   },
   (t) => [

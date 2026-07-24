@@ -12,14 +12,14 @@ import {
 import { id, timestamps, organizations } from "./core";
 import { employees } from "./people";
 import { products } from "./inventory";
-import { bankAccounts } from "./banking";
 
 /**
  * Salidas internas (port fiel de `salidas_internas` del ERP CubaOne):
  * salidas NO-venta — Donación / Regalo / Autoconsumo / Trabajadores.
  * Sin máquina de estados: el efecto (stock + banco) se aplica al crear y
  * se revierte íntegro al eliminar; editar = revertir + recrear (re-numera).
- * `bankMovementId` es referencia blanda como `consolidado_bancario_id`.
+ * `consolidadoId` = consolidado_bancario_id del ERP (referencia blanda al
+ * egreso DB con origen='salida_interna' en consolidated_entries).
  */
 export const internalOutflows = pgTable(
   "internal_outflows",
@@ -38,8 +38,7 @@ export const internalOutflows = pgTable(
     valorProductosCents: bigint("valor_productos_cents", { mode: "bigint" })
       .notNull()
       .default(sql`0`),
-    bankAccountId: uuid("bank_account_id").references(() => bankAccounts.id),
-    bankMovementId: uuid("bank_movement_id"),
+    consolidadoId: uuid("consolidado_id"),
     motivo: text("motivo"),
     notas: text("notas"),
     ...timestamps,

@@ -2,18 +2,18 @@ import { and, desc, eq, gte, inArray, lte } from "drizzle-orm";
 import {
   internalOutflows,
   internalOutflowItems,
-  bankMovements,
+  consolidatedEntries,
   employees,
 } from "@/db/schema";
 import { assertOwnedByOrg } from "@/lib/tenant";
 import { logAudit } from "@/lib/audit";
 import { parseQtyToMilli, milliToQtyString } from "@/lib/qty";
+import { centsToDecimalString } from "@/lib/money";
 import {
   registerMovement,
   getOwnedProduct,
   getStock,
 } from "@/features/inventory/queries";
-import { getOwnedAccount } from "@/features/banking/queries";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Db = any;
@@ -49,7 +49,6 @@ export type OutflowInput = {
   destinoNombre?: string | null;
   employeeId?: string | null;
   montoEfectivoCents: bigint;
-  bankAccountId?: string | null;
   motivo?: string | null;
   notas?: string | null;
   items: Array<{ productId: string; qty: string }>;
@@ -115,10 +114,6 @@ async function createOutflowTx(
   }
 
   const efectivo = input.montoEfectivoCents;
-  if (efectivo > 0n && !input.bankAccountId) {
-    // Adaptación multi-cuenta: el ERP tiene un solo consolidado bancario
-    throw new Error("Selecciona la cuenta bancaria para el egreso en efectivo");
-  }
 
   const [outflow] = await tx
     .insert(internalOutflows)
@@ -130,35 +125,46 @@ async function createOutflowTx(
       employeeId: input.employeeId ?? null,
       montoEfectivoCents: efectivo,
       valorProductosCents: 0n,
-      bankAccountId: efectivo > 0n ? input.bankAccountId : null,
       motivo: input.motivo ?? null,
       notas: input.notas ?? null,
     })
     .returning();
 
-  // Egreso bancario (inventario.js:106-136): excluido de conciliación
-  // pendiente en el ERP (origen='salida_interna') → aquí status 'ignored'.
-  if (efectivo > 0n && input.bankAccountId) {
-    await getOwnedAccount(tx, orgId, input.bankAccountId);
-    const destino = input.destinoNombre?.trim();
-    const [mov] = await tx
-      .insert(bankMovements)
+  // Egreso al consolidado bancario (inventario.js:106-136): DB con
+  // origen='salida_interna', excluido de conciliación por diseño.
+  if (efectivo > 0n) {
+    const [dia, mes, anio] = [
+      parseInt(input.fecha.slice(8, 10), 10),
+      parseInt(input.fecha.slice(5, 7), 10),
+      parseInt(input.fecha.slice(0, 4), 10),
+    ];
+    const [entry] = await tx
+      .insert(consolidatedEntries)
       .values({
         orgId,
-        bankAccountId: input.bankAccountId,
-        movementDate: input.fecha,
-        description: `${categoriaBancaria(input.tipo)}${destino ? ` — ${destino}` : ""}`,
-        amountCents: -efectivo,
-        reference: `SAL-${outflow.id}`,
-        dedupHash: `salida_interna_${outflow.id}`,
-        status: "ignored",
+        archivoNombre: "salida-interna",
+        fechaContable: input.fecha,
+        dia,
+        mes,
+        anio,
+        referencia: input.motivo ?? null,
+        tipoTransaccion: "DB",
+        importe: centsToDecimalString(efectivo),
+        observaciones: input.notas ?? null,
+        categoria: categoriaBancaria(input.tipo),
+        subcategoria: input.tipo,
+        detalle: input.destinoNombre ?? null,
+        conciliado: false,
+        clienteNombre: input.destinoNombre ?? null,
+        origen: "salida_interna",
+        auditStatus: "MANUAL",
       })
       .returning();
     await tx
       .update(internalOutflows)
-      .set({ bankMovementId: mov.id })
+      .set({ consolidadoId: entry.id })
       .where(eq(internalOutflows.id, outflow.id));
-    outflow.bankMovementId = mov.id;
+    outflow.consolidadoId = entry.id;
   }
 
   // Líneas: descuenta stock al CREAR, costo = promedio del kardex
@@ -220,13 +226,13 @@ async function revertOutflowTx(
       note: `Reversión de salida interna SAL-${outflow.id}`,
     });
   }
-  if (outflow.bankMovementId) {
+  if (outflow.consolidadoId) {
     await tx
-      .delete(bankMovements)
+      .delete(consolidatedEntries)
       .where(
         and(
-          eq(bankMovements.id, outflow.bankMovementId),
-          eq(bankMovements.orgId, orgId),
+          eq(consolidatedEntries.id, outflow.consolidadoId),
+          eq(consolidatedEntries.orgId, orgId),
         ),
       );
   }

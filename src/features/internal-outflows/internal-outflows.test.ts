@@ -2,7 +2,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 import { createTestDb, type TestDb } from "@/test/db";
-import { organizations, bankAccounts, bankMovements } from "@/db/schema";
+import { organizations, consolidatedEntries } from "@/db/schema";
 import {
   createProduct,
   registerMovement,
@@ -20,7 +20,6 @@ let orgA: string;
 let orgB: string;
 let jabonId: string;
 let cloroId: string;
-let cuentaId: string;
 const USER = null;
 
 beforeAll(async () => {
@@ -58,12 +57,6 @@ beforeAll(async () => {
     qty: "10",
     unitCostCents: 2000n,
   });
-
-  const [cuenta] = await db
-    .insert(bankAccounts)
-    .values({ orgId: orgA, name: "BPA CUP", currency: "CUP" })
-    .returning();
-  cuentaId = cuenta.id;
 });
 
 describe("validaciones con mensajes literales del ERP", () => {
@@ -155,36 +148,30 @@ describe("crear salida: efecto inmediato en stock, kardex y banco", () => {
     ]);
   });
 
-  it("con efectivo crea egreso bancario negativo excluido de conciliación (ignored)", async () => {
+  it("con efectivo crea egreso DB en el consolidado con origen salida_interna", async () => {
     const salida = await createInternalOutflow(db, orgA, USER, {
       fecha: "2026-07-21",
       tipo: "DONACION",
       destinoNombre: "Hogar de ancianos",
       montoEfectivoCents: 150_00n,
-      bankAccountId: cuentaId,
+      motivo: "Aniversario",
       items: [],
     });
-    expect(salida.bankMovementId).not.toBeNull();
-    const [mov] = await db
+    expect(salida.consolidadoId).not.toBeNull();
+    const [entry] = await db
       .select()
-      .from(bankMovements)
-      .where(eq(bankMovements.id, salida.bankMovementId!));
-    expect(mov.amountCents).toBe(-150_00n);
-    expect(mov.status).toBe("ignored");
-    expect(mov.description).toBe("Donaciones — Hogar de ancianos");
-  });
-
-  it("con efectivo pero sin cuenta bancaria rechaza", async () => {
-    await expect(
-      createInternalOutflow(db, orgA, USER, {
-        fecha: "2026-07-21",
-        tipo: "REGALO",
-        montoEfectivoCents: 10_00n,
-        items: [],
-      }),
-    ).rejects.toThrow(
-      "Selecciona la cuenta bancaria para el egreso en efectivo",
-    );
+      .from(consolidatedEntries)
+      .where(eq(consolidatedEntries.id, salida.consolidadoId!));
+    expect(entry.tipoTransaccion).toBe("DB");
+    expect(entry.importe).toBe("150.00");
+    expect(entry.origen).toBe("salida_interna");
+    expect(entry.categoria).toBe("Donaciones");
+    expect(entry.subcategoria).toBe("DONACION");
+    expect(entry.detalle).toBe("Hogar de ancianos");
+    expect(entry.referencia).toBe("Aniversario");
+    expect(entry.conciliado).toBe(false);
+    expect(entry.auditStatus).toBe("MANUAL");
+    expect(entry.archivoNombre).toBe("salida-interna");
   });
 
   it("eliminar revierte íntegro: stock devuelto y salida borrada", async () => {
@@ -195,16 +182,16 @@ describe("crear salida: efecto inmediato en stock, kardex y banco", () => {
     expect(list.find((s) => s.id === salidaId)).toBeUndefined();
   });
 
-  it("eliminar una salida con efectivo borra también el egreso bancario", async () => {
+  it("eliminar una salida con efectivo borra también su fila del consolidado", async () => {
     const [salida] = await listInternalOutflows(db, orgA, {});
     expect(salida.tipo).toBe("DONACION");
-    const movId = salida.bankMovementId!;
+    const entryId = salida.consolidadoId!;
     await deleteInternalOutflow(db, orgA, USER, salida.id);
-    const movs = await db
+    const entries = await db
       .select()
-      .from(bankMovements)
-      .where(eq(bankMovements.id, movId));
-    expect(movs).toHaveLength(0);
+      .from(consolidatedEntries)
+      .where(eq(consolidatedEntries.id, entryId));
+    expect(entries).toHaveLength(0);
   });
 });
 

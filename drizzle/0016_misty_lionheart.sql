@@ -1,0 +1,1 @@
+ALTER TABLE "internal_outflows" ADD COLUMN "consolidado_id" uuid;

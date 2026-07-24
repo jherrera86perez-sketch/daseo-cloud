@@ -164,6 +164,10 @@ export const payments = pgTable(
     method: text("method").notNull().default("cash"),
     // F3: conciliación bancaria (sin FK circular; banking.ts la define)
     bankAccountId: uuid("bank_account_id"),
+    // Conciliación cobro↔banco del ERP (cobros.banco_movimiento_id):
+    // línea CR del estado de cuenta BPA vinculada + score del match
+    bancoMovimientoId: uuid("banco_movimiento_id"),
+    bancoMatchScore: integer("banco_match_score"),
     paidAt: timestamp("paid_at", { withTimezone: true }).notNull().defaultNow(),
     note: text("note"),
     createdAt: timestamp("created_at", { withTimezone: true })

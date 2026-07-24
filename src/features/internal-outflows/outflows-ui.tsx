@@ -44,7 +44,6 @@ export type OutflowDto = {
   notas: string | null;
   montoEfectivo: string; // decimal
   valorProductos: string; // decimal
-  bankAccountId: string | null;
   items: OutflowItemDto[];
 };
 
@@ -55,8 +54,6 @@ export type ProductOpt = {
   balance: string;
   avgCost: string; // decimal por unidad
 };
-
-export type AccountOpt = { id: string; name: string; currency: string };
 
 const TIPOS = ["DONACION", "REGALO", "AUTOCONSUMO", "TRABAJADORES"] as const;
 const BADGE_CLASS: Record<string, string> = {
@@ -76,11 +73,9 @@ function primerDiaMes(): string {
 export function OutflowsView({
   rows,
   products,
-  accounts,
 }: Readonly<{
   rows: OutflowDto[];
   products: ProductOpt[];
-  accounts: AccountOpt[];
 }>) {
   const t = useTranslations("app.internalOutflows");
   const [desde, setDesde] = useState(primerDiaMes);
@@ -316,7 +311,6 @@ export function OutflowsView({
           key={modal === "new" ? "new" : modal.id}
           initial={modal === "new" ? null : modal}
           products={products}
-          accounts={accounts}
           onClose={() => setModal(null)}
         />
       )}
@@ -331,12 +325,10 @@ type Line = { productId: string; qty: string };
 function OutflowModal({
   initial,
   products,
-  accounts,
   onClose,
 }: Readonly<{
   initial: OutflowDto | null;
   products: ProductOpt[];
-  accounts: AccountOpt[];
   onClose: () => void;
 }>) {
   const t = useTranslations("app.internalOutflows");
@@ -353,9 +345,6 @@ function OutflowModal({
   );
   const [efectivo, setEfectivo] = useState(
     initial && Number(initial.montoEfectivo) > 0 ? initial.montoEfectivo : "",
-  );
-  const [bankAccountId, setBankAccountId] = useState(
-    initial?.bankAccountId ?? accounts[0]?.id ?? "",
   );
   const [motivo, setMotivo] = useState(initial?.motivo ?? "");
   const [notas, setNotas] = useState(initial?.notas ?? "");
@@ -416,7 +405,6 @@ function OutflowModal({
       tipo: tipo as OutflowFormInput["tipo"],
       destinoNombre: destino.trim() || null,
       montoEfectivo: efectivoNum > 0 ? String(efectivoNum) : "0",
-      bankAccountId: efectivoNum > 0 ? bankAccountId || null : null,
       motivo: motivo.trim() || null,
       notas: notas.trim() || null,
       items,
@@ -596,25 +584,6 @@ function OutflowModal({
                   className="h-8"
                 />
               </label>
-              {Number(efectivo) > 0 && (
-                <label className="flex flex-col gap-1">
-                  <span className="text-xs text-muted-foreground">
-                    {t("bankAccountLabel")}
-                  </span>
-                  <select
-                    value={bankAccountId}
-                    onChange={(e) => setBankAccountId(e.target.value)}
-                    className="border-input h-8 rounded-md border bg-transparent px-2 text-sm"
-                  >
-                    <option value="">{t("selectAccount")}</option>
-                    {accounts.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.name} ({a.currency})
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              )}
               <label className="flex flex-col gap-1">
                 <span className="text-xs text-muted-foreground">
                   {t("reasonLabel")}

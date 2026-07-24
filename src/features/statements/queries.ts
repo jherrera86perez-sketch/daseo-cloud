@@ -1,5 +1,9 @@
-import { and, asc, desc, eq } from "drizzle-orm";
-import { statements, statementMovements } from "@/db/schema";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import {
+  statements,
+  statementMovements,
+  consolidatedEntries,
+} from "@/db/schema";
 import { assertOwnedByOrg } from "@/lib/tenant";
 import { logAudit } from "@/lib/audit";
 import {
@@ -174,18 +178,38 @@ export async function deleteStatement(
   orgId: string,
   userId: UserId,
   id: string,
-): Promise<{ movimientos: number }> {
+): Promise<{ movimientos: number; consolidado: number }> {
   const { statement, movements } = await getStatementDetail(db, orgId, id);
-  await db
-    .delete(statements)
-    .where(and(eq(statements.id, id), eq(statements.orgId, orgId)));
+  // Cascada del ERP (estados_cuenta.js:804-853): también se borran las
+  // líneas del consolidado bancario ligadas a estos movimientos.
+  let consolidado = 0;
+  await db.transaction(async (tx: Db) => {
+    if (movements.length > 0) {
+      const borradas = await tx
+        .delete(consolidatedEntries)
+        .where(
+          and(
+            eq(consolidatedEntries.orgId, orgId),
+            inArray(
+              consolidatedEntries.statementMovementId,
+              movements.map((m: StatementMovementRow) => m.id),
+            ),
+          ),
+        )
+        .returning({ id: consolidatedEntries.id });
+      consolidado = borradas.length;
+    }
+    await tx
+      .delete(statements)
+      .where(and(eq(statements.id, id), eq(statements.orgId, orgId)));
+  });
   await logAudit(db, {
     orgId,
     userId,
     entity: "statement",
     entityId: id,
     action: "delete",
-    after: { filename: statement.filename },
+    after: { filename: statement.filename, consolidado },
   });
-  return { movimientos: movements.length };
+  return { movimientos: movements.length, consolidado };
 }
