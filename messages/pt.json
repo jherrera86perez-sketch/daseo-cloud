@@ -100,7 +100,11 @@
         "finance": "Finanças",
         "tax": "Impostos (ONAT)",
         "settings": "Configurações"
-      }
+      },
+      "openMenu": "Abrir menu",
+      "collapseSidebar": "Recolher barra lateral",
+      "expandSidebar": "Expandir barra lateral",
+      "collapse": "Recolher"
     },
     "header": {
       "search": "Buscar",

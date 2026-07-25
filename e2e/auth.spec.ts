@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openNav } from "./nav";
 
 // Flujo completo de auth contra la BD real (dev local: Neon; CI: secret).
 // Email único por corrida para no chocar con datos previos.
@@ -31,6 +32,7 @@ test.describe
     await page.getByRole("button", { name: /entrar/i }).click();
     await page.waitForURL(/\/dashboard/);
 
+    await openNav(page);
     await page.getByRole("button", { name: /cerrar sesión/i }).click();
     await page.waitForURL(/\/login/);
 

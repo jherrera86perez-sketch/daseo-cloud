@@ -1,12 +1,11 @@
 import { getTranslations } from "next-intl/server";
 import { requireOrg } from "@/lib/session";
-import { Link } from "@/i18n/navigation";
 import { AppHeader } from "@/components/app-header";
+import { AppShell } from "@/components/app-shell";
 import { Toaster } from "@/components/ui/sonner";
 import {
   LayoutDashboard,
   Settings,
-  Droplets,
   Users,
   Package,
   Receipt,
@@ -156,17 +155,6 @@ export default async function AppLayout({
       ],
     },
   ];
-  // NavItem.icon debe ser un elemento ya renderizado (ReactNode), no el
-  // componente: una función/ComponentType no puede cruzar el límite
-  // Server→Client de RSC al pasarla como prop a CommandPaletteTrigger.
-  const flatNavItems = navSections.flatMap((s) =>
-    s.items.map(({ href, label, icon: Icon }) => ({
-      href,
-      label,
-      icon: <Icon className="size-4" aria-hidden />,
-    })),
-  );
-
   const db = getDb();
   const [low, cobros, [settings]] = await Promise.all([
     lowStockProducts(db, orgId),
@@ -174,53 +162,68 @@ export default async function AppLayout({
     db.select().from(orgSettings).where(eq(orgSettings.orgId, orgId)),
   ]);
 
+  // ≈ badges por item del ERP ("Ventas 3", "Inventario 18"). Se cablean a las
+  // rutas REALES de Cloud reutilizando las dos queries que el header ya hace
+  // —cero consultas nuevas—. El ERP documenta que uno de sus tres paths con
+  // badge ya no coincide con ninguna ruta suya: ese bug no se replica.
+  const badges: Record<string, number> = {
+    "/sales": cobros.num_ventas,
+    "/products": low.length,
+  };
+
+  // NavItem.icon debe ser un elemento ya renderizado (ReactNode), no el
+  // componente: una función/ComponentType no puede cruzar el límite
+  // Server→Client de RSC al pasarla como prop.
+  const sections = navSections.map((s) => ({
+    title: s.title,
+    items: s.items.map(({ href, label, icon: Icon }) => ({
+      href,
+      label,
+      icon: <Icon className="size-4" aria-hidden />,
+      badge: badges[href] || undefined,
+    })),
+  }));
+
+  const flatNavItems = sections.flatMap((s) =>
+    s.items.map(({ href, label, icon }) => ({ href, label, icon })),
+  );
+
   return (
-    <div className="flex min-h-dvh flex-col sm:flex-row">
-      <aside className="border-b bg-sidebar text-sidebar-foreground sm:min-h-dvh sm:w-56 sm:border-b-0 sm:border-r">
-        <div className="flex items-center gap-2 p-4 font-semibold">
-          <Droplets className="size-5 text-primary" aria-hidden />
-          Daseo Cloud
-        </div>
-        <nav className="flex flex-wrap gap-1 px-2 pb-2 sm:flex-col">
-          {navSections.map((section) => (
-            <div key={section.title} className="w-full sm:mb-1">
-              <p className="px-3 pt-2 pb-1 text-xs font-semibold tracking-wide text-sidebar-foreground/50 uppercase">
-                {section.title}
-              </p>
-              {section.items.map(({ href, label, icon: Icon }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-sidebar-accent"
-                >
-                  <Icon className="size-4" aria-hidden />
-                  {label}
-                </Link>
-              ))}
-            </div>
-          ))}
-          <LogoutButton />
-        </nav>
-        <LocaleSwitcher />
-        <ThemeSwitcher />
-      </aside>
-      <div className="flex flex-1 flex-col">
-        <AppHeader
-          lowStockCount={low.length}
-          receivableCents={cobros.total_adeudado_base_cents}
-          baseCurrency={settings?.baseCurrency ?? "CUP"}
-          navItems={flatNavItems}
-        />
-        <main className="flex-1 p-4 sm:p-6">
+    <>
+      <AppShell
+        sections={sections}
+        labels={{
+          openMenu: t("openMenu"),
+          collapse: t("collapse"),
+          collapseSidebar: t("collapseSidebar"),
+          expandSidebar: t("expandSidebar"),
+        }}
+        header={
+          <AppHeader
+            lowStockCount={low.length}
+            receivableCents={cobros.total_adeudado_base_cents}
+            baseCurrency={settings?.baseCurrency ?? "CUP"}
+            navItems={flatNavItems}
+          />
+        }
+        sidebarFooter={
+          <div className="space-y-1">
+            <LogoutButton />
+            <LocaleSwitcher />
+            <ThemeSwitcher />
+          </div>
+        }
+      >
+        <div className="p-4 sm:p-6">
           {trialNotice && (
             <div className="mb-4 rounded-md border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-sm">
               {trialNotice}
             </div>
           )}
           {children}
-        </main>
-      </div>
+        </div>
+      </AppShell>
       <Toaster />
-    </div>
+    </>
   );
 }

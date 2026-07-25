@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openNav } from "./nav";
 
 // Flujo M4: producto → entrada 100@50 → salida 30 → kardex saldo 70 avg 50.00
 const unique = `m4-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
@@ -19,6 +20,7 @@ test.describe.serial("inventario: kardex end-to-end", () => {
     await page.waitForURL(/\/dashboard/);
 
     // crear producto
+    await openNav(page);
     await page.getByRole("link", { name: /productos/i }).click();
     await page.getByRole("link", { name: /nuevo producto/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Detergente E2E");

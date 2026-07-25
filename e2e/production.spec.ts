@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openNav } from "./nav";
 
 // M8: receta → orden → confirmar con merma y mano de obra → stock del
 // terminado con costo real visible en su kardex.
@@ -17,6 +18,7 @@ test.describe.serial("producción end-to-end", () => {
     await page.waitForURL(/\/dashboard/);
 
     // insumo 100 kg @ 50.00
+    await openNav(page);
     await page.getByRole("link", { name: /productos/i }).click();
     await page.getByRole("link", { name: /nuevo producto/i }).click();
     await page.getByLabel(/nombre \*/i).fill("SLES M8");
@@ -30,6 +32,7 @@ test.describe.serial("producción end-to-end", () => {
     await expect(page.getByText(/^100 kg$/)).toBeVisible();
 
     // terminado producible
+    await openNav(page);
     await page.getByRole("link", { name: /productos/i }).click();
     await page.getByRole("link", { name: /nuevo producto/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Detergente M8");
@@ -40,6 +43,7 @@ test.describe.serial("producción end-to-end", () => {
     const productUrl = page.url();
 
     // receta 10 kg → 100 L
+    await openNav(page);
     await page.getByRole("link", { name: /recetas/i }).click();
     await page.getByRole("link", { name: /nueva receta/i }).click();
     await page.getByLabel(/nombre de la fórmula/i).fill("Fórmula M8");
@@ -49,6 +53,7 @@ test.describe.serial("producción end-to-end", () => {
     await page.waitForURL(/\/recipes\/[0-9a-f-]+$/);
 
     // orden de producción
+    await openNav(page);
     await page.getByRole("link", { name: /producción/i }).click();
     await page.getByRole("button", { name: /nueva orden/i }).click();
     await page.waitForURL(/\/production\/[0-9a-f-]+$/);

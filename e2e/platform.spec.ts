@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openNav } from "./nav";
 
 // F6: generar API key en settings → consumir /api/v1 con ella → revocar → 401.
 const unique = `f6-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
@@ -19,6 +20,7 @@ test.describe.serial("API pública end-to-end", () => {
     await page.waitForURL(/\/dashboard/);
 
     // cliente para que la API tenga algo que devolver
+    await openNav(page);
     await page.getByRole("link", { name: "Clientes", exact: true }).click();
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Cliente API");
@@ -26,6 +28,7 @@ test.describe.serial("API pública end-to-end", () => {
     await page.waitForURL(/\/customers\/[0-9a-f-]+$/);
 
     // generar API key
+    await openNav(page);
     await page.getByRole("link", { name: /configuración/i }).click();
     await page.getByPlaceholder(/laika/i).fill("Bot E2E");
     await page.getByRole("button", { name: /generar key/i }).click();
