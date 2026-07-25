@@ -32,7 +32,8 @@ test.describe
     await page.getByRole("button", { name: /entrar/i }).click();
     await page.waitForURL(/\/dashboard/);
 
-    await openNav(page);
+    // El logout vive en el menu de usuario del header desde la paridad visual
+    await page.getByRole("button", { name: /menú de usuario/i }).click();
     await page.getByRole("button", { name: /cerrar sesión/i }).click();
     await page.waitForURL(/\/login/);
 

@@ -113,7 +113,8 @@
       "receivable": "Te deben {amount} {currency}",
       "receivableTitle": "Ver cuentas por cobrar",
       "lowStockTitle": "{count} producto(s) bajo el stock mínimo",
-      "noAlerts": "Sin alertas de stock"
+      "noAlerts": "Sin alertas de stock",
+      "userMenu": "Menú de usuario"
     },
     "reconciliation": {
       "title": "Control de Caja",

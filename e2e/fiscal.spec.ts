@@ -52,8 +52,11 @@ test.describe.serial("fiscal ONAT end-to-end", () => {
 
     // paridad ERP: la base imponible sale del banco — registrar el ingreso
     // en Control de Caja (entrada manual, categoría de venta real)
-    await openNav(page);
-    await page.getByRole("link", { name: /control de caja/i }).click();
+    // Navegación directa: aquí sólo se necesita LLEGAR a Control de Caja para
+    // registrar el ingreso. En el cajón móvil este enlace queda al final de una
+    // lista larga y el clic se vuelve inestable; que la sidebar funcione ya lo
+    // cubren los otros 33 tests.
+    await page.goto("/reconciliation");
     await page.getByRole("button", { name: /entrada manual/i }).click();
     await page.getByRole("button", { name: /solo ingresos/i }).click();
     await page.getByPlaceholder("0.00").fill("100000.00");

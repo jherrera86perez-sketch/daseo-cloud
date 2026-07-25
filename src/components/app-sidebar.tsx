@@ -129,7 +129,7 @@ export function AppSidebar({
           {sections.map((section) => (
             <div key={section.title} className="mb-1">
               {!collapsed ? (
-                <p className="t-label px-3 pt-3 pb-1 text-sidebar-section-label">
+                <p className="t-label pointer-events-none px-3 pt-3 pb-1 text-sidebar-section-label">
                   {section.title}
                 </p>
               ) : (

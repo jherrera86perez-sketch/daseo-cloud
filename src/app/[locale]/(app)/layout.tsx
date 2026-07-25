@@ -38,6 +38,7 @@ import { subscriptionGate } from "@/features/admin/gate";
 import { documentAllowance } from "@/features/admin/limits";
 import { lowStockProducts } from "@/features/inventory/queries";
 import { cobrosResumen } from "@/features/sales/queries";
+import { listRates } from "@/features/rates/queries";
 import { orgSettings } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
@@ -47,7 +48,7 @@ export const dynamic = "force-dynamic";
 export default async function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { orgId } = await requireOrg();
+  const { orgId, role, user } = await requireOrg();
   const t = await getTranslations("app.nav");
 
   // F7-M2: la suscripción manda sobre toda la zona app.
@@ -156,11 +157,30 @@ export default async function AppLayout({
     },
   ];
   const db = getDb();
-  const [low, cobros, [settings]] = await Promise.all([
+  const [low, cobros, [settings], allRates] = await Promise.all([
     lowStockProducts(db, orgId),
     cobrosResumen(db, orgId),
     db.select().from(orgSettings).where(eq(orgSettings.orgId, orgId)),
+    listRates(db, orgId),
   ]);
+
+  // ≈ ExchangeRatesWidget del ERP. `listRates` ya viene ordenada por fecha
+  // descendente, así que la primera aparición de cada moneda es la vigente.
+  // El ERP fija USD/MLC/EUR; aquí se muestran las que la org tenga, porque
+  // Cloud es multi-tenant y una lista fija sería mentira para otra moneda base.
+  const rates = [
+    ...new Map(
+      allRates.map((r) => [
+        r.currency,
+        {
+          currency: r.currency,
+          value: String(r.rateToBase)
+            .replace(/(\.\d*?)0+$/, "$1")
+            .replace(/\.$/, ""),
+        },
+      ]),
+    ).values(),
+  ].slice(0, 3);
 
   // ≈ badges por item del ERP ("Ventas 3", "Inventario 18"). Se cablean a las
   // rutas REALES de Cloud reutilizando las dos queries que el header ya hace
@@ -204,14 +224,17 @@ export default async function AppLayout({
             receivableCents={cobros.total_adeudado_base_cents}
             baseCurrency={settings?.baseCurrency ?? "CUP"}
             navItems={flatNavItems}
+            rates={rates}
+            userName={user.name || user.email}
+            userRole={role.toUpperCase()}
+            userMenu={
+              <div className="space-y-1">
+                <LocaleSwitcher />
+                <ThemeSwitcher />
+                <LogoutButton />
+              </div>
+            }
           />
-        }
-        sidebarFooter={
-          <div className="space-y-1">
-            <LogoutButton />
-            <LocaleSwitcher />
-            <ThemeSwitcher />
-          </div>
         }
       >
         <div className="p-4 sm:p-6">

@@ -113,7 +113,8 @@
       "receivable": "Devem-lhe {amount} {currency}",
       "receivableTitle": "Ver contas a receber",
       "lowStockTitle": "{count} produto(s) abaixo do estoque mínimo",
-      "noAlerts": "Sem alertas de estoque"
+      "noAlerts": "Sem alertas de estoque",
+      "userMenu": "Menu do usuário"
     },
     "reconciliation": {
       "title": "Controle de Caixa",
