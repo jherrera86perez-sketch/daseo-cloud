@@ -407,6 +407,17 @@
    * con el tema, para que las tablas sigan siendo server components.
    * Por defecto "cozy" (Cómoda), que es lo que trae seleccionado el ERP.
    */
+  /*
+   * Valor por defecto = "cozy". Va aquí y no en el componente porque las
+   * utilidades de Tailwind ganarían a las reglas de densidad y el toggle no
+   * haría nada. Una celda que necesite otro padding puede seguir poniendo su
+   * utilidad: sigue ganando a la capa base.
+   */
+  table th,
+  table td {
+    padding: 10px 12px;
+  }
+
   [data-density="compact"] table {
     font-size: 12.5px;
   }
