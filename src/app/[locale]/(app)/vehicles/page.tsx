@@ -1,4 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/ui/layout/page-header";
+import { PageLayout } from "@/components/ui/layout/page-layout";
 import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
 import { listVehicles } from "@/features/vehicles/queries";
@@ -10,11 +12,11 @@ export default async function VehiclesPage() {
   const vehicles = await listVehicles(getDb(), orgId);
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">{t("title")}</h1>
-      <p className="text-sm text-muted-foreground">{t("hint")}</p>
-      <VehicleForm />
-      <VehiclesTable vehicles={vehicles} />
-    </div>
+    <PageLayout header={<PageHeader title={t("title")} subtitle={t("hint")} />}>
+      <div className="flex flex-col gap-4">
+        <VehicleForm />
+        <VehiclesTable vehicles={vehicles} />
+      </div>
+    </PageLayout>
   );
 }

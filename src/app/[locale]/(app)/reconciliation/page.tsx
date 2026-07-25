@@ -1,4 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/ui/layout/page-header";
+import { PageLayout } from "@/components/ui/layout/page-layout";
 import { requireOrg } from "@/lib/session";
 import { ControlCajaView } from "@/features/consolidado/conciliacion-ui";
 
@@ -7,12 +9,10 @@ export default async function ReconciliationPage() {
   await requireOrg();
   const t = await getTranslations("app.reconciliation");
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
-      </div>
+    <PageLayout
+      header={<PageHeader title={t("title")} subtitle={t("subtitle")} />}
+    >
       <ControlCajaView />
-    </div>
+    </PageLayout>
   );
 }
