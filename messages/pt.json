@@ -5,7 +5,8 @@
     "language": "Idioma",
     "loading": "Carregando…",
     "save": "Salvar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "close": "Fechar"
   },
   "landing": {
     "title": "Daseo Cloud",
@@ -663,8 +664,16 @@
       "lowStock": "Abaixo do mínimo",
       "lowStockAlert": "{count} produto(s) abaixo do estoque mínimo",
       "status": "Status",
-      "stockStatus": { "critico": "Crítico", "bajo": "Baixo", "ok": "OK" },
-      "urgency": { "CRITICA": "Crítica", "ALTA": "Alta", "MEDIA": "Média" },
+      "stockStatus": {
+        "critico": "Crítico",
+        "bajo": "Baixo",
+        "ok": "OK"
+      },
+      "urgency": {
+        "CRITICA": "Crítica",
+        "ALTA": "Alta",
+        "MEDIA": "Média"
+      },
       "cascadeNote": "Afeta produção de: {products}",
       "panel": {
         "inventoryValue": "Valor em estoque",
@@ -718,7 +727,11 @@
           "servicio": "Serviço"
         },
         "unit": "Unidade",
-        "units": { "kg": "kg", "L": "L", "unit": "un" },
+        "units": {
+          "kg": "kg",
+          "L": "L",
+          "unit": "un"
+        },
         "price": "Preço de venda",
         "stockMin": "Estoque mínimo (alerta)",
         "autoStockMin": "Calcular automaticamente (conforme consumo)",
@@ -1079,7 +1092,10 @@
       "title": "Fiscal (ONAT)",
       "settingsTitle": "Configuração fiscal",
       "regime": "Regime",
-      "regimes": { "general": "TCP Geral", "simplified": "TCP Simplificado" },
+      "regimes": {
+        "general": "TCP Geral",
+        "simplified": "TCP Simplificado"
+      },
       "payroll": "Folha mensal",
       "quota": "Cota fixa (simplif.)",
       "minExempt": "Mínimo isento DJ",
@@ -1174,7 +1190,10 @@
       "link": "Vincular",
       "linked": "Movimento conciliado",
       "ignore": "Ignorar",
-      "statuses": { "matched": "Conciliado", "ignored": "Ignorado" }
+      "statuses": {
+        "matched": "Conciliado",
+        "ignored": "Ignorado"
+      }
     },
     "suppliers": {
       "title": "Fornecedores",
