@@ -286,7 +286,7 @@ export function RafflesView({ history }: Readonly<{ history: RaffleDto[] }>) {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y divide-surface-100">
                     {participantes.map((p, i) => {
                       const isWinner =
                         pendingWinner?.client_name === p.client_name &&
@@ -351,7 +351,7 @@ export function RafflesView({ history }: Readonly<{ history: RaffleDto[] }>) {
               <p className="mb-2 text-sm font-semibold">
                 {t("historyTitle")} ({history.length})
               </p>
-              <ul className="flex flex-col divide-y">
+              <ul className="flex flex-col divide-y divide-surface-100">
                 {history.map((s) => (
                   <li
                     key={s.id}
@@ -479,7 +479,7 @@ function SorteoSpinner({
   if (phase === "spinning") {
     return (
       <div className="flex flex-col items-center gap-3 py-8">
-        <p className="rounded-md border px-6 py-4 text-2xl font-bold blur-[0.5px]">
+        <p className="t-num-display rounded-md border border-border px-6 py-4 text-2xl blur-[0.5px]">
           {displayName}
         </p>
         <p className="flex items-center gap-2 text-sm text-muted-foreground">

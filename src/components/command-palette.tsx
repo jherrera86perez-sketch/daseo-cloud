@@ -68,7 +68,7 @@ export function CommandPaletteTrigger({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 rounded-md border px-2.5 py-1 text-sm text-muted-foreground hover:bg-accent"
+        className="flex items-center gap-2 rounded-md border px-2.5 py-1 text-sm text-muted-foreground transition-colors hover:bg-surface-hover"
       >
         <Search className="size-4" aria-hidden />
         {t("search")}
@@ -103,7 +103,7 @@ export function CommandPaletteTrigger({
                     key={item.href}
                     type="button"
                     onClick={() => go(item.href)}
-                    className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm hover:bg-accent"
+                    className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm transition-colors hover:bg-surface-hover"
                   >
                     {item.icon}
                     {item.label}

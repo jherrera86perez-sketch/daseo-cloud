@@ -16,7 +16,7 @@ export default async function NewRecipePage() {
     <div className="flex flex-col gap-4">
       <h1 className="t-display text-2xl tracking-[-0.025em]">{t("new")}</h1>
       {producibles.length === 0 || components.length === 0 ? (
-        <p className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+        <p className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
           {t("needProducts")}
         </p>
       ) : (

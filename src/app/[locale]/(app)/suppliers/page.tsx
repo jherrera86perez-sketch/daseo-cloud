@@ -22,7 +22,7 @@ export default async function SuppliersPage() {
         </Button>
       </div>
       {rows.length === 0 ? (
-        <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+        <div className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
           {t("empty")}
         </div>
       ) : (
@@ -41,7 +41,7 @@ export default async function SuppliersPage() {
               <Link
                 href={`/suppliers/${s.id}/edit`}
                 aria-label={t("edit")}
-                className="rounded p-1 hover:bg-accent"
+                className="rounded p-1 transition-colors hover:bg-surface-hover"
               >
                 <Pencil className="size-4" aria-hidden />
               </Link>

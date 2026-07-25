@@ -146,7 +146,7 @@ export default async function FiscalPage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y divide-surface-100">
                     {obligations.map((o) => (
                       <tr key={o.id}>
                         <td className="py-2 pr-3" data-numeric="">
@@ -244,7 +244,7 @@ export default async function FiscalPage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y divide-surface-100">
                     {dj.brackets.map((b) => (
                       <tr key={b.fromCents.toString()}>
                         <td className="py-1 pr-3" data-numeric="">
@@ -302,7 +302,7 @@ export default async function FiscalPage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y divide-surface-100">
                     {gap.months
                       .filter(
                         (m) =>

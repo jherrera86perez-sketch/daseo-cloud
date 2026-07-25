@@ -17,7 +17,7 @@ export function SinDeudaButton({
     <button
       type="button"
       disabled={pending}
-      className="rounded-md border px-2 py-1 text-xs hover:bg-accent disabled:opacity-50"
+      className="rounded-md border px-2 py-1 text-xs transition-colors hover:bg-surface-hover disabled:opacity-50"
       onClick={() => {
         // confirm literal del ERP
         if (!window.confirm(t("sinDeudaConfirm", { numero }))) return;

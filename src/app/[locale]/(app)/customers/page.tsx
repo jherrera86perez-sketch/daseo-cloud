@@ -40,7 +40,7 @@ export default async function CustomersPage({
       </form>
 
       {rows.length === 0 ? (
-        <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+        <div className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
           {q ? t("emptySearch", { q }) : t("empty")}
         </div>
       ) : (
@@ -49,7 +49,7 @@ export default async function CustomersPage({
             <li key={c.id}>
               <Link
                 href={`/customers/${c.id}`}
-                className="flex items-center justify-between gap-2 px-4 py-3 hover:bg-accent"
+                className="flex items-center justify-between gap-2 px-4 py-3 transition-colors hover:bg-surface-hover"
               >
                 <span className="font-medium">{c.name}</span>
                 <span className="text-sm text-muted-foreground" data-numeric="">

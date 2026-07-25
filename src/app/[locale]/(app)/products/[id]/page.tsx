@@ -48,7 +48,7 @@ export default async function ProductDetailPage({
         <Card>
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground">{t("stock")}</p>
-            <p className="text-xl font-bold" data-numeric="">
+            <p className="t-num-display text-[22px]" data-numeric="">
               {milliToQtyString(stock.qtyMilli)}{" "}
               {t(`form.units.${product.unit}`)}
             </p>
@@ -57,7 +57,7 @@ export default async function ProductDetailPage({
         <Card>
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground">{t("avgCost")}</p>
-            <p className="text-xl font-bold" data-numeric="">
+            <p className="t-num-display text-[22px]" data-numeric="">
               {centsToDecimalString(stock.avgCostCents)}
             </p>
           </CardContent>
@@ -135,7 +135,7 @@ export default async function ProductDetailPage({
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-surface-100">
                   {movements.map((m) => (
                     <tr key={m.id}>
                       <td className="py-2 pr-3">

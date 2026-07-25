@@ -57,14 +57,14 @@ export default async function PayablesPage() {
       <div className="flex flex-col gap-4 lg:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-3">
           {grupos.length === 0 ? (
-            <div className="rounded-md border border-dashed p-8 text-center">
+            <div className="rounded-md border border-border bg-card p-10 text-center">
               <p className="font-medium">{t("cleanTitle")}</p>
               <p className="text-sm text-muted-foreground">{t("cleanBody")}</p>
             </div>
           ) : (
             grupos.map((g) => (
               <section key={g.supplierId} className="rounded-md border">
-                <header className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/50 px-4 py-2">
+                <header className="flex flex-wrap items-center justify-between gap-2 border-b bg-surface-100 px-4 py-2">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold">{g.supplierName}</span>
                     <span

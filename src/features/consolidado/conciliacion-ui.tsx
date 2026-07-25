@@ -425,7 +425,7 @@ export function ControlCajaView() {
                 <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                   {label}
                 </p>
-                <p className="text-lg font-bold" data-numeric="">
+                <p className="t-num-display text-[20px]" data-numeric="">
                   {value}
                 </p>
               </CardContent>
@@ -674,7 +674,7 @@ function BancoTable({
                 <th className="px-2 py-1.5" />
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-surface-100">
               {rows.map((m) => (
                 <tr key={m.id} className={m.conciliado ? "opacity-60" : ""}>
                   <td className="px-2 py-1.5 font-mono text-xs">{m.fecha}</td>
@@ -797,7 +797,7 @@ function LibrosTable({
                 <th className="px-2 py-1.5" />
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-surface-100">
               {rows.map((r) => (
                 <tr key={r.id}>
                   <td className="px-2 py-1.5 font-mono text-xs">{r.fecha}</td>
@@ -859,7 +859,7 @@ function LibrosTable({
                 </tr>
               ))}
             </tbody>
-            <tfoot className="border-t bg-muted/50 text-xs">
+            <tfoot className="border-t bg-surface-100 text-xs">
               <tr>
                 <td colSpan={2} className="px-2 py-1.5 font-medium">
                   {t("totals")}
@@ -1058,7 +1058,7 @@ function CobrosPanel({
                     <th className="px-2 py-1.5" />
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-surface-100">
                   {filtrados.map((c) => (
                     <BodyCobro
                       key={c.paymentId}
@@ -1184,7 +1184,7 @@ function BodyCobro({
                     <th className="px-2 py-1" />
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-surface-100">
                   {sugerencias.map((s) => (
                     <tr key={s.movimientoId}>
                       <td className="px-2 py-1">

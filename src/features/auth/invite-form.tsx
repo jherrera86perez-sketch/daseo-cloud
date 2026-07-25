@@ -56,7 +56,7 @@ export function InviteForm() {
         </Button>
       </div>
       {link && (
-        <div className="flex items-center gap-2 rounded-md border bg-muted/50 p-2 text-sm">
+        <div className="flex items-center gap-2 rounded-md border bg-surface-100 p-2 text-sm">
           <code className="flex-1 overflow-x-auto whitespace-nowrap">
             {link}
           </code>

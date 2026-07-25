@@ -55,9 +55,12 @@ export default async function AdminPage() {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody className="divide-y divide-surface-100">
             {rows.map((o) => (
-              <tr key={o.id} className="hover:bg-accent">
+              <tr
+                key={o.id}
+                className="transition-colors hover:bg-surface-hover"
+              >
                 <td className="px-4 py-2">
                   <span className="font-medium">{o.name}</span>{" "}
                   <span className="text-xs text-muted-foreground">

@@ -15,7 +15,7 @@ export default async function BankingPage() {
       <h1 className="t-display text-2xl tracking-[-0.025em]">{t("title")}</h1>
       <NewAccountForm />
       {accounts.length === 0 ? (
-        <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+        <div className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
           {t("empty")}
         </div>
       ) : (
@@ -24,7 +24,7 @@ export default async function BankingPage() {
             <li key={a.id}>
               <Link
                 href={`/banking/${a.id}`}
-                className="flex items-center justify-between px-4 py-3 hover:bg-accent"
+                className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-surface-hover"
               >
                 <span className="font-medium">{a.name}</span>
                 <span className="text-sm text-muted-foreground">

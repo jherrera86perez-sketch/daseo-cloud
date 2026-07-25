@@ -57,7 +57,7 @@ export default async function ProductionOrderPage({
           </CardHeader>
           <CardContent>
             <table className="w-full text-sm">
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-surface-100">
                 {inputs.map((i) => (
                   <tr key={i.id}>
                     <td className="py-2 pr-2">{i.componentName}</td>

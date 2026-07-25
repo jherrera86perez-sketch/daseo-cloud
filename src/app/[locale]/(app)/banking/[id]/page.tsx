@@ -42,7 +42,7 @@ export default async function BankAccountPage({
         <h1 className="t-display text-2xl tracking-[-0.025em]">
           {account.name}
         </h1>
-        <p className="text-lg font-bold" data-numeric="">
+        <p className="t-num-display text-[20px]" data-numeric="">
           {t("importedBalance")}:{" "}
           {balance < 0n
             ? `-${centsToDecimalString(-balance)}`
@@ -86,7 +86,7 @@ export default async function BankAccountPage({
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-surface-100">
                   {movements.map((m) => (
                     <tr key={m.id}>
                       <td className="py-2 pr-3" data-numeric="">

@@ -71,7 +71,7 @@ export default async function SettingsPage() {
             <CardTitle>{t("membersTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="flex flex-col divide-y">
+            <ul className="flex flex-col divide-y divide-surface-100">
               {memberRows.map((m) => (
                 <li
                   key={m.id}

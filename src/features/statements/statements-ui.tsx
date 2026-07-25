@@ -167,7 +167,7 @@ export function StatementsView({
         </form>
 
         {statements.length === 0 ? (
-          <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+          <div className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
             <p className="font-medium">{t("emptyTitle")}</p>
             <p>{t("emptyBody")}</p>
           </div>
@@ -278,7 +278,7 @@ export function StatementsView({
                       <th className="px-3 py-2" />
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y divide-surface-100">
                     {filtered.length === 0 && (
                       <tr>
                         <td
@@ -354,7 +354,10 @@ function StatementRows({
 
   return (
     <>
-      <tr className="cursor-pointer hover:bg-accent" onClick={onToggle}>
+      <tr
+        className="cursor-pointer transition-colors hover:bg-surface-hover"
+        onClick={onToggle}
+      >
         <td className="px-3 py-2 font-medium">
           {s.titular || s.filename}
           {!s.cuadrado && (
@@ -448,7 +451,7 @@ function StatementRows({
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y divide-surface-100">
                       {movs.map((m) => (
                         <MovRow
                           key={m.id}
@@ -501,7 +504,10 @@ function MovRow({
         ? "Switch CE"
         : null;
   return (
-    <tr className="cursor-pointer align-top hover:bg-accent" onClick={onToggle}>
+    <tr
+      className="cursor-pointer align-top transition-colors hover:bg-surface-hover"
+      onClick={onToggle}
+    >
       <td className="px-2 py-1.5 whitespace-nowrap" data-numeric="">
         {m.fecha ?? "—"}
       </td>
@@ -599,7 +605,7 @@ function SummaryPanel({
               {t("netBalance")}
             </p>
             <p
-              className={`text-2xl font-bold ${balance >= 0 ? "text-success" : "text-destructive"}`}
+              className={`t-num-display text-2xl ${balance >= 0 ? "text-success" : "text-destructive"}`}
               data-numeric=""
             >
               {balance.toFixed(2)}

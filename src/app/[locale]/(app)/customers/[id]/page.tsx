@@ -184,7 +184,10 @@ export default async function CustomerDetailPage({
           ) : (
             <ol className="flex flex-col gap-3">
               {interactions.map((i) => (
-                <li key={i.id} className="rounded-md border p-3 text-sm">
+                <li
+                  key={i.id}
+                  className="rounded-md border border-border bg-card p-4 text-sm"
+                >
                   <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                     <span>{t(`types.${i.type}`)}</span>
                     <time dateTime={i.occurredAt.toISOString()}>

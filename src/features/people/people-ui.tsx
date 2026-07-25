@@ -251,7 +251,7 @@ export function DayObservationForm({
   const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
 
   return (
-    <details className="rounded-md border p-3">
+    <details className="rounded-md border border-border bg-card p-4">
       <summary className="cursor-pointer text-sm font-medium">
         {t("dayObservation")}
       </summary>

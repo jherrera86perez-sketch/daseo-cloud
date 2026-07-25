@@ -29,7 +29,7 @@ export function VehicleForm() {
   return (
     <form
       action={formAction}
-      className="flex flex-wrap items-end gap-2 rounded-md border p-3"
+      className="flex flex-wrap items-end gap-2 rounded-md border border-border bg-card p-4"
     >
       <div className="flex flex-col gap-1">
         <Label htmlFor="v-plate">{t("plate")}</Label>
@@ -115,7 +115,7 @@ export function VehiclesTable({
             <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted" />
           </tr>
         </thead>
-        <tbody className="divide-y">
+        <tbody className="divide-y divide-surface-100">
           {vehicles.map((v) => {
             const cat = VEHICLE_CATEGORIES.find(
               (c) => c.code === v.categoryCode,

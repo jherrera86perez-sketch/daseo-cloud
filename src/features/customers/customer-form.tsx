@@ -76,7 +76,7 @@ export function CustomerForm({
       ))}
 
       {/* Financiero (informativo, como el ERP: no se enforza en ventas) */}
-      <div className="grid grid-cols-2 gap-3 rounded-md border p-3">
+      <div className="grid grid-cols-2 gap-3 rounded-md border border-border bg-card p-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor="paymentTerms">{t("paymentTerms")}</Label>
           <select

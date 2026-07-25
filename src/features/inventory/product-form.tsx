@@ -139,7 +139,7 @@ export function ProductForm({
       </div>
 
       {/* Stock mínimo automático (ROP) — paridad ERP */}
-      <div className="flex flex-col gap-2 rounded-md border p-3">
+      <div className="flex flex-col gap-2 rounded-md border border-border bg-card p-4">
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"

@@ -105,13 +105,13 @@ export default async function ReceivablesPage({
       </div>
 
       {grupos.length === 0 ? (
-        <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+        <div className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
           {t("empty")}
         </div>
       ) : (
         grupos.map((g) => (
           <section key={g.customerId} className="rounded-md border">
-            <header className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/50 px-4 py-2">
+            <header className="flex flex-wrap items-center justify-between gap-2 border-b bg-surface-100 px-4 py-2">
               <div className="flex items-center gap-2">
                 <span className="font-semibold">{g.customerName}</span>
                 <span

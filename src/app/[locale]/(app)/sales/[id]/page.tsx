@@ -99,7 +99,7 @@ export default async function SaleDetailPage({
         </CardHeader>
         <CardContent>
           <table className="w-full text-sm">
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-surface-100">
               {items.map((i) => (
                 <tr key={i.id}>
                   <td className="py-2 pr-2">{i.description}</td>

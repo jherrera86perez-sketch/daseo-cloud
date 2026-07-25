@@ -31,7 +31,7 @@ export default async function AuditPage() {
         {!isAdmin ? (
           <p className="text-sm text-muted-foreground">{t("adminOnly")}</p>
         ) : rows.length === 0 ? (
-          <p className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+          <p className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
             {t("empty")}
           </p>
         ) : (
@@ -53,7 +53,7 @@ export default async function AuditPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-surface-100">
                 {rows.map(({ log, userEmail }) => (
                   <tr key={log.id}>
                     <td className="px-4 py-2 whitespace-nowrap" data-numeric="">

@@ -195,7 +195,7 @@ export function OutflowsView({
               <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                 {t(key)}
               </p>
-              <p className="text-xl font-bold" data-numeric="">
+              <p className="t-num-display text-[22px]" data-numeric="">
                 {value}
               </p>
             </CardContent>
@@ -240,7 +240,7 @@ export function OutflowsView({
                     <th className="px-2 py-1.5" />
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-surface-100">
                   {filtradas.map((s) => (
                     <tr key={s.id}>
                       <td className="px-2 py-1.5 font-mono text-xs">
