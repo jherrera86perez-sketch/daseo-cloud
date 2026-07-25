@@ -426,7 +426,7 @@ git commit -m "feat(visual): portar la capa de tokens del ERP (piel Linear)"
 - Consumes: los tokens de la Tarea 2.
 - Produces: `--font-sans`, `--font-display`, `--font-mono` con los stacks del ERP; las utilidades `.t-display`, `.t-mono`, `.t-eyebrow`, `.t-label`, `.t-num`, `.t-num-display`; y las reglas globales de foco, scrollbar y selección. Las tareas 4–10 usan `.t-eyebrow`/`.t-num` en cabeceras y cifras.
 
-- [ ] **Step 1: Cambiar las fuentes**
+- [x] **Step 1: Cambiar las fuentes**
 
 En `src/app/[locale]/layout.tsx`, sustituye los imports de Geist por las tres del ERP:
 
@@ -455,7 +455,7 @@ const plexMono = IBM_Plex_Mono({
 
 Y en el `<html>`, reemplaza las variables de Geist por `${inter.variable} ${bricolage.variable} ${plexMono.variable}`.
 
-- [ ] **Step 2: Apuntar los tokens de fuente**
+- [x] **Step 2: Apuntar los tokens de fuente**
 
 En `globals.css`, dentro de `@theme inline`, sustituye las dos líneas de fuente por:
 
@@ -465,7 +465,7 @@ En `globals.css`, dentro de `@theme inline`, sustituye las dos líneas de fuente
 --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 ```
 
-- [ ] **Step 3: Añadir las utilidades tipográficas del ERP**
+- [x] **Step 3: Añadir las utilidades tipográficas del ERP**
 
 Al final de `globals.css`, copiadas de `index.css:74-127`:
 
@@ -510,7 +510,7 @@ Al final de `globals.css`, copiadas de `index.css:74-127`:
 }
 ```
 
-- [ ] **Step 4: Añadir el lenguaje de interacción Linear**
+- [x] **Step 4: Añadir el lenguaje de interacción Linear**
 
 Al bloque `@layer base` de `globals.css`, copiado de `index.css:132-160`. **Esto es lo que hace que "se sienta" como el ERP**: hovers planos, foco fino, scrollbars delgadas.
 
@@ -544,7 +544,7 @@ Al bloque `@layer base` de `globals.css`, copiado de `index.css:132-160`. **Esto
 }
 ```
 
-- [ ] **Step 5: Verificar**
+- [x] **Step 5: Verificar**
 
 ```bash
 cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build
@@ -552,7 +552,7 @@ cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build
 
 Expected: todo verde. Si el build se queja de una fuente, es que el nombre del import de `next/font/google` no coincide — `Bricolage_Grotesque` lleva guion bajo.
 
-- [ ] **Step 6: Verificar el peso de la landing**
+- [x] **Step 6: Verificar el peso de la landing**
 
 Éste es el riesgo #2 del spec: no engordar `/`.
 
@@ -562,7 +562,7 @@ cd "C:/dev/crmventas" && npm run build
 
 Busca en la salida el tamaño de la ruta `/`. **Debe bajar o quedar igual** respecto a antes: se fueron dos fuentes Geist y entraron tres de Google, pero `next/font` las auto-hospeda y sólo carga las usadas. Si sube por encima de 175 KB de scripts, la landing rompe el gate de Lighthouse — repórtalo antes de seguir.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd "C:/dev/crmventas"
