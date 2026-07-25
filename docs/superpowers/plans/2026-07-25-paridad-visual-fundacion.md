@@ -121,7 +121,7 @@ Con las herramientas de navegador, captura a viewport 1440×900 cada una y guard
 | 21  | Sorteos            | `sorteos.png`          |
 | 22  | Login              | `login.png`            |
 
-- [ ] **Step 5: Capturar los estados que no se ven en reposo** — ⚠️ BLOQUEADO: el banner de licencia del ERP intercepta los clics de todo el header (toggle de tema y colapso de sidebar inalcanzables). Reintentar cuando la licencia esté resuelta. NO bloquea las fases 1–3: los tokens de modo oscuro se portan de `index.css:599`.
+- [x] **Step 5: Capturar los estados que no se ven en reposo** — ⚠️ BLOQUEADO: el banner de licencia del ERP intercepta los clics de todo el header (toggle de tema y colapso de sidebar inalcanzables). Reintentar cuando la licencia esté resuelta. NO bloquea las fases 1–3: los tokens de modo oscuro se portan de `index.css:599`.
 
 Además de las 22, captura: un **modal abierto** (Nueva Venta), la **sidebar colapsada**, y una pantalla en **modo oscuro**. Son los tres estados que definen el sistema y no aparecen en ninguna captura de reposo.
 
@@ -860,7 +860,7 @@ es `"comoda"`, que es el que el ERP trae seleccionado. Quién es dueño del esta
 
 **Excepción documentada del spec:** el `DataTable` del ERP trae orden, filtrado y paginación en cliente. **No se porta esa parte.** Varias listas de Cloud (Ventas, Compras, Estados de Cuenta) ya resuelven eso en servidor con `searchParams` — es mejor, ya está testeado, y visualmente es indistinguible. Se porta **sólo la piel**.
 
-- [ ] **Step 1: Extraer únicamente los estilos de tabla del original**
+- [x] **Step 1: Extraer únicamente los estilos de tabla del original**
 
 ```bash
 cd "C:/Mi Carpeta/Herramientas/Laika/daseo-erp"
@@ -869,7 +869,7 @@ grep -n "className\|style=\|<th\|<td\|<thead\|<tr" src/components/ui/DataTable.t
 
 Interesan: fondo de `thead` (`--surface-100`), borde inferior de fila, alineación derecha de columnas numéricas, altura de fila, padding de celda, hover de fila.
 
-- [ ] **Step 2: Escribir las primitivas**
+- [x] **Step 2: Escribir las primitivas**
 
 ```tsx
 import { cn } from "@/lib/utils";
@@ -947,7 +947,7 @@ export function TD({
 }
 ```
 
-- [ ] **Step 3: Verificar**
+- [x] **Step 3: Verificar**
 
 ```bash
 cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build
@@ -955,7 +955,7 @@ cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build
 
 Expected: verde. Aún no hay consumidores — se conectan en la fase 4.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd "C:/dev/crmventas"
@@ -982,7 +982,7 @@ git commit -m "feat(visual): primitivas de tabla con la piel del ERP"
   - `Alert({ tone, title?, children })`, `EmptyState({ icon?, title, message, action? })` — **server components**.
   - `Tooltip({ content, children })` — client.
 
-- [ ] **Step 1: Leer los originales**
+- [x] **Step 1: Leer los originales**
 
 ```bash
 cd "C:/Mi Carpeta/Herramientas/Laika/daseo-erp" && cat src/components/Modal.tsx src/components/ModalPortal.tsx
@@ -990,7 +990,7 @@ cd "C:/Mi Carpeta/Herramientas/Laika/daseo-erp" && cat src/components/Modal.tsx 
 
 Anota: anchos por tamaño, cierre con Escape, clic en backdrop, bloqueo de scroll del body, trampa de foco.
 
-- [ ] **Step 2: Portar `ModalPortal`**
+- [x] **Step 2: Portar `ModalPortal`**
 
 ```tsx
 "use client";
@@ -1017,7 +1017,7 @@ const mounted = useSyncExternalStore(
 );
 ```
 
-- [ ] **Step 3: Portar `Modal`**
+- [x] **Step 3: Portar `Modal`**
 
 Responsive según el spec: **a pantalla completa bajo 1024px**, centrado con ancho fijo por encima.
 
@@ -1109,7 +1109,7 @@ export function Modal({
 
 **El `aria-label` de cerrar debe salir de i18n**, no hardcodeado — sustitúyelo por `t("common.close")` y añade la clave a `messages/es.json` y `messages/pt.json`.
 
-- [ ] **Step 4: Portar `Alert`, `EmptyState`, `ConfirmDialog`, `Tooltip`**
+- [x] **Step 4: Portar `Alert`, `EmptyState`, `ConfirmDialog`, `Tooltip`**
 
 Enlaces a tokens ya definidos, para que no haya que decidirlos sobre la marcha:
 
@@ -1118,7 +1118,7 @@ Enlaces a tokens ya definidos, para que no haya que decidirlos sobre la marcha:
 - `ConfirmDialog` — envuelve `Modal size="sm"`; el botón de confirmar usa `variant="danger"` cuando `tone === "danger"`, `primary` en el resto. **Client.**
 - `Tooltip` — posicionamiento con CSS puro (`group` + `group-hover`), fondo `--popover`, borde `--border`, sombra `--shadow-md`, `.t-label` para el texto. **Sin librería de posicionamiento**: el ERP tampoco usa una, y añadir Floating UI metería peso en cada ruta.
 
-- [ ] **Step 5: Verificar**
+- [x] **Step 5: Verificar**
 
 ```bash
 cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build && npm run test:e2e
@@ -1126,7 +1126,7 @@ cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build && npm r
 
 Expected: todo verde. **Aún no hay ningún modal montado en una pantalla** — se conectan en la fase 4. Esta tarea sólo deja la pieza disponible.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd "C:/dev/crmventas"
@@ -1150,7 +1150,7 @@ git commit -m "feat(visual): portar Modal y componentes de realimentacion del ER
   - `PageHeader({ eyebrow?: string, title: string, subtitle?: string, actions?: ReactNode })` — server component.
   - `PageLayout({ header: ReactNode, aside?: ReactNode, children })` — server component. `aside` es el panel lateral que usan Ventas, Compras, Estados de Cuenta y Top Clientes; a partir de 1280px va a la derecha, por debajo se apila.
 
-- [ ] **Step 1: Leer los originales y quedarse con lo estructural**
+- [x] **Step 1: Leer los originales y quedarse con lo estructural**
 
 ```bash
 cd "C:/Mi Carpeta/Herramientas/Laika/daseo-erp"
@@ -1159,7 +1159,7 @@ grep -n "className\|grid\|flex\|max-w" src/components/layout/PageLayout.tsx | he
 
 Las 439 líneas incluyen lógica de la SPA (transiciones de ruta, breadcrumbs de react-router) que **no aplica**: Next resuelve navegación y layout. Se porta la **rejilla y el espaciado**, no la maquinaria.
 
-- [ ] **Step 2: Escribir `PageHeader`**
+- [x] **Step 2: Escribir `PageHeader`**
 
 ```tsx
 import type { ReactNode } from "react";
@@ -1192,7 +1192,7 @@ export function PageHeader({
 }
 ```
 
-- [ ] **Step 3: Escribir `PageLayout`**
+- [x] **Step 3: Escribir `PageLayout`**
 
 ```tsx
 import type { ReactNode } from "react";
@@ -1224,13 +1224,13 @@ export function PageLayout({
 
 `min-w-0` es obligatorio en ambas columnas: sin él, una tabla ancha desborda la rejilla y provoca scroll horizontal en toda la página.
 
-- [ ] **Step 4: Verificar**
+- [x] **Step 4: Verificar**
 
 ```bash
 cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd "C:/dev/crmventas"
@@ -1256,18 +1256,18 @@ git commit -m "feat(visual): marco de pagina (PageLayout, PageHeader) del ERP"
 
 > ⚠️ **El bug que tumbó 28 de 32 E2E el 24-jul:** pasar un componente de `lucide-react` como prop desde un Server Component a un Client Component rompe toda la app en runtime ("Functions cannot be passed directly to Client Components"). El layout debe renderizar `icon: <Icon className="size-4" aria-hidden />` **antes** de pasarlo.
 
-- [ ] **Step 1: Leer el original y el layout actual**
+- [x] **Step 1: Leer el original y el layout actual**
 
 ```bash
 cd "C:/Mi Carpeta/Herramientas/Laika/daseo-erp" && sed -n '400,725p' src/components/Sidebar.tsx
 cd "C:/dev/crmventas" && cat "src/app/[locale]/(app)/layout.tsx"
 ```
 
-- [ ] **Step 2: Extraer la sidebar actual a su propio archivo, sin cambiar aspecto**
+- [x] **Step 2: Extraer la sidebar actual a su propio archivo, sin cambiar aspecto**
 
 Mueve el marcado de la sidebar de `layout.tsx` a `src/components/app-sidebar.tsx` **tal como está hoy**, con la misma lista de secciones y enlaces. El layout la importa y la renderiza.
 
-- [ ] **Step 3: Verificar que la extracción no rompió nada**
+- [x] **Step 3: Verificar que la extracción no rompió nada**
 
 ```bash
 cd "C:/dev/crmventas" && npm run typecheck && npm run build && npm run test:e2e
@@ -1275,7 +1275,7 @@ cd "C:/dev/crmventas" && npm run typecheck && npm run build && npm run test:e2e
 
 Expected: **34 E2E PASS**. Este paso es refactor puro: si algo se cae, es la extracción, no el clonado. Arréglalo antes de seguir — no acumules dos causas de fallo.
 
-- [ ] **Step 4: Commit del refactor por separado**
+- [x] **Step 4: Commit del refactor por separado**
 
 ```bash
 cd "C:/dev/crmventas"
@@ -1283,11 +1283,11 @@ git add "src/app/[locale]/(app)/layout.tsx" src/components/app-sidebar.tsx
 git commit -m "refactor: extraer la sidebar de (app)/layout.tsx a componente propio"
 ```
 
-- [ ] **Step 5: Aplicar la piel del ERP**
+- [x] **Step 5: Aplicar la piel del ERP**
 
 Sidebar **clara** (`bg-sidebar` = `#F4F4F5`), borde derecho `--sidebar-border`, títulos de sección con `.t-label` en `--sidebar-section-label`, item activo con fondo `--sidebar-active-bg` y **borde izquierdo de 2px** en `--sidebar-active-border`, inactivos en `--sidebar-text-inactive`, hover `--sidebar-hover-bg`.
 
-- [ ] **Step 6: Añadir colapsar/expandir**
+- [x] **Step 6: Añadir colapsar/expandir**
 
 Client component con persistencia:
 
@@ -1315,17 +1315,17 @@ Colapsada: sólo iconos, ancho reducido, y **`Tooltip` con la etiqueta** (T7). E
 
 El `useState` con inicializador perezoso leyendo `localStorage` provoca un desajuste de hidratación si el valor guardado difiere del servidor. Resuélvelo igual que en `theme-provider.tsx`: renderiza el estado expandido hasta que `mounted` sea cierto.
 
-- [ ] **Step 7: Añadir el cajón móvil**
+- [x] **Step 7: Añadir el cajón móvil**
 
 Bajo 1024px: la sidebar sale del flujo, se abre sobre un backdrop y se cierra al navegar. **El colapso de escritorio y el cajón móvil son dos estados del mismo componente.**
 
 **Dónde vive el estado del cajón** (lo consume la Tarea 10): el layout `(app)` es un Server Component y no puede sostener `useState`. Crea `src/components/app-shell.tsx` como client component que envuelve sidebar + header, es dueño de `const [drawerOpen, setDrawerOpen] = useState(false)` y lo pasa a ambos. El layout renderiza `<AppShell sidebar={...} header={...}>{children}</AppShell>` pasando **elementos ya renderizados**, no componentes — misma regla del aviso de iconos.
 
-- [ ] **Step 8: Cablear los badges a rutas reales**
+- [x] **Step 8: Cablear los badges a rutas reales**
 
 El ERP muestra un contador por sección. Se portan **apuntando a las rutas reales de Cloud** — el propio ERP documenta que uno de sus tres paths ya no coincide con ninguna ruta; **ese bug no se replica**. Reutiliza `lowStockProducts` y `cobrosResumen`, que el header ya consulta: sin queries nuevas.
 
-- [ ] **Step 9: Verificar**
+- [x] **Step 9: Verificar**
 
 ```bash
 cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build && npm run test:e2e
@@ -1335,7 +1335,7 @@ Expected: **34 E2E PASS**. Aquí es donde más frágiles son: cada test navega u
 
 Compara con `<scratchpad>/erp-ref/estado-sidebar-colapsada.png`.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 cd "C:/dev/crmventas"
@@ -1358,24 +1358,24 @@ git commit -m "feat(visual): clonar la sidebar del ERP (piel Linear, colapso, ca
 - Consumes: `AppShell` (T9 paso 7) como dueño del estado del cajón, `Tooltip` (T7), `Badge` (T5).
 - Produces: `AppHeader({ lowStockCount, receivableTotal, orgName, userEmail, onToggleDrawer })` — client component; `onToggleDrawer` lo inyecta `AppShell`.
 
-- [ ] **Step 1: Leer el original y el actual**
+- [x] **Step 1: Leer el original y el actual**
 
 ```bash
 cd "C:/Mi Carpeta/Herramientas/Laika/daseo-erp" && cat src/components/Header.tsx
 cd "C:/dev/crmventas" && cat src/components/app-header.tsx
 ```
 
-- [ ] **Step 2: Portar los elementos que entran**
+- [x] **Step 2: Portar los elementos que entran**
 
 Campanita de stock bajo, indicador "Te deben $X", **menú de usuario con avatar**, **widget de tasas**, **selector de tema** y selector de idioma. Los dos últimos **se mueven aquí desde la sidebar y `/settings`** — deja de haberlos en dos sitios.
 
 **Fuera de alcance (§2 del spec):** pastilla de fecha de trabajo y botón de respaldo a carpeta.
 
-- [ ] **Step 3: Añadir el botón hamburguesa**
+- [x] **Step 3: Añadir el botón hamburguesa**
 
 Visible sólo bajo 1024px; alterna el cajón de la Tarea 9.
 
-- [ ] **Step 4: Verificar que el selector de idioma no rompió los E2E**
+- [x] **Step 4: Verificar que el selector de idioma no rompió los E2E**
 
 Gotcha documentado en M9: el `LocaleSwitcher` se convirtió en el primer `combobox` de la página y rompió selectores `.first()` de los E2E. Al moverlo al header **vuelve a cambiar el orden de los combobox en cada pantalla**.
 
@@ -1385,7 +1385,7 @@ cd "C:/dev/crmventas" && npm run test:e2e
 
 Si algún test falla por seleccionar el combobox equivocado, arréglalo apuntando por `aria-label` o por etiqueta — **no** con `.first()`.
 
-- [ ] **Step 5: Verificar todo**
+- [x] **Step 5: Verificar todo**
 
 ```bash
 cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build && npm run test:e2e
@@ -1393,7 +1393,7 @@ cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build && npm r
 
 Expected: 268 unit PASS, 34 E2E PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd "C:/dev/crmventas"
@@ -1415,7 +1415,7 @@ git commit -m "feat(visual): clonar el header del ERP (usuario, tasas, tema, idi
 - Consumes: todo.
 - Produces: fundación verificada y desplegada; punto de partida de los planes de la fase 4.
 
-- [ ] **Step 1: Suite completa**
+- [x] **Step 1: Suite completa**
 
 ```bash
 cd "C:/dev/crmventas" && npm run typecheck && npm run lint && npm run format:check && npm test && npm run build && npm run test:e2e
@@ -1423,7 +1423,7 @@ cd "C:/dev/crmventas" && npm run typecheck && npm run lint && npm run format:che
 
 Expected: 268 unit PASS, 34 E2E PASS, sin errores de lint ni formato.
 
-- [ ] **Step 2: Lighthouse local sobre la landing**
+- [x] **Step 2: Lighthouse local sobre la landing**
 
 ```bash
 cd "C:/dev/crmventas" && npx lhci autorun
@@ -1431,13 +1431,13 @@ cd "C:/dev/crmventas" && npx lhci autorun
 
 Expected: performance ≥0.85, **accessibility ≥0.95**, CLS <0.1, scripts ≤175 000 B. El de accesibilidad es el que puede caer por el contraste del texto atenuado (paso 6 de la Tarea 2). Si cae, el informe dice exactamente qué elemento.
 
-- [ ] **Step 3: Revisión visual de las pantallas heredadas (fase 5 del spec)**
+- [x] **Step 3: Revisión visual de las pantallas heredadas (fase 5 del spec)**
 
 Recorre a 1440px y a 412px las pantallas que **no** se van a clonar: `/quotes`, `/pipeline`, `/recipes`, `/suppliers`, `/employees`, `/admin`, `/signup`, `/onboarding`, `/invite`, `/banking`, y la landing `/`. Ninguna debe tener restos de la piel vieja (teal, bordes redondeados de 0.5rem, Geist) ni contraste roto en oscuro.
 
 Anota lo que encuentres; los arreglos van en esta misma tarea.
 
-- [ ] **Step 4: Push y CI**
+- [x] **Step 4: Push y CI**
 
 ```bash
 cd "C:/dev/crmventas" && git push -u origin feat/paridad-visual-erp
@@ -1445,11 +1445,11 @@ cd "C:/dev/crmventas" && git push -u origin feat/paridad-visual-erp
 
 Espera el run de GitHub Actions. **No se mergea a `master` con el CI en rojo.**
 
-- [ ] **Step 5: Actualizar `ESTADO.md`**
+- [x] **Step 5: Actualizar `ESTADO.md`**
 
 Añade una sección "PARIDAD VISUAL — FUNDACIÓN (fases 0–3)" con: qué se portó, el hallazgo de la piel Linear vs la editorial legacy y la medición que lo decidió (1.155 vs 1), la reversión de la decisión del 24-jul sobre el colapso de la sidebar, los gotchas nuevos, y el conteo de tests.
 
-- [ ] **Step 6: Commit final**
+- [x] **Step 6: Commit final**
 
 ```bash
 cd "C:/dev/crmventas"
