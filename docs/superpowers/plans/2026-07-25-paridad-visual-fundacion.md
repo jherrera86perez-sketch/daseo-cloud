@@ -66,7 +66,7 @@ Cubre las **fases 0–3** del spec: referencias, tokens, componentes y chrome. E
 - Consumes: nada.
 - Produces: `<scratchpad>/erp-ref/<pantalla>.png` para las 22 pantallas, e `inventario-referencias.md` con la tabla `pantalla ERP → ruta Cloud → nombre de archivo de captura`, que consumen todas las tareas posteriores y los planes de la fase 4.
 
-- [ ] **Step 1: Levantar el backend del ERP**
+- [x] **Step 1: Levantar el backend del ERP**
 
 ```bash
 cd "C:/Mi Carpeta/Herramientas/Laika/daseo-erp"
@@ -75,7 +75,7 @@ npm run server
 
 Espera `listening` / health en `http://localhost:3001/api/health`. Déjalo corriendo en segundo plano.
 
-- [ ] **Step 2: Levantar el frontend del ERP**
+- [x] **Step 2: Levantar el frontend del ERP**
 
 ```bash
 cd "C:/Mi Carpeta/Herramientas/Laika/daseo-erp"
@@ -84,13 +84,13 @@ npm run dev
 
 Vite sirve en `http://localhost:5176`. **No se usa Electron**: el ERP es una app web dentro de Electron, y en navegador se ve igual.
 
-- [ ] **Step 3: Verificar que carga con datos**
+- [x] **Step 3: Verificar que carga con datos**
 
 Abre `http://localhost:5176` y confirma que el Dashboard muestra cifras (la BD `cubaone.db` tiene 8 MB de datos reales). Si pide login, usa las credenciales locales del ERP.
 
 Si el frontend no arranca o la BD está vacía: **detente y repórtalo**. Sin referencias no se puede clonar, y adivinar el aspecto es exactamente lo que este trabajo evita.
 
-- [ ] **Step 4: Capturar las 22 pantallas**
+- [x] **Step 4: Capturar las 22 pantallas**
 
 Con las herramientas de navegador, captura a viewport 1440×900 cada una y guarda en el scratchpad:
 
@@ -119,19 +119,19 @@ Con las herramientas de navegador, captura a viewport 1440×900 cada una y guard
 | 21 | Sorteos | `sorteos.png` |
 | 22 | Login | `login.png` |
 
-- [ ] **Step 5: Capturar los estados que no se ven en reposo**
+- [ ] **Step 5: Capturar los estados que no se ven en reposo** — ⚠️ BLOQUEADO: el banner de licencia del ERP intercepta los clics de todo el header (toggle de tema y colapso de sidebar inalcanzables). Reintentar cuando la licencia esté resuelta. NO bloquea las fases 1–3: los tokens de modo oscuro se portan de `index.css:599`.
 
 Además de las 22, captura: un **modal abierto** (Nueva Venta), la **sidebar colapsada**, y una pantalla en **modo oscuro**. Son los tres estados que definen el sistema y no aparecen en ninguna captura de reposo.
 
 Archivos: `estado-modal-nueva-venta.png`, `estado-sidebar-colapsada.png`, `estado-dark.png`.
 
-- [ ] **Step 6: Escribir el índice**
+- [x] **Step 6: Escribir el índice**
 
 Crea `docs/superpowers/plans/2026-07-25-inventario-referencias.md` con la tabla anterior más la columna "ruta Cloud equivalente" (`/dashboard`, `/sales`, `/purchases`, `/products`, `/receivables`, `/payables`, `/production`, `/products/[id]`, `/internal-outflows`, `/products/[id]`, `/customers/[id]`, `/assistant`, `/top-clients`, `/statements`, `/reconciliation`, `/fiscal`, `/vehicles`, `/settings`, `/settings`, `/audit`, `/raffles`, `/login`).
 
 **El documento no lleva imágenes**, sólo la tabla: las capturas se quedan en el scratchpad.
 
-- [ ] **Step 7: Verificar que no se coló ninguna captura al repo**
+- [x] **Step 7: Verificar que no se coló ninguna captura al repo**
 
 ```bash
 cd "C:/dev/crmventas" && git status --short && git check-ignore -v docs/superpowers/plans/*.png 2>/dev/null || echo "sin PNG en docs/"
@@ -139,7 +139,7 @@ cd "C:/dev/crmventas" && git status --short && git check-ignore -v docs/superpow
 
 Expected: ningún `.png` en la salida de `git status`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 cd "C:/dev/crmventas"
