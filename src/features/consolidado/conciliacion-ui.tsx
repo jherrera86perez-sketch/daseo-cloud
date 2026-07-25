@@ -650,15 +650,27 @@ function BancoTable({
           <table className="w-full text-sm">
             <thead className="border-b bg-muted text-left">
               <tr>
-                <th className="px-2 py-1.5 font-medium">{t("colDate")}</th>
-                <th className="px-2 py-1.5 font-medium">{t("colType")}</th>
-                <th className="px-2 py-1.5 font-medium">{t("colRef")}</th>
-                <th className="px-2 py-1.5 font-medium">{t("colObs")}</th>
-                <th className="px-2 py-1.5 text-right font-medium">
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colDate")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colType")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colRef")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colObs")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                   {t("colAmount")}
                 </th>
-                <th className="px-2 py-1.5 font-medium">{t("colState")}</th>
-                <th className="px-2 py-1.5 font-medium">{t("colCategory")}</th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colState")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colCategory")}
+                </th>
                 <th className="px-2 py-1.5" />
               </tr>
             </thead>
@@ -761,17 +773,27 @@ function LibrosTable({
           <table className="w-full text-sm">
             <thead className="border-b bg-muted text-left">
               <tr>
-                <th className="px-2 py-1.5 font-medium">{t("colDate")}</th>
-                <th className="px-2 py-1.5 font-medium">{t("colType")}</th>
-                <th className="px-2 py-1.5 text-right font-medium">
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colDate")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colType")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                   {t("colAmount")}
                 </th>
-                <th className="px-2 py-1.5 font-medium">{t("colCategory")}</th>
-                <th className="px-2 py-1.5 font-medium">
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colCategory")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                   {t("colSubcategory")}
                 </th>
-                <th className="px-2 py-1.5 font-medium">{t("colDesc")}</th>
-                <th className="px-2 py-1.5 font-medium">{t("colOrigin")}</th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colDesc")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colOrigin")}
+                </th>
                 <th className="px-2 py-1.5" />
               </tr>
             </thead>
@@ -1021,14 +1043,16 @@ function CobrosPanel({
               <table className="w-full text-sm">
                 <thead className="border-b bg-muted text-left">
                   <tr>
-                    <th className="px-2 py-1.5 font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                       {t("colCobroDate")}
                     </th>
-                    <th className="px-2 py-1.5 font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                       {t("colClient")}
                     </th>
-                    <th className="px-2 py-1.5 font-medium">{t("colSale")}</th>
-                    <th className="px-2 py-1.5 text-right font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                      {t("colSale")}
+                    </th>
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                       {t("colTransfer")}
                     </th>
                     <th className="px-2 py-1.5" />

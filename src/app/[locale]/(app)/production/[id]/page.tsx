@@ -22,7 +22,7 @@ export default async function ProductionOrderPage({
 
   return (
     <div className="flex max-w-2xl flex-col gap-6">
-      <h1 className="text-2xl font-bold">
+      <h1 className="t-display text-2xl tracking-[-0.025em]">
         {order.recipeName} → {order.productName}
         <span className="ml-3 align-middle rounded-full bg-secondary px-2 py-0.5 text-xs font-normal">
           {t(`statuses.${order.status}`)}

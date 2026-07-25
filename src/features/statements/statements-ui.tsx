@@ -255,20 +255,24 @@ export function StatementsView({
 
               <div className="overflow-x-auto rounded-md border">
                 <table className="w-full text-sm">
-                  <thead className="border-b bg-muted/50 text-left">
+                  <thead className="bg-surface-100 text-left">
                     <tr>
-                      <th className="px-3 py-2 font-medium">{t("account")}</th>
-                      <th className="px-3 py-2 font-medium">{t("period")}</th>
-                      <th className="px-3 py-2 text-right font-medium">
+                      <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                        {t("account")}
+                      </th>
+                      <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                        {t("period")}
+                      </th>
+                      <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                         {t("ops")}
                       </th>
-                      <th className="px-3 py-2 text-right font-medium">
+                      <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                         {t("credits")}
                       </th>
-                      <th className="px-3 py-2 text-right font-medium">
+                      <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                         {t("debits")}
                       </th>
-                      <th className="px-3 py-2 text-right font-medium">
+                      <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                         {t("finalBalance")}
                       </th>
                       <th className="px-3 py-2" />
@@ -424,20 +428,22 @@ function StatementRows({
                   <table className="w-full text-xs">
                     <thead className="sticky top-0 border-b bg-muted text-left">
                       <tr>
-                        <th className="px-2 py-1.5 font-medium">{t("date")}</th>
-                        <th className="px-2 py-1.5 font-medium">
+                        <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                          {t("date")}
+                        </th>
+                        <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                           {t("reference")}
                         </th>
-                        <th className="px-2 py-1.5 text-center font-medium">
+                        <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                           {t("type")}
                         </th>
-                        <th className="px-2 py-1.5 text-right font-medium">
+                        <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                           {t("amount")}
                         </th>
-                        <th className="px-2 py-1.5 text-right font-medium">
+                        <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                           {t("balance")}
                         </th>
-                        <th className="px-2 py-1.5 font-medium">
+                        <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                           {t("client")}
                         </th>
                       </tr>

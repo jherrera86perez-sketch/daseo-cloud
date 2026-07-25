@@ -12,7 +12,7 @@ export default async function BankingPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">{t("title")}</h1>
+      <h1 className="t-display text-2xl tracking-[-0.025em]">{t("title")}</h1>
       <NewAccountForm />
       {accounts.length === 0 ? (
         <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">

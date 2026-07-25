@@ -363,15 +363,29 @@ function SeguimientoTable({
       </h2>
       <div className="overflow-x-auto rounded-md border">
         <table className="w-full text-sm">
-          <thead className="border-b bg-muted/50 text-left">
+          <thead className="bg-surface-100 text-left">
             <tr>
-              <th className="px-3 py-2 font-medium">#</th>
-              <th className="px-3 py-2 font-medium">{t("colImpact")}</th>
-              <th className="px-3 py-2 font-medium">{t("colRec")}</th>
-              <th className="px-3 py-2 font-medium">{t("colCat")}</th>
-              <th className="px-3 py-2 font-medium">{t("colScore")}</th>
-              <th className="px-3 py-2 font-medium">{t("colStatus")}</th>
-              <th className="px-3 py-2 font-medium">{t("colActions")}</th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                #
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colImpact")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colRec")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colCat")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colScore")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colStatus")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colActions")}
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y">

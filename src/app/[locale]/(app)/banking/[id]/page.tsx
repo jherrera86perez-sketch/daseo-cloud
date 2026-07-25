@@ -39,7 +39,9 @@ export default async function BankAccountPage({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">{account.name}</h1>
+        <h1 className="t-display text-2xl tracking-[-0.025em]">
+          {account.name}
+        </h1>
         <p className="text-lg font-bold" data-numeric="">
           {t("importedBalance")}:{" "}
           {balance < 0n
@@ -68,16 +70,20 @@ export default async function BankAccountPage({
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="border-b text-left text-xs text-muted-foreground">
+                <thead className="bg-surface-100 text-left">
                   <tr>
-                    <th className="py-2 pr-3 font-medium">{t("date")}</th>
-                    <th className="py-2 pr-3 font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                      {t("date")}
+                    </th>
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                       {t("description")}
                     </th>
-                    <th className="py-2 pr-3 text-right font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                       {t("amount")}
                     </th>
-                    <th className="py-2 font-medium">{t("status")}</th>
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                      {t("status")}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">

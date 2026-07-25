@@ -14,7 +14,7 @@ export default async function SuppliersPage() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        <h1 className="t-display text-2xl tracking-[-0.025em]">{t("title")}</h1>
         <Button asChild>
           <Link href="/suppliers/new">
             <Plus className="size-4" aria-hidden /> {t("new")}

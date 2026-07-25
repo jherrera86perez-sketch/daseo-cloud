@@ -14,7 +14,7 @@ export default async function NewRecipePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">{t("new")}</h1>
+      <h1 className="t-display text-2xl tracking-[-0.025em]">{t("new")}</h1>
       {producibles.length === 0 || components.length === 0 ? (
         <p className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
           {t("needProducts")}

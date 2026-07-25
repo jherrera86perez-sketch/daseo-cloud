@@ -557,22 +557,32 @@ function RankingTab({
   return (
     <div className="overflow-x-auto rounded-md border">
       <table className="w-full text-sm">
-        <thead className="border-b bg-muted/50 text-left">
+        <thead className="bg-surface-100 text-left">
           <tr>
-            <th className="px-2 py-2 text-center font-medium">#</th>
-            <th className="px-3 py-2 font-medium">{t("colClient")}</th>
-            <th className="px-3 py-2 text-right font-medium">
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              #
+            </th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              {t("colClient")}
+            </th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
               {t("colTransfers")}
             </th>
-            <th className="px-3 py-2 text-right font-medium">
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
               {t("colTotal")}
             </th>
-            <th className="px-3 py-2 text-right font-medium">
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
               {t("colTicket")}
             </th>
-            <th className="px-3 py-2 font-medium">{t("colFrequency")}</th>
-            <th className="px-3 py-2 font-medium">{t("colLastOp")}</th>
-            <th className="px-3 py-2 font-medium">{t("colPhone")}</th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              {t("colFrequency")}
+            </th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              {t("colLastOp")}
+            </th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              {t("colPhone")}
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y">
@@ -707,15 +717,21 @@ function TendTable({
           <table className="w-full text-sm">
             <thead className="text-left text-xs text-muted-foreground">
               <tr>
-                <th className="py-1 pr-2 font-medium">#</th>
-                <th className="py-1 pr-2 font-medium">{t("colClient")}</th>
-                <th className="py-1 pr-2 text-right font-medium">
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  #
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colClient")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                   {t("colPrevMonth")}
                 </th>
-                <th className="py-1 pr-2 text-right font-medium">
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                   {t("colThisMonth")}
                 </th>
-                <th className="py-1 text-right font-medium">Δ</th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
+                  Δ
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -815,21 +831,30 @@ function RfmTab({
       </div>
       <div className="overflow-x-auto rounded-md border">
         <table className="w-full text-sm">
-          <thead className="border-b bg-muted/50 text-left">
+          <thead className="bg-surface-100 text-left">
             <tr>
-              <th className="px-3 py-2 font-medium">{t("colSegment")}</th>
-              <th className="px-3 py-2 font-medium">{t("colClient")}</th>
-              <th className="px-3 py-2 text-right font-medium">
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colSegment")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colClient")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                 {t("colOps")}
               </th>
-              <th className="px-3 py-2 text-right font-medium">
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                 {t("colTotal")}
               </th>
-              <th className="px-3 py-2 text-right font-medium">
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                 {t("colTicket")}
               </th>
-              <th className="px-3 py-2 font-medium">{t("colLastOp")}</th>
-              <th className="px-3 py-2 font-medium" title={t("rfmTooltip")}>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colLastOp")}
+              </th>
+              <th
+                className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted"
+                title={t("rfmTooltip")}
+              >
                 RFM
               </th>
             </tr>
@@ -927,21 +952,29 @@ function RiesgoTab({
       </div>
       <div className="overflow-x-auto rounded-md border">
         <table className="w-full text-sm">
-          <thead className="border-b bg-muted/50 text-left">
+          <thead className="bg-surface-100 text-left">
             <tr>
-              <th className="px-3 py-2 font-medium">{t("colClient")}</th>
-              <th className="px-3 py-2 font-medium">{t("colNormalFreq")}</th>
-              <th className="px-3 py-2 text-right font-medium">
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colClient")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colNormalFreq")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                 {t("colNoOpsSince")}
               </th>
-              <th className="px-3 py-2 text-right font-medium">
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                 {t("colOps")}
               </th>
-              <th className="px-3 py-2 text-right font-medium">
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                 {t("colTotal")}
               </th>
-              <th className="px-3 py-2 font-medium">{t("colSeverity")}</th>
-              <th className="px-3 py-2 font-medium">{t("colAction")}</th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colSeverity")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colAction")}
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y">
