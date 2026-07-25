@@ -42,7 +42,8 @@ export function PageLayout({
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-[1600px] px-4 py-5 lg:px-6",
+        // El padding lo pone el layout de (app); aquí sólo se centra y se acota.
+        "mx-auto w-full max-w-[1600px]",
         className,
       )}
     >

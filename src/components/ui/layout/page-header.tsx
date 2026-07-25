@@ -71,7 +71,7 @@ export function PageHeader({
         className={cn(
           "absolute bottom-0 h-px bg-brand-accent opacity-70",
           "shadow-[0_0_12px_rgba(180,83,9,0.4)]",
-          large ? "left-7 w-20" : "left-6 w-16",
+          large ? "left-0 w-20" : "left-0 w-16",
         )}
       />
     </header>
