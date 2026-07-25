@@ -11,9 +11,10 @@ La maratón de paridad de julio dejó Daseo Cloud **funcionalmente fiel** al ERP
 
 | | ERP CubaOne | Daseo Cloud (hoy) |
 |---|---|---|
-| Paleta | Navy `#1E3A5F` + amber `#B45309` + superficies crema `#F2EFE9`/`#FDFCF8` | Teal profundo OKLCH sobre neutros fríos |
-| Sidebar | Navy oscuro `#1A2535`, borde activo amber | Clara, tono del tema |
-| Tipografía | `"Segoe UI", Inter, ui-sans-serif, …` | Geist |
+| Paleta | Navy `#1E3A5F` de marca + amber `#B45309` sobre **grises neutros Linear** (`#FAFAFA` fondo, `#FFFFFF` tarjeta, `#E1E1E3` borde) | Teal profundo OKLCH sobre neutros fríos |
+| Sidebar | **Clara `#F4F4F5`**, item activo con borde navy | Clara, tono del tema |
+| Tipografía | `Inter, "Segoe UI", system-ui` (body) · `Bricolage Grotesque` (display) · `IBM Plex Mono` (mono/cifras) | Geist |
+| Interacción | "Linear": hovers planos sin `transform` ni glow, focus ring 2px/offset 1px, scrollbars 5px | Estándar shadcn |
 | Motor | Tailwind v3 + 410 variables CSS + 88 KB de CSS propio | Tailwind v4 + ~40 tokens OKLCH |
 | Gráficos | ECharts (+ Recharts en un componente) | SVG/CSS puro |
 | Interacción | Modales (≈55 archivos con overlay) | Páginas y formularios inline (4 archivos con overlay) |
@@ -73,19 +74,35 @@ los expone a Tailwind. **Los 98 `.tsx` existentes sólo consumen nombres semánt
 `text-muted-foreground`, `border-border`). Por tanto, **reemplazar los valores de `:root` repinta las 48
 pantallas sin editar un componente.**
 
+> **Corrección de fuente de verdad (25-jul, durante la redacción del plan).** La paleta NO se toma de
+> `tailwind.config.js`. Ese bloque `colors` (superficies crema `#F2EFE9`, sidebar navy `#1A2535`) es la
+> piel *"editorial"* **legacy**, superada por la piel *"Linear"* declarada en `src/styles/index.css:343`.
+> Medición decisiva: **1.155 usos de `var(--color-surface*)` en `.tsx` contra 1 uso de una clase Tailwind
+> `surface`**. Las variables CSS ganan; el bloque `colors` de superficies y sidebar es **configuración
+> muerta** — mismo tipo de hallazgo que los 5 puntos de código muerto de la paridad de Clientes.
+> **Fuente de verdad única: `src/styles/index.css`.**
+
 Cambios en `src/app/globals.css`:
 
-1. **Valores** → hex literales del ERP, tomados de su `tailwind.config.js` y su `index.css`.
+1. **Valores** → hex literales de `src/styles/index.css` del ERP (`:root` en línea 343, `.dark` en 599).
+   Núcleo: fondo `#FAFAFA`, tarjeta `#FFFFFF`, borde `#E1E1E3`, borde-hover `#CDCDD1`, hover
+   `rgba(0,0,0,0.03)`, `surface-100 #F4F4F5`, `surface-200 #E9E9EB`; texto `#1A1A1F`/`#5C5E66`/`#8B8D94`;
+   marca `--color-primary #1E3A5F` (hover `#2B5D9B`, active `#162B47`), secundario `#B45309`.
 2. **Se retira la convención OKLCH** en la capa de tokens. Era regla del proyecto ("nunca hex crudos"),
    pero aquí prima la fidelidad **verificable**: un hex se coteja de un vistazo contra la fuente del ERP;
    un OKLCH convertido, no. La regla se reescribe: *los componentes siguen sin usar hex crudos — sólo la
    capa de tokens los declara*.
-3. **Tokens nuevos** que Cloud no tiene y las pantallas del ERP usan: escala `surface-100/200/300`
-   (cabeceras de tabla, filas alternas), escala amber completa, `--btn-*-bg/hover/active`,
-   `--chart-grid/axis/tooltip`, escala navy de sidebar (`inactive`, `active-bg`, `active-border`).
-4. **Tipografía** → stack exacto del ERP. En Windows se ve idéntico; fuera cae a Inter, igual que el ERP.
-   Efecto lateral: **desaparece la webfont Geist y el bundle baja**.
-5. **Modo oscuro** → los valores de `html[data-theme="dark"]` del ERP (`index.css:599`) al bloque `.dark`
+3. **Tokens nuevos** que Cloud no tiene y las pantallas del ERP usan: escalas `surface-100/200`, escalas
+   completas 50–900 de success/warning/danger/info, `--btn-*-bg/hover/active` + `--btn-inset-highlight`,
+   `--chart-grid/axis/tooltip`, los 9 tokens `--sidebar-*`, la escala de sombras `--shadow-xs…float`, la
+   escala de radios (`4/6/8/12/16/20px`) y las tres transiciones (`100/150/250ms`).
+4. **Tipografía** → los tres stacks del ERP: body `Inter, "Segoe UI", system-ui`, display
+   `Bricolage Grotesque`, mono `IBM Plex Mono` con `font-variant-numeric: tabular-nums` para cifras.
+   Sustituye a Geist.
+5. **Lenguaje de interacción "Linear"** (parte del aspecto, no un detalle): hovers **sin `transform` ni
+   glow** — sólo cambio de `border-color` y fondo sutil; `:focus-visible` con outline de 2px y offset 1px;
+   scrollbars de 5px con pulgar redondeado; `active` de botón primario a `scale(0.99)` sin sombra.
+6. **Modo oscuro** → los valores de `html[data-theme="dark"]` del ERP (`index.css:599`) al bloque `.dark`
    de Cloud (next-themes usa `attribute="class"`).
 
 ### 4.2 Biblioteca de componentes
@@ -123,7 +140,8 @@ testeado, y visualmente es indistinguible.
 
 **Sidebar.** Hoy vive incrustada en `(app)/layout.tsx` (226 líneas, que además hace `requireOrg`, el gate
 de suscripción y el header). Se extrae a `src/components/app-sidebar.tsx` — higiene necesaria, no se
-clonan 725 líneas dentro de ese layout. Se porta la navy `#1A2535`, el borde amber del item activo, las 7
+clonan 725 líneas dentro de ese layout. Se porta la sidebar **clara** (`--sidebar-bg #F4F4F5`, borde
+`#E1E1E3`, item activo con fondo `#E9E9EB` y borde navy `#1E3A5F`, etiquetas de sección `#8B8D94`), las 7
 secciones y **el colapsar/expandir con persistencia en `localStorage` + tooltips en modo colapsado**.
 
 > **Reversión explícita:** en la paridad del chrome (24-jul) se decidió *no* portar el colapso por
@@ -183,10 +201,11 @@ lenguaje visual **donde ese contenido ya vive en Cloud**. Decisión documentada,
 
 ## 7. Riesgos
 
-1. **Contraste vs. gate de accesibilidad.** La paleta del ERP nació en Electron, sin CI; los tokens de
-   Cloud se eligieron para pasar a11y ≥0.95. Si algún par texto/fondo no llega a 4.5:1 hay conflicto entre
-   fidelidad y gate. **Se mide en la fase 1, antes de aplicar nada**, y los pares problemáticos se
-   reportan en vez de descubrirse con el CI en rojo.
+1. **Contraste vs. gate de accesibilidad** — *riesgo rebajado tras la corrección de fuente de verdad.*
+   La paleta Linear es neutra y de alto contraste (`#1A1A1F` sobre `#FAFAFA` ≈ 16:1), muy por encima de
+   4.5:1. El único par dudoso es el texto atenuado `#8B8D94` sobre `#FAFAFA` (≈ 2.8:1), que **sólo cumple
+   si se usa exclusivamente en texto no esencial** (etiquetas de sección, eyebrows) — como hace el ERP.
+   **Se mide en la fase 1** y, si algún uso lo pone en texto esencial, se reporta antes de aplicar.
 
 2. **Fuga de peso a la landing pública.** `lighthouserc.json` sólo mide `/` y `/pt`: las rutas de la app
    están tras autenticación y LHCI nunca las visita. **Consecuencia: los 175 KB nunca aplicaron a
