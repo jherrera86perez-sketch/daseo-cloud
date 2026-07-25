@@ -9,16 +9,16 @@
 La maratón de paridad de julio dejó Daseo Cloud **funcionalmente fiel** al ERP CubaOne (10 módulos,
 268 tests unitarios, 34 E2E) pero **visualmente ajeno**. Son dos sistemas de diseño distintos:
 
-| | ERP CubaOne | Daseo Cloud (hoy) |
-|---|---|---|
-| Paleta | Navy `#1E3A5F` de marca + amber `#B45309` sobre **grises neutros Linear** (`#FAFAFA` fondo, `#FFFFFF` tarjeta, `#E1E1E3` borde) | Teal profundo OKLCH sobre neutros fríos |
-| Sidebar | **Clara `#F4F4F5`**, item activo con borde navy | Clara, tono del tema |
-| Tipografía | `Inter, "Segoe UI", system-ui` (body) · `Bricolage Grotesque` (display) · `IBM Plex Mono` (mono/cifras) | Geist |
-| Interacción | "Linear": hovers planos sin `transform` ni glow, focus ring 2px/offset 1px, scrollbars 5px | Estándar shadcn |
-| Motor | Tailwind v3 + 410 variables CSS + 88 KB de CSS propio | Tailwind v4 + ~40 tokens OKLCH |
-| Gráficos | ECharts (+ Recharts en un componente) | SVG/CSS puro |
-| Interacción | Modales (≈55 archivos con overlay) | Páginas y formularios inline (4 archivos con overlay) |
-| Primitivas UI | ~35 componentes (`atoms/`, `forms/`, `feedback/`, `charts/`) | 5 (`button`, `card`, `input`, `label`, `sonner`) |
+|               | ERP CubaOne                                                                                                                     | Daseo Cloud (hoy)                                     |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Paleta        | Navy `#1E3A5F` de marca + amber `#B45309` sobre **grises neutros Linear** (`#FAFAFA` fondo, `#FFFFFF` tarjeta, `#E1E1E3` borde) | Teal profundo OKLCH sobre neutros fríos               |
+| Sidebar       | **Clara `#F4F4F5`**, item activo con borde navy                                                                                 | Clara, tono del tema                                  |
+| Tipografía    | `Inter, "Segoe UI", system-ui` (body) · `Bricolage Grotesque` (display) · `IBM Plex Mono` (mono/cifras)                         | Geist                                                 |
+| Interacción   | "Linear": hovers planos sin `transform` ni glow, focus ring 2px/offset 1px, scrollbars 5px                                      | Estándar shadcn                                       |
+| Motor         | Tailwind v3 + 410 variables CSS + 88 KB de CSS propio                                                                           | Tailwind v4 + ~40 tokens OKLCH                        |
+| Gráficos      | ECharts (+ Recharts en un componente)                                                                                           | SVG/CSS puro                                          |
+| Interacción   | Modales (≈55 archivos con overlay)                                                                                              | Páginas y formularios inline (4 archivos con overlay) |
+| Primitivas UI | ~35 componentes (`atoms/`, `forms/`, `feedback/`, `charts/`)                                                                    | 5 (`button`, `card`, `input`, `label`, `sonner`)      |
 
 ## 2. Objetivo y alcance
 
@@ -41,7 +41,7 @@ La maratón de paridad de julio dejó Daseo Cloud **funcionalmente fiel** al ERP
 
 ### Fuera de alcance
 
-- Tema *"editorial"* del ERP (tercera variante decorativa además de claro/oscuro).
+- Tema _"editorial"_ del ERP (tercera variante decorativa además de claro/oscuro).
 - Pastilla de "fecha de trabajo" (`WorkingDateModal`): paradigma offline de escritorio; Cloud ya tiene
   fecha retroactiva **por documento**, que es más granular.
 - Botón de respaldo a carpeta: Electron/filesystem local, no aplica sobre Neon.
@@ -76,7 +76,7 @@ pantallas sin editar un componente.**
 
 > **Corrección de fuente de verdad (25-jul, durante la redacción del plan).** La paleta NO se toma de
 > `tailwind.config.js`. Ese bloque `colors` (superficies crema `#F2EFE9`, sidebar navy `#1A2535`) es la
-> piel *"editorial"* **legacy**, superada por la piel *"Linear"* declarada en `src/styles/index.css:343`.
+> piel _"editorial"_ **legacy**, superada por la piel _"Linear"_ declarada en `src/styles/index.css:343`.
 > Medición decisiva: **1.155 usos de `var(--color-surface*)` en `.tsx` contra 1 uso de una clase Tailwind
 > `surface`**. Las variables CSS ganan; el bloque `colors` de superficies y sidebar es **configuración
 > muerta** — mismo tipo de hallazgo que los 5 puntos de código muerto de la paridad de Clientes.
@@ -90,8 +90,8 @@ Cambios en `src/app/globals.css`:
    marca `--color-primary #1E3A5F` (hover `#2B5D9B`, active `#162B47`), secundario `#B45309`.
 2. **Se retira la convención OKLCH** en la capa de tokens. Era regla del proyecto ("nunca hex crudos"),
    pero aquí prima la fidelidad **verificable**: un hex se coteja de un vistazo contra la fuente del ERP;
-   un OKLCH convertido, no. La regla se reescribe: *los componentes siguen sin usar hex crudos — sólo la
-   capa de tokens los declara*.
+   un OKLCH convertido, no. La regla se reescribe: _los componentes siguen sin usar hex crudos — sólo la
+   capa de tokens los declara_.
 3. **Tokens nuevos** que Cloud no tiene y las pantallas del ERP usan: escalas `surface-100/200`, escalas
    completas 50–900 de success/warning/danger/info, `--btn-*-bg/hover/active` + `--btn-inset-highlight`,
    `--chart-grid/axis/tooltip`, los 9 tokens `--sidebar-*`, la escala de sombras `--shadow-xs…float`, la
@@ -115,7 +115,7 @@ MainLayout 52, ModalPortal 24).
   `feedback/`, `charts/` — más los de raíz.
 - **Reemplazo en sitio:** los 5 primitivos actuales se **sustituyen** conservando nombre de archivo en
   minúscula y la misma superficie de importación, para que las 98 pantallas los adopten sin tocar imports.
-  *(El ERP usa `Button.tsx`; en Windows el FS no distingue mayúsculas y colisionaría.)*
+  _(El ERP usa `Button.tsx`; en Windows el FS no distingue mayúsculas y colisionaría.)_
 - **Regla de fidelidad** (la misma de la maratón funcional): se copia marcado y clases **literalmente**;
   sólo se adaptan las costuras del framework — `react-router Link` → `next/link`, `"use client"` donde
   haga falta, y los tres lint de React 19 ya conocidos (nada de `setState` en effect, ni componentes
@@ -144,12 +144,12 @@ clonan 725 líneas dentro de ese layout. Se porta la sidebar **clara** (`--sideb
 `#E1E1E3`, item activo con fondo `#E9E9EB` y borde navy `#1E3A5F`, etiquetas de sección `#8B8D94`), las 7
 secciones y **el colapsar/expandir con persistencia en `localStorage` + tooltips en modo colapsado**.
 
-> **Reversión explícita:** en la paridad del chrome (24-jul) se decidió *no* portar el colapso por
+> **Reversión explícita:** en la paridad del chrome (24-jul) se decidió _no_ portar el colapso por
 > "cosmético, bajo valor". Bajo "clon pantalla por pantalla" esa decisión queda revertida.
 
 **Badges de alerta por sección:** se portan **cableados a las rutas reales de Cloud**. El propio ERP
-documenta que uno de sus tres paths con badge ya no apunta a ninguna ruta real: *no se replican los bugs
-confirmados del ERP* (regla vigente de la maratón funcional).
+documenta que uno de sus tres paths con badge ya no apunta a ninguna ruta real: _no se replican los bugs
+confirmados del ERP_ (regla vigente de la maratón funcional).
 
 Nombre y logo de empresa del ERP mapean al nombre de la organización de Cloud (multi-tenant: cada org ve
 el suyo).
@@ -163,25 +163,25 @@ son **dos estados del mismo componente**, no dos componentes.
 
 ## 5. Fases
 
-| Fase | Contenido |
-|---|---|
-| **0. Referencias** | Levantar el ERP (`npm run server` + `vite`, `node_modules` ya instalado, `cubaone.db` con datos). Capturar las 22 pantallas **al scratchpad de sesión** |
-| **1. Tokens** | §4.1. Verificación: una sola pantalla de referencia debe coincidir en color/fondo/borde sin tocar componentes |
-| **2. Componentes** | §4.2, en el orden indicado |
-| **3. Chrome** | §4.3 |
-| **4. Las 22 pantallas** | 5 lotes, abajo |
-| **5. Barrido de las heredadas** | Revisión una por una de las pantallas exclusivas de Cloud, para que ninguna quede huérfana |
-| **6. Cierre** | Lighthouse, 34 E2E, CI verde, deploy, `ESTADO.md` |
+| Fase                            | Contenido                                                                                                                                               |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0. Referencias**              | Levantar el ERP (`npm run server` + `vite`, `node_modules` ya instalado, `cubaone.db` con datos). Capturar las 22 pantallas **al scratchpad de sesión** |
+| **1. Tokens**                   | §4.1. Verificación: una sola pantalla de referencia debe coincidir en color/fondo/borde sin tocar componentes                                           |
+| **2. Componentes**              | §4.2, en el orden indicado                                                                                                                              |
+| **3. Chrome**                   | §4.3                                                                                                                                                    |
+| **4. Las 22 pantallas**         | 5 lotes, abajo                                                                                                                                          |
+| **5. Barrido de las heredadas** | Revisión una por una de las pantallas exclusivas de Cloud, para que ninguna quede huérfana                                                              |
+| **6. Cierre**                   | Lighthouse, 34 E2E, CI verde, deploy, `ESTADO.md`                                                                                                       |
 
 ### Lotes de la fase 4
 
-| Lote | Pantallas del ERP | Criterio |
-|---|---|---|
-| 1 | Ventas, Compras, Inventario, CxC, CxP | Valida `DataTable` + `PageLayout` + `Modal` sobre las 5 listas maestras. Si cuadra, las otras 17 son repetición |
-| 2 | Producción, Kardex, Salidas Internas, Trazabilidad, Compromisos | Detalle y documentos |
-| 3 | Dashboard, Panel del Negocio, Top Clientes | Los de ECharts |
-| 4 | Estados de Cuenta, Conciliación, Modelos Fiscales, Vehículos | Finanzas, las más densas |
-| 5 | Configuración, Catálogos, Auditoría, Sorteos, Login | Administración y acceso |
+| Lote | Pantallas del ERP                                               | Criterio                                                                                                        |
+| ---- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| 1    | Ventas, Compras, Inventario, CxC, CxP                           | Valida `DataTable` + `PageLayout` + `Modal` sobre las 5 listas maestras. Si cuadra, las otras 17 son repetición |
+| 2    | Producción, Kardex, Salidas Internas, Trazabilidad, Compromisos | Detalle y documentos                                                                                            |
+| 3    | Dashboard, Panel del Negocio, Top Clientes                      | Los de ECharts                                                                                                  |
+| 4    | Estados de Cuenta, Conciliación, Modelos Fiscales, Vehículos    | Finanzas, las más densas                                                                                        |
+| 5    | Configuración, Catálogos, Auditoría, Sorteos, Login             | Administración y acceso                                                                                         |
 
 Cada lote se presenta con capturas ERP vs Cloud lado a lado para aprobación.
 
@@ -189,19 +189,19 @@ Cada lote se presenta con capturas ERP vs Cloud lado a lado para aprobación.
 
 Cuatro de las 22 no tienen ruta equivalente en Cloud:
 
-| Pantalla ERP | Dónde vive ese contenido en Cloud |
-|---|---|
-| Kardex | dentro de `/products/[id]` |
+| Pantalla ERP | Dónde vive ese contenido en Cloud                 |
+| ------------ | ------------------------------------------------- |
+| Kardex       | dentro de `/products/[id]`                        |
 | Trazabilidad | dentro de `/products/[id]` (lotes y vencimientos) |
-| Compromisos | dentro de `/customers/[id]` |
-| Catálogos | repartido en `/settings` |
+| Compromisos  | dentro de `/customers/[id]`                       |
+| Catálogos    | repartido en `/settings`                          |
 
 Como se descartó adoptar la arquitectura del ERP (§2.4), **no se crean rutas nuevas**: se clona su
 lenguaje visual **donde ese contenido ya vive en Cloud**. Decisión documentada, no omisión.
 
 ## 7. Riesgos
 
-1. **Contraste vs. gate de accesibilidad** — *riesgo rebajado tras la corrección de fuente de verdad.*
+1. **Contraste vs. gate de accesibilidad** — _riesgo rebajado tras la corrección de fuente de verdad._
    La paleta Linear es neutra y de alto contraste (`#1A1A1F` sobre `#FAFAFA` ≈ 16:1), muy por encima de
    4.5:1. El único par dudoso es el texto atenuado `#8B8D94` sobre `#FAFAFA` (≈ 2.8:1), que **sólo cumple
    si se usa exclusivamente en texto no esencial** (etiquetas de sección, eyebrows) — como hace el ERP.

@@ -28,41 +28,43 @@ Cubre las **fases 0–3** del spec: referencias, tokens, componentes y chrome. E
 
 **Diferidos conscientes de este plan**, porque su único consumidor está en la fase 4 y portarlos antes sería código sin uso:
 
-| Componente | Llega con |
-|---|---|
-| `ui/charts/` (`CustomCartesianGrid`, `CustomTooltip`, `constants`) + ECharts | Lote 3 — Dashboard, Panel del Negocio |
-| `forms/combobox.tsx` | Lote 1 — el selector de cliente de Ventas es su primer consumidor real |
-| `forms/file-dropzone.tsx` | Lote 4 — la carga de PDF de Estados de Cuenta |
-| `ui/pagination.tsx`, `ui/skeletons/` | Lote 1, cuando se sepa qué listas paginan de verdad |
+| Componente                                                                   | Llega con                                                              |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `ui/charts/` (`CustomCartesianGrid`, `CustomTooltip`, `constants`) + ECharts | Lote 3 — Dashboard, Panel del Negocio                                  |
+| `forms/combobox.tsx`                                                         | Lote 1 — el selector de cliente de Ventas es su primer consumidor real |
+| `forms/file-dropzone.tsx`                                                    | Lote 4 — la carga de PDF de Estados de Cuenta                          |
+| `ui/pagination.tsx`, `ui/skeletons/`                                         | Lote 1, cuando se sepa qué listas paginan de verdad                    |
 
 ## Estructura de archivos
 
-| Archivo | Responsabilidad |
-|---|---|
-| `src/app/globals.css` | **Modificar.** Única declaración de tokens y del lenguaje de interacción Linear |
-| `src/app/[locale]/layout.tsx` | **Modificar.** Cambia las fuentes Geist por las tres del ERP |
-| `src/components/ui/forms/{button,input,select,textarea,checkbox,switch}.tsx` | **Crear.** Primitivas de formulario |
-| `src/components/ui/form-field.tsx` | **Crear.** Etiqueta + control + error, envoltorio de las anteriores |
-| `src/components/ui/{card,badge,stat-card,kpi-strip}.tsx` | **Crear/Modificar.** Tarjetas y cifras |
-| `src/components/ui/atoms/{section-header,status-dot,table-empty-row}.tsx` | **Crear.** Átomos presentacionales |
-| `src/components/ui/data-table.tsx` | **Crear.** Piel de tabla; el filtrado sigue en servidor |
-| `src/components/ui/modal.tsx`, `modal-portal.tsx` | **Crear.** Diálogo, que Cloud no tiene |
-| `src/components/ui/feedback/{alert,confirm-dialog,empty-state,tooltip}.tsx` | **Crear.** Realimentación |
-| `src/components/ui/layout/{page-layout,page-header}.tsx` | **Crear.** Marco común de página |
-| `src/components/app-sidebar.tsx` | **Crear.** Extraída de `layout.tsx` y clonada |
-| `src/components/app-header.tsx` | **Modificar.** De 65 líneas a la versión del ERP |
-| `src/app/[locale]/(app)/layout.tsx` | **Modificar.** Adelgaza: deja de contener la sidebar |
-| `src/components/ui/{button,card,input,label}.tsx` | **Eliminar** tras migrar sus consumidores |
+| Archivo                                                                      | Responsabilidad                                                                 |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `src/app/globals.css`                                                        | **Modificar.** Única declaración de tokens y del lenguaje de interacción Linear |
+| `src/app/[locale]/layout.tsx`                                                | **Modificar.** Cambia las fuentes Geist por las tres del ERP                    |
+| `src/components/ui/forms/{button,input,select,textarea,checkbox,switch}.tsx` | **Crear.** Primitivas de formulario                                             |
+| `src/components/ui/form-field.tsx`                                           | **Crear.** Etiqueta + control + error, envoltorio de las anteriores             |
+| `src/components/ui/{card,badge,stat-card,kpi-strip}.tsx`                     | **Crear/Modificar.** Tarjetas y cifras                                          |
+| `src/components/ui/atoms/{section-header,status-dot,table-empty-row}.tsx`    | **Crear.** Átomos presentacionales                                              |
+| `src/components/ui/data-table.tsx`                                           | **Crear.** Piel de tabla; el filtrado sigue en servidor                         |
+| `src/components/ui/modal.tsx`, `modal-portal.tsx`                            | **Crear.** Diálogo, que Cloud no tiene                                          |
+| `src/components/ui/feedback/{alert,confirm-dialog,empty-state,tooltip}.tsx`  | **Crear.** Realimentación                                                       |
+| `src/components/ui/layout/{page-layout,page-header}.tsx`                     | **Crear.** Marco común de página                                                |
+| `src/components/app-sidebar.tsx`                                             | **Crear.** Extraída de `layout.tsx` y clonada                                   |
+| `src/components/app-header.tsx`                                              | **Modificar.** De 65 líneas a la versión del ERP                                |
+| `src/app/[locale]/(app)/layout.tsx`                                          | **Modificar.** Adelgaza: deja de contener la sidebar                            |
+| `src/components/ui/{button,card,input,label}.tsx`                            | **Eliminar** tras migrar sus consumidores                                       |
 
 ---
 
 ### Task 1: Capturar las 22 pantallas de referencia del ERP
 
 **Files:**
+
 - Create: `<scratchpad>/erp-ref/` (fuera del repo — **no se commitea nada**)
 - Create: `docs/superpowers/plans/2026-07-25-inventario-referencias.md` (índice sin imágenes)
 
 **Interfaces:**
+
 - Consumes: nada.
 - Produces: `<scratchpad>/erp-ref/<pantalla>.png` para las 22 pantallas, e `inventario-referencias.md` con la tabla `pantalla ERP → ruta Cloud → nombre de archivo de captura`, que consumen todas las tareas posteriores y los planes de la fase 4.
 
@@ -94,30 +96,30 @@ Si el frontend no arranca o la BD está vacía: **detente y repórtalo**. Sin re
 
 Con las herramientas de navegador, captura a viewport 1440×900 cada una y guarda en el scratchpad:
 
-| # | Pantalla ERP | Archivo |
-|---|---|---|
-| 1 | Dashboard (`/`) | `dashboard.png` |
-| 2 | Ventas | `ventas.png` |
-| 3 | Compras | `compras.png` |
-| 4 | Inventario | `inventario.png` |
-| 5 | Cuentas por Cobrar | `cxc.png` |
-| 6 | Cuentas por Pagar | `cxp.png` |
-| 7 | Producción | `produccion.png` |
-| 8 | Kardex | `kardex.png` |
-| 9 | Salidas Internas | `salidas-internas.png` |
-| 10 | Trazabilidad | `trazabilidad.png` |
-| 11 | Compromisos | `compromisos.png` |
-| 12 | Panel del Negocio | `panel-negocio.png` |
-| 13 | Top Clientes | `top-clientes.png` |
-| 14 | Estados de Cuenta | `estados-cuenta.png` |
-| 15 | Conciliación | `conciliacion.png` |
-| 16 | Modelos Fiscales | `modelos-fiscales.png` |
-| 17 | Vehículos | `vehiculos.png` |
-| 18 | Configuración | `configuracion.png` |
-| 19 | Catálogos | `catalogos.png` |
-| 20 | Auditoría | `audit-logs.png` |
-| 21 | Sorteos | `sorteos.png` |
-| 22 | Login | `login.png` |
+| #   | Pantalla ERP       | Archivo                |
+| --- | ------------------ | ---------------------- |
+| 1   | Dashboard (`/`)    | `dashboard.png`        |
+| 2   | Ventas             | `ventas.png`           |
+| 3   | Compras            | `compras.png`          |
+| 4   | Inventario         | `inventario.png`       |
+| 5   | Cuentas por Cobrar | `cxc.png`              |
+| 6   | Cuentas por Pagar  | `cxp.png`              |
+| 7   | Producción         | `produccion.png`       |
+| 8   | Kardex             | `kardex.png`           |
+| 9   | Salidas Internas   | `salidas-internas.png` |
+| 10  | Trazabilidad       | `trazabilidad.png`     |
+| 11  | Compromisos        | `compromisos.png`      |
+| 12  | Panel del Negocio  | `panel-negocio.png`    |
+| 13  | Top Clientes       | `top-clientes.png`     |
+| 14  | Estados de Cuenta  | `estados-cuenta.png`   |
+| 15  | Conciliación       | `conciliacion.png`     |
+| 16  | Modelos Fiscales   | `modelos-fiscales.png` |
+| 17  | Vehículos          | `vehiculos.png`        |
+| 18  | Configuración      | `configuracion.png`    |
+| 19  | Catálogos          | `catalogos.png`        |
+| 20  | Auditoría          | `audit-logs.png`       |
+| 21  | Sorteos            | `sorteos.png`          |
+| 22  | Login              | `login.png`            |
 
 - [ ] **Step 5: Capturar los estados que no se ven en reposo** — ⚠️ BLOQUEADO: el banner de licencia del ERP intercepta los clics de todo el header (toggle de tema y colapso de sidebar inalcanzables). Reintentar cuando la licencia esté resuelta. NO bloquea las fases 1–3: los tokens de modo oscuro se portan de `index.css:599`.
 
@@ -152,10 +154,12 @@ git commit -m "docs: inventario de referencias visuales del ERP (22 pantallas + 
 ### Task 2: Capa de tokens
 
 **Files:**
+
 - Modify: `src/app/globals.css` (líneas 1–103: bloques `:root` y `.dark`)
 - Modify: `src/app/globals.css` (bloque `@theme inline`, líneas 105–152)
 
 **Interfaces:**
+
 - Consumes: `<scratchpad>/erp-ref/ventas.png` de la Tarea 1 como referencia de verificación.
 - Produces: los tokens semánticos existentes (`--background`, `--card`, `--border`, `--primary`, `--muted-foreground`, `--sidebar*`…) con valores del ERP, más los tokens nuevos `--surface-100`, `--surface-200`, `--surface-hover`, `--border-hover`, `--btn-*`, `--shadow-*`, `--chart-*`, y las escalas 50–900 de success/warning/danger/info. Todas las tareas siguientes los consumen.
 
@@ -168,91 +172,96 @@ En `src/app/globals.css`, sustituye el `:root` completo por:
   --radius: 8px;
 
   /* ── Superficies — paleta neutra Linear (index.css:434) ── */
-  --background: #FAFAFA;
-  --foreground: #1A1A1F;
-  --card: #FFFFFF;
-  --card-foreground: #1A1A1F;
-  --popover: #FFFFFF;
-  --popover-foreground: #1A1A1F;
-  --surface-100: #F4F4F5;
-  --surface-200: #E9E9EB;
+  --background: #fafafa;
+  --foreground: #1a1a1f;
+  --card: #ffffff;
+  --card-foreground: #1a1a1f;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1f;
+  --surface-100: #f4f4f5;
+  --surface-200: #e9e9eb;
   --surface-hover: rgba(0, 0, 0, 0.03);
 
   /* ── Marca — navy primario ── */
-  --primary: #1E3A5F;
-  --primary-foreground: #FFFFFF;
-  --primary-hover: #2B5D9B;
-  --primary-active: #162B47;
-  --primary-muted: rgba(30, 58, 95, 0.10);
+  --primary: #1e3a5f;
+  --primary-foreground: #ffffff;
+  --primary-hover: #2b5d9b;
+  --primary-active: #162b47;
+  --primary-muted: rgba(30, 58, 95, 0.1);
 
   /* ── Acento — amber tostado ── */
-  --secondary: #B45309;
-  --secondary-foreground: #FFFFFF;
+  --secondary: #b45309;
+  --secondary-foreground: #ffffff;
 
-  --muted: #F4F4F5;
-  --muted-foreground: #8B8D94;
-  --accent: #E9E9EB;
-  --accent-foreground: #1A1A1F;
+  --muted: #f4f4f5;
+  --muted-foreground: #8b8d94;
+  --accent: #e9e9eb;
+  --accent-foreground: #1a1a1f;
 
   /* ── Semánticos (valor base = el "oscuro" del ERP, para texto sobre claro) ── */
-  --destructive: #7F1D1D;
-  --destructive-foreground: #FFFFFF;
-  --success: #14532D;
-  --success-foreground: #FFFFFF;
-  --warning: #78350F;
-  --warning-foreground: #FFFFFF;
+  --destructive: #7f1d1d;
+  --destructive-foreground: #ffffff;
+  --success: #14532d;
+  --success-foreground: #ffffff;
+  --warning: #78350f;
+  --warning-foreground: #ffffff;
 
-  --border: #E1E1E3;
-  --border-hover: #CDCDD1;
-  --input: #E1E1E3;
-  --ring: #2B5D9B;
+  --border: #e1e1e3;
+  --border-hover: #cdcdd1;
+  --input: #e1e1e3;
+  --ring: #2b5d9b;
 
   /* ── Botones (index.css:459) ── */
-  --btn-primary-bg: #1E3A5F;
-  --btn-primary-bg-hover: #2B5D9B;
-  --btn-primary-bg-active: #162B47;
-  --btn-danger-bg: #B91C1C;
-  --btn-danger-bg-hover: #991B1B;
-  --btn-danger-bg-active: #7F1D1D;
-  --btn-success-bg: #15803D;
+  --btn-primary-bg: #1e3a5f;
+  --btn-primary-bg-hover: #2b5d9b;
+  --btn-primary-bg-active: #162b47;
+  --btn-danger-bg: #b91c1c;
+  --btn-danger-bg-hover: #991b1b;
+  --btn-danger-bg-active: #7f1d1d;
+  --btn-success-bg: #15803d;
   --btn-success-bg-hover: #166534;
-  --btn-success-bg-active: #14532D;
-  --btn-warning-bg: #B45309;
-  --btn-warning-bg-hover: #92400E;
-  --btn-warning-bg-active: #78350F;
+  --btn-success-bg-active: #14532d;
+  --btn-warning-bg: #b45309;
+  --btn-warning-bg-hover: #92400e;
+  --btn-warning-bg-active: #78350f;
   --btn-inset-highlight: rgba(255, 255, 255, 0.08);
 
   /* ── Sidebar Linear: CLARA, no navy (index.css:475) ── */
-  --sidebar: #F4F4F5;
-  --sidebar-foreground: #1A1A1F;
-  --sidebar-border: #E1E1E3;
-  --sidebar-text-inactive: #5C5E66;
-  --sidebar-text-active: #1A1A1F;
-  --sidebar-active-bg: #E9E9EB;
-  --sidebar-active-border: #1E3A5F;
+  --sidebar: #f4f4f5;
+  --sidebar-foreground: #1a1a1f;
+  --sidebar-border: #e1e1e3;
+  --sidebar-text-inactive: #5c5e66;
+  --sidebar-text-active: #1a1a1f;
+  --sidebar-active-bg: #e9e9eb;
+  --sidebar-active-border: #1e3a5f;
   --sidebar-hover-bg: rgba(0, 0, 0, 0.04);
-  --sidebar-section-label: #8B8D94;
-  --sidebar-divider: #E9E9EB;
+  --sidebar-section-label: #8b8d94;
+  --sidebar-divider: #e9e9eb;
 
   /* ── Elevación ── */
   --shadow-xs: 0 1px 2px rgba(26, 29, 46, 0.04);
-  --shadow-sm: 0 1px 3px rgba(26, 29, 46, 0.06), 0 1px 2px rgba(26, 29, 46, 0.04);
-  --shadow-md: 0 4px 8px rgba(26, 29, 46, 0.06), 0 2px 4px rgba(26, 29, 46, 0.04);
-  --shadow-lg: 0 8px 24px rgba(26, 29, 46, 0.08), 0 2px 8px rgba(26, 29, 46, 0.04);
-  --shadow-xl: 0 20px 40px rgba(26, 29, 46, 0.10), 0 4px 12px rgba(26, 29, 46, 0.05);
-  --shadow-float: 0 0 0 1px rgba(26, 29, 46, 0.06), 0 8px 24px rgba(26, 29, 46, 0.09);
+  --shadow-sm:
+    0 1px 3px rgba(26, 29, 46, 0.06), 0 1px 2px rgba(26, 29, 46, 0.04);
+  --shadow-md:
+    0 4px 8px rgba(26, 29, 46, 0.06), 0 2px 4px rgba(26, 29, 46, 0.04);
+  --shadow-lg:
+    0 8px 24px rgba(26, 29, 46, 0.08), 0 2px 8px rgba(26, 29, 46, 0.04);
+  --shadow-xl:
+    0 20px 40px rgba(26, 29, 46, 0.1), 0 4px 12px rgba(26, 29, 46, 0.05);
+  --shadow-float:
+    0 0 0 1px rgba(26, 29, 46, 0.06), 0 8px 24px rgba(26, 29, 46, 0.09);
 
   /* ── Gráficos: navy → amber → semánticos ── */
-  --chart-1: #1E3A5F;
-  --chart-2: #B45309;
-  --chart-3: #15803D;
-  --chart-4: #2B5D9B;
-  --chart-5: #B91C1C;
-  --chart-grid: #E1E1E3;
-  --chart-axis-text: #8B8D94;
-  --chart-tooltip-bg: #FFFFFF;
-  --chart-tooltip-border: #E1E1E3;
-  --chart-tooltip-text: #1A1A1F;
+  --chart-1: #1e3a5f;
+  --chart-2: #b45309;
+  --chart-3: #15803d;
+  --chart-4: #2b5d9b;
+  --chart-5: #b91c1c;
+  --chart-grid: #e1e1e3;
+  --chart-axis-text: #8b8d94;
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-border: #e1e1e3;
+  --chart-tooltip-text: #1a1a1f;
 
   /* ── Transiciones ── */
   --transition-fast: 100ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -267,76 +276,76 @@ Valores tomados de `html[data-theme="dark"]` (index.css:599). Nota que en oscuro
 
 ```css
 .dark {
-  --background: #08090A;
-  --foreground: #E6E6E8;
-  --card: #0F1011;
-  --card-foreground: #E6E6E8;
-  --popover: #0F1011;
-  --popover-foreground: #E6E6E8;
-  --surface-100: #18181B;
-  --surface-200: #1F1F23;
+  --background: #08090a;
+  --foreground: #e6e6e8;
+  --card: #0f1011;
+  --card-foreground: #e6e6e8;
+  --popover: #0f1011;
+  --popover-foreground: #e6e6e8;
+  --surface-100: #18181b;
+  --surface-200: #1f1f23;
   --surface-hover: rgba(255, 255, 255, 0.04);
 
-  --primary: #5B8BD8;
-  --primary-foreground: #08090A;
-  --primary-hover: #76A0E1;
-  --primary-active: #4575C4;
+  --primary: #5b8bd8;
+  --primary-foreground: #08090a;
+  --primary-hover: #76a0e1;
+  --primary-active: #4575c4;
   --primary-muted: rgba(91, 139, 216, 0.14);
 
-  --secondary: #B58A5C;
-  --secondary-foreground: #08090A;
+  --secondary: #b58a5c;
+  --secondary-foreground: #08090a;
 
-  --muted: #18181B;
-  --muted-foreground: #6B6F76;
-  --accent: #1F1F23;
-  --accent-foreground: #E6E6E8;
+  --muted: #18181b;
+  --muted-foreground: #6b6f76;
+  --accent: #1f1f23;
+  --accent-foreground: #e6e6e8;
 
-  --destructive: #F87171;
-  --destructive-foreground: #08090A;
-  --success: #4ADE80;
-  --success-foreground: #08090A;
-  --warning: #FCD34D;
-  --warning-foreground: #08090A;
+  --destructive: #f87171;
+  --destructive-foreground: #08090a;
+  --success: #4ade80;
+  --success-foreground: #08090a;
+  --warning: #fcd34d;
+  --warning-foreground: #08090a;
 
-  --border: #1F1F23;
-  --border-hover: #2A2A2F;
-  --input: #1F1F23;
-  --ring: #76A0E1;
+  --border: #1f1f23;
+  --border-hover: #2a2a2f;
+  --input: #1f1f23;
+  --ring: #76a0e1;
 
-  --btn-primary-bg: #5B8BD8;
-  --btn-primary-bg-hover: #76A0E1;
-  --btn-primary-bg-active: #4575C4;
-  --btn-danger-bg: #EF4444;
-  --btn-danger-bg-hover: #F87171;
-  --btn-danger-bg-active: #991B1B;
-  --btn-success-bg: #22C55E;
-  --btn-success-bg-hover: #4ADE80;
+  --btn-primary-bg: #5b8bd8;
+  --btn-primary-bg-hover: #76a0e1;
+  --btn-primary-bg-active: #4575c4;
+  --btn-danger-bg: #ef4444;
+  --btn-danger-bg-hover: #f87171;
+  --btn-danger-bg-active: #991b1b;
+  --btn-success-bg: #22c55e;
+  --btn-success-bg-hover: #4ade80;
   --btn-success-bg-active: #166534;
-  --btn-warning-bg: #F59E0B;
-  --btn-warning-bg-hover: #FBBF24;
-  --btn-warning-bg-active: #92400E;
+  --btn-warning-bg: #f59e0b;
+  --btn-warning-bg-hover: #fbbf24;
+  --btn-warning-bg-active: #92400e;
 
-  --sidebar: #0F1011;
-  --sidebar-foreground: #E6E6E8;
-  --sidebar-border: #1F1F23;
-  --sidebar-text-inactive: #9CA0A8;
-  --sidebar-text-active: #E6E6E8;
-  --sidebar-active-bg: #18181B;
-  --sidebar-active-border: #5B8BD8;
+  --sidebar: #0f1011;
+  --sidebar-foreground: #e6e6e8;
+  --sidebar-border: #1f1f23;
+  --sidebar-text-inactive: #9ca0a8;
+  --sidebar-text-active: #e6e6e8;
+  --sidebar-active-bg: #18181b;
+  --sidebar-active-border: #5b8bd8;
   --sidebar-hover-bg: rgba(255, 255, 255, 0.04);
-  --sidebar-section-label: #6B6F76;
-  --sidebar-divider: #1F1F23;
+  --sidebar-section-label: #6b6f76;
+  --sidebar-divider: #1f1f23;
 
-  --chart-1: #5B8BD8;
-  --chart-2: #F59E0B;
-  --chart-3: #22C55E;
-  --chart-4: #76A0E1;
-  --chart-5: #EF4444;
-  --chart-grid: #1F1F23;
-  --chart-axis-text: #6B6F76;
-  --chart-tooltip-bg: #0F1011;
-  --chart-tooltip-border: #1F1F23;
-  --chart-tooltip-text: #E6E6E8;
+  --chart-1: #5b8bd8;
+  --chart-2: #f59e0b;
+  --chart-3: #22c55e;
+  --chart-4: #76a0e1;
+  --chart-5: #ef4444;
+  --chart-grid: #1f1f23;
+  --chart-axis-text: #6b6f76;
+  --chart-tooltip-bg: #0f1011;
+  --chart-tooltip-border: #1f1f23;
+  --chart-tooltip-text: #e6e6e8;
 }
 ```
 
@@ -345,26 +354,26 @@ Valores tomados de `html[data-theme="dark"]` (index.css:599). Nota que en oscuro
 En el bloque `@theme inline`, **añade** (sin borrar los existentes) al final, antes de los `--radius-*`:
 
 ```css
-  --color-surface-100: var(--surface-100);
-  --color-surface-200: var(--surface-200);
-  --color-surface-hover: var(--surface-hover);
-  --color-border-hover: var(--border-hover);
-  --color-sidebar-active-bg: var(--sidebar-active-bg);
-  --color-sidebar-active-border: var(--sidebar-active-border);
-  --color-sidebar-section-label: var(--sidebar-section-label);
-  --color-chart-grid: var(--chart-grid);
-  --color-chart-axis-text: var(--chart-axis-text);
+--color-surface-100: var(--surface-100);
+--color-surface-200: var(--surface-200);
+--color-surface-hover: var(--surface-hover);
+--color-border-hover: var(--border-hover);
+--color-sidebar-active-bg: var(--sidebar-active-bg);
+--color-sidebar-active-border: var(--sidebar-active-border);
+--color-sidebar-section-label: var(--sidebar-section-label);
+--color-chart-grid: var(--chart-grid);
+--color-chart-axis-text: var(--chart-axis-text);
 ```
 
 Y **sustituye** el bloque de radios por la escala del ERP:
 
 ```css
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
+--radius-xs: 4px;
+--radius-sm: 6px;
+--radius-md: 8px;
+--radius-lg: 12px;
+--radius-xl: 16px;
+--radius-2xl: 20px;
 ```
 
 - [ ] **Step 4: Verificar que compila y la suite no se movió**
@@ -408,10 +417,12 @@ git commit -m "feat(visual): portar la capa de tokens del ERP (piel Linear)"
 ### Task 3: Tipografía y lenguaje de interacción
 
 **Files:**
+
 - Modify: `src/app/[locale]/layout.tsx` (declaración de fuentes)
 - Modify: `src/app/globals.css` (bloque `@layer base`)
 
 **Interfaces:**
+
 - Consumes: los tokens de la Tarea 2.
 - Produces: `--font-sans`, `--font-display`, `--font-mono` con los stacks del ERP; las utilidades `.t-display`, `.t-mono`, `.t-eyebrow`, `.t-label`, `.t-num`, `.t-num-display`; y las reglas globales de foco, scrollbar y selección. Las tareas 4–10 usan `.t-eyebrow`/`.t-num` en cabeceras y cifras.
 
@@ -449,9 +460,9 @@ Y en el `<html>`, reemplaza las variables de Geist por `${inter.variable} ${bric
 En `globals.css`, dentro de `@theme inline`, sustituye las dos líneas de fuente por:
 
 ```css
-  --font-sans: var(--font-inter), "Segoe UI", system-ui, sans-serif;
-  --font-display: var(--font-bricolage), var(--font-inter), sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+--font-sans: var(--font-inter), "Segoe UI", system-ui, sans-serif;
+--font-display: var(--font-bricolage), var(--font-inter), sans-serif;
+--font-mono: var(--font-plex-mono), ui-monospace, monospace;
 ```
 
 - [ ] **Step 3: Añadir las utilidades tipográficas del ERP**
@@ -564,12 +575,14 @@ git commit -m "feat(visual): tipografia y lenguaje de interaccion Linear del ERP
 ### Task 4: Primitivas de formulario
 
 **Files:**
+
 - Create: `src/components/ui/forms/button.tsx`, `input.tsx`, `select.tsx`, `textarea.tsx`, `checkbox.tsx`, `switch.tsx`
 - Create: `src/components/ui/forms/index.ts`
 - Create: `src/components/ui/form-field.tsx`
 - Reference: `<ERP>/src/components/ui/forms/*.tsx` y `<ERP>/src/components/FormField.tsx` (108 líneas)
 
 **Interfaces:**
+
 - Consumes: tokens de la Tarea 2, utilidades de la Tarea 3.
 - Produces:
   - `Button({ variant?: "primary" | "secondary" | "danger" | "success" | "warning" | "ghost", size?: "sm" | "md" | "lg", ...ButtonHTMLAttributes })` — server component salvo que reciba `onClick`.
@@ -595,7 +608,8 @@ Copia el marcado y las clases literalmente; adapta sólo las costuras. Estructur
 import { cn } from "@/lib/utils";
 import type { ButtonHTMLAttributes } from "react";
 
-type Variant = "primary" | "secondary" | "danger" | "success" | "warning" | "ghost";
+type Variant =
+  "primary" | "secondary" | "danger" | "success" | "warning" | "ghost";
 type Size = "sm" | "md" | "lg";
 
 const VARIANTS: Record<Variant, string> = {
@@ -615,7 +629,10 @@ export function Button({
   size = "md",
   className,
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: Variant;
+  size?: Size;
+}) {
   return (
     <button
       className={cn(
@@ -687,12 +704,14 @@ git commit -m "feat(visual): portar primitivas de formulario del ERP"
 ### Task 5: Tarjetas, badges y cifras
 
 **Files:**
+
 - Create: `src/components/ui/card.tsx` (reemplaza el actual), `badge.tsx`, `stat-card.tsx`, `kpi-strip.tsx`
 - Create: `src/components/ui/atoms/section-header.tsx`, `status-dot.tsx`, `table-empty-row.tsx`, `density-toggle.tsx`
 - Reference: `<ERP>/src/components/{Card,Badge,StatCard}.tsx`, `<ERP>/src/components/ui/KpiStrip.tsx`, `<ERP>/src/components/ui/atoms/*`
 - Reference: `<scratchpad>/erp-ref/ventas.jpg` (la barra de herramientas con el DensityToggle)
 
 **Interfaces:**
+
 - Consumes: tokens (T2), utilidades tipográficas (T3), `cn` de `@/lib/utils`.
 - Produces:
   - `Card({ hoverable?: boolean, elevated?: boolean, className?, children })` + `CardHeader`, `CardTitle`, `CardContent`, `CardFooter` — **misma superficie que el `card.tsx` actual de Cloud**, para no romper sus consumidores.
@@ -826,10 +845,12 @@ git commit -m "feat(visual): portar tarjetas, badges, StatCard y KpiStrip del ER
 ### Task 6: DataTable (piel del ERP, filtrado en servidor)
 
 **Files:**
+
 - Create: `src/components/ui/data-table.tsx`
 - Reference: `<ERP>/src/components/ui/DataTable.tsx` (487 líneas)
 
 **Interfaces:**
+
 - Consumes: `TableEmptyRow` y `DensityToggle` (T5), tokens (T2).
 - Produces: `DataTable({ children, density?: "compacta" | "comoda" | "espaciosa", className? })`, `THead`, `TRow`, `TH({ align?, numeric? })`, `TD({ align?, numeric? })` — **primitivas de presentación puras**, server components, sin estado.
 
@@ -854,12 +875,20 @@ Interesan: fondo de `thead` (`--surface-100`), borde inferior de fila, alineaci�
 import { cn } from "@/lib/utils";
 import type { ReactNode, ThHTMLAttributes, TdHTMLAttributes } from "react";
 
-export function DataTable({ children, className }: { children: ReactNode; className?: string }) {
+export function DataTable({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   // overflow-x-auto es obligatorio: sin él los clics tactiles se rompen a 375px
   // (gotcha documentado en F4)
   return (
     <div className="overflow-x-auto rounded-lg border border-border">
-      <table className={cn("w-full border-collapse text-sm", className)}>{children}</table>
+      <table className={cn("w-full border-collapse text-sm", className)}>
+        {children}
+      </table>
     </div>
   );
 }
@@ -868,9 +897,20 @@ export function THead({ children }: { children: ReactNode }) {
   return <thead className="bg-surface-100">{children}</thead>;
 }
 
-export function TRow({ children, className }: { children: ReactNode; className?: string }) {
+export function TRow({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <tr className={cn("border-b border-border transition-colors hover:bg-surface-hover", className)}>
+    <tr
+      className={cn(
+        "border-b border-border transition-colors hover:bg-surface-hover",
+        className,
+      )}
+    >
       {children}
     </tr>
   );
@@ -899,7 +939,10 @@ export function TD({
   ...props
 }: TdHTMLAttributes<HTMLTableCellElement> & { numeric?: boolean }) {
   return (
-    <td className={cn("px-3 py-2", numeric && "t-num text-right", className)} {...props} />
+    <td
+      className={cn("px-3 py-2", numeric && "t-num text-right", className)}
+      {...props}
+    />
   );
 }
 ```
@@ -925,11 +968,13 @@ git commit -m "feat(visual): primitivas de tabla con la piel del ERP"
 ### Task 7: Modal y realimentación
 
 **Files:**
+
 - Create: `src/components/ui/modal.tsx`, `modal-portal.tsx`
 - Create: `src/components/ui/feedback/alert.tsx`, `confirm-dialog.tsx`, `empty-state.tsx`, `tooltip.tsx`
 - Reference: `<ERP>/src/components/{Modal,ModalPortal}.tsx` (400 + 24 líneas), `<ERP>/src/components/ui/feedback/*`
 
 **Interfaces:**
+
 - Consumes: `Button` (T4), tokens (T2).
 - Produces:
   - `Modal({ open: boolean, onClose: () => void, title: string, size?: "sm" | "md" | "lg" | "xl", children, footer? })` — **client component**.
@@ -1041,13 +1086,19 @@ export function Modal({
         >
           <header className="flex items-center justify-between border-b border-border px-5 py-3">
             <h2 className="t-display text-base">{title}</h2>
-            <button onClick={onClose} aria-label="Cerrar" className="rounded p-1 hover:bg-surface-hover">
+            <button
+              onClick={onClose}
+              aria-label="Cerrar"
+              className="rounded p-1 hover:bg-surface-hover"
+            >
               <X className="size-4" />
             </button>
           </header>
           <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
           {footer ? (
-            <footer className="border-t border-border px-5 py-3">{footer}</footer>
+            <footer className="border-t border-border px-5 py-3">
+              {footer}
+            </footer>
           ) : null}
         </div>
       </div>
@@ -1088,10 +1139,12 @@ git commit -m "feat(visual): portar Modal y componentes de realimentacion del ER
 ### Task 8: Marco de página
 
 **Files:**
+
 - Create: `src/components/ui/layout/page-layout.tsx`, `page-header.tsx`
 - Reference: `<ERP>/src/components/layout/PageLayout.tsx` (439 líneas), `<ERP>/src/components/common/PageHeader.tsx` (90)
 
 **Interfaces:**
+
 - Consumes: `SectionHeader` (T5), `Button` (T4), tokens (T2).
 - Produces:
   - `PageHeader({ eyebrow?: string, title: string, subtitle?: string, actions?: ReactNode })` — server component.
@@ -1127,9 +1180,13 @@ export function PageHeader({
       <div>
         {eyebrow ? <p className="t-eyebrow mb-1">{eyebrow}</p> : null}
         <h1 className="t-display text-2xl">{title}</h1>
-        {subtitle ? <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p> : null}
+        {subtitle ? (
+          <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+        ) : null}
       </div>
-      {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
+      {actions ? (
+        <div className="flex items-center gap-2">{actions}</div>
+      ) : null}
     </header>
   );
 }
@@ -1186,12 +1243,14 @@ git commit -m "feat(visual): marco de pagina (PageLayout, PageHeader) del ERP"
 ### Task 9: Sidebar
 
 **Files:**
+
 - Create: `src/components/app-sidebar.tsx`
 - Modify: `src/app/[locale]/(app)/layout.tsx` (extraer la sidebar, dejar `requireOrg` + gate + header)
 - Reference: `<ERP>/src/components/Sidebar.tsx` (725 líneas)
 - Reference: `<scratchpad>/erp-ref/estado-sidebar-colapsada.png`
 
 **Interfaces:**
+
 - Consumes: tokens `--sidebar-*` (T2), `Tooltip` (T7).
 - Produces: `AppSidebar({ sections, orgName, logoUrl? })` donde `sections: Array<{ label: string; items: Array<{ href: string; label: string; icon: ReactNode; badge?: number }> }>`. **El `icon` llega ya renderizado como `ReactNode`** — nunca como componente.
 
@@ -1238,7 +1297,9 @@ Client component con persistencia:
 const [collapsed, setCollapsed] = useState<boolean>(() => {
   if (typeof window === "undefined") return false;
   try {
-    return JSON.parse(window.localStorage.getItem("sidebarCollapsed") ?? "false");
+    return JSON.parse(
+      window.localStorage.getItem("sidebarCollapsed") ?? "false",
+    );
   } catch {
     window.localStorage.removeItem("sidebarCollapsed");
     return false;
@@ -1287,11 +1348,13 @@ git commit -m "feat(visual): clonar la sidebar del ERP (piel Linear, colapso, ca
 ### Task 10: Header
 
 **Files:**
+
 - Modify: `src/components/app-header.tsx` (65 líneas → versión del ERP)
 - Modify: `src/app/[locale]/(app)/layout.tsx` (mover aquí el `ThemeSwitcher` y el selector de idioma)
 - Reference: `<ERP>/src/components/Header.tsx` (358), `<ERP>/src/components/{CobranzasIndicator,ExchangeRatesWidget,UserMenuDropdown,ThemeSwitcher}.tsx`
 
 **Interfaces:**
+
 - Consumes: `AppShell` (T9 paso 7) como dueño del estado del cajón, `Tooltip` (T7), `Badge` (T5).
 - Produces: `AppHeader({ lowStockCount, receivableTotal, orgName, userEmail, onToggleDrawer })` — client component; `onToggleDrawer` lo inyecta `AppShell`.
 
@@ -1343,10 +1406,12 @@ git commit -m "feat(visual): clonar el header del ERP (usuario, tasas, tema, idi
 ### Task 11: Cierre de la fundación
 
 **Files:**
+
 - Modify: `ESTADO.md` (local, gitignored)
 - Reference: todas las anteriores
 
 **Interfaces:**
+
 - Consumes: todo.
 - Produces: fundación verificada y desplegada; punto de partida de los planes de la fase 4.
 
@@ -1399,12 +1464,12 @@ git push
 
 Con la fundación en verde, se escribe un plan por lote de la fase 4, cotejando cada captura de la Tarea 1 con la pantalla real de Cloud:
 
-| Plan | Lote | Pantallas |
-|---|---|---|
-| `2026-XX-XX-paridad-visual-lote-1.md` | Listas maestras | Ventas, Compras, Inventario, CxC, CxP |
-| `…-lote-2.md` | Detalle y documentos | Producción, Kardex, Salidas Internas, Trazabilidad, Compromisos |
-| `…-lote-3.md` | Analítica (ECharts) | Dashboard, Panel del Negocio, Top Clientes |
-| `…-lote-4.md` | Finanzas | Estados de Cuenta, Conciliación, Modelos Fiscales, Vehículos |
-| `…-lote-5.md` | Administración y acceso | Configuración, Catálogos, Auditoría, Sorteos, Login |
+| Plan                                  | Lote                    | Pantallas                                                       |
+| ------------------------------------- | ----------------------- | --------------------------------------------------------------- |
+| `2026-XX-XX-paridad-visual-lote-1.md` | Listas maestras         | Ventas, Compras, Inventario, CxC, CxP                           |
+| `…-lote-2.md`                         | Detalle y documentos    | Producción, Kardex, Salidas Internas, Trazabilidad, Compromisos |
+| `…-lote-3.md`                         | Analítica (ECharts)     | Dashboard, Panel del Negocio, Top Clientes                      |
+| `…-lote-4.md`                         | Finanzas                | Estados de Cuenta, Conciliación, Modelos Fiscales, Vehículos    |
+| `…-lote-5.md`                         | Administración y acceso | Configuración, Catálogos, Auditoría, Sorteos, Login             |
 
 El lote 1 es el que valida la fundación sobre pantallas reales: si `DataTable`, `PageLayout` y `Modal` cuadran ahí, los 17 restantes son repetición.
