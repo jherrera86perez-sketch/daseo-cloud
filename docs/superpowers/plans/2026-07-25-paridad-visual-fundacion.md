@@ -591,7 +591,7 @@ git commit -m "feat(visual): tipografia y lenguaje de interaccion Linear del ERP
   - `FormField({ label: string, htmlFor: string, error?: string, hint?: string, required?: boolean, children: ReactNode })`.
   - Todos reexportados desde `src/components/ui/forms/index.ts`.
 
-- [ ] **Step 1: Leer los originales del ERP**
+- [x] **Step 1: Leer los originales del ERP**
 
 ```bash
 cd "C:/Mi Carpeta/Herramientas/Laika/daseo-erp"
@@ -600,7 +600,7 @@ cat src/components/ui/forms/Button.tsx src/components/ui/forms/Input.tsx src/com
 
 Anota qué variantes y tamaños existen realmente. **No inventes variantes que el ERP no tiene** — y no omitas las que tiene.
 
-- [ ] **Step 2: Portar `Button`**
+- [x] **Step 2: Portar `Button`**
 
 Copia el marcado y las clases literalmente; adapta sólo las costuras. Estructura esperada:
 
@@ -651,11 +651,11 @@ export function Button({
 
 **Sin `"use client"`**: un `<button>` con `type="submit"` dentro de un form de server action no necesita cliente. Los tamaños exactos (`h-8/9/10`, paddings) salen del original, no de este esqueleto.
 
-- [ ] **Step 3: Portar el resto de primitivas**
+- [x] **Step 3: Portar el resto de primitivas**
 
 `Input`, `Textarea`, `Select` con `forwardRef` y sin `"use client"`. `Checkbox` y `Switch` **sí** llevan `"use client"` (manejan estado visual). `FormField` es server component.
 
-- [ ] **Step 4: Crear el barril**
+- [x] **Step 4: Crear el barril**
 
 ```ts
 // src/components/ui/forms/index.ts
@@ -667,7 +667,7 @@ export { Checkbox } from "./checkbox";
 export { Switch } from "./switch";
 ```
 
-- [ ] **Step 5: Migrar los consumidores del botón viejo**
+- [x] **Step 5: Migrar los consumidores del botón viejo**
 
 ```bash
 cd "C:/dev/crmventas" && grep -rln "from \"@/components/ui/button\"" --include=*.tsx src/ | wc -l
@@ -675,7 +675,7 @@ cd "C:/dev/crmventas" && grep -rln "from \"@/components/ui/button\"" --include=*
 
 Reapunta cada import a `@/components/ui/forms`. Si alguna llamada usa una variante que el botón viejo tenía y el del ERP no (p. ej. `variant="outline"`), mapéala a la más cercana del ERP y **anótalo en el commit**; no inventes una variante nueva.
 
-- [ ] **Step 6: Borrar los primitivos viejos ya migrados**
+- [x] **Step 6: Borrar los primitivos viejos ya migrados**
 
 ```bash
 cd "C:/dev/crmventas" && rm src/components/ui/button.tsx src/components/ui/input.tsx src/components/ui/label.tsx
@@ -683,7 +683,7 @@ cd "C:/dev/crmventas" && rm src/components/ui/button.tsx src/components/ui/input
 
 `card.tsx` se borra en la Tarea 5, `sonner.tsx` se conserva.
 
-- [ ] **Step 7: Verificar**
+- [x] **Step 7: Verificar**
 
 ```bash
 cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build && npm run test:e2e
@@ -691,7 +691,7 @@ cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build && npm r
 
 Expected: typecheck limpio (los imports rotos aparecen aquí), 268 unit PASS, **34 E2E PASS**. Los E2E hacen clic en botones por texto y rol: si un botón portado cambió su rol accesible, se cae aquí.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 cd "C:/dev/crmventas"
@@ -728,14 +728,14 @@ git commit -m "feat(visual): portar primitivas de formulario del ERP"
 > Controla la altura de fila de la tabla, así que su valor lo consume `DataTable` (T6) vía prop
 > `density`. Es la clase de brecha que la fase 0 existía para encontrar.
 
-- [ ] **Step 1: Leer los originales**
+- [x] **Step 1: Leer los originales**
 
 ```bash
 cd "C:/Mi Carpeta/Herramientas/Laika/daseo-erp"
 cat src/components/Card.tsx src/components/Badge.tsx src/components/StatCard.tsx src/components/ui/KpiStrip.tsx
 ```
 
-- [ ] **Step 2: Comprobar la superficie del `Card` actual de Cloud**
+- [x] **Step 2: Comprobar la superficie del `Card` actual de Cloud**
 
 ```bash
 cd "C:/dev/crmventas" && cat src/components/ui/card.tsx && grep -rn "CardHeader\|CardTitle\|CardContent\|CardFooter\|CardDescription" --include=*.tsx src/ | wc -l
@@ -743,7 +743,7 @@ cd "C:/dev/crmventas" && cat src/components/ui/card.tsx && grep -rn "CardHeader\
 
 El `Card` nuevo **debe exportar los mismos sub-componentes que ya se usan**. Si el del ERP no tiene `CardDescription` y Cloud lo usa, se añade como envoltorio con la tipografía del ERP — no se rompen los consumidores.
 
-- [ ] **Step 3: Portar `Card`**
+- [x] **Step 3: Portar `Card`**
 
 Aplicando el hover Linear (sólo `border-color` y fondo, sin `transform` ni sombra grande):
 
@@ -778,7 +778,7 @@ export function Card({
 }
 ```
 
-- [ ] **Step 4: Portar `Badge`**
+- [x] **Step 4: Portar `Badge`**
 
 El mapa de tonos se deriva de los tokens de la Tarea 2; los `-muted` son fondos al 10 % de opacidad:
 
@@ -820,11 +820,11 @@ export function Badge({
 
 Los pares fondo/texto salen de las escalas `50`/`800` del ERP (`index.css:363-415`) y están medidos por encima de 7:1 — no comprometen el gate de accesibilidad. **En modo oscuro estos hex fijos no funcionan**: añade en el mismo archivo un `dark:` por tono usando las escalas `900`/`300` (p. ej. `dark:bg-[#052E16] dark:text-[#4ADE80]` para success).
 
-- [ ] **Step 5: Portar `StatCard`, `KpiStrip` y los tres átomos**
+- [x] **Step 5: Portar `StatCard`, `KpiStrip` y los tres átomos**
 
 `StatCard` y `KpiStrip` usan `.t-num-display` para la cifra y `.t-eyebrow` para la etiqueta — es la firma visual del ERP. Léelos del original antes de escribirlos; las medidas exactas (altura de tarjeta, separación entre KPIs) no se inventan.
 
-- [ ] **Step 6: Verificar**
+- [x] **Step 6: Verificar**
 
 ```bash
 cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build && npm run test:e2e
@@ -832,7 +832,7 @@ cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build && npm r
 
 Expected: todo verde, 34 E2E PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd "C:/dev/crmventas"
