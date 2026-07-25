@@ -34,7 +34,9 @@ export default async function ProductDetailPage({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">{product.name}</h1>
+        <h1 className="t-display text-2xl tracking-[-0.025em]">
+          {product.name}
+        </h1>
         <Button asChild variant="outline" size="sm">
           <Link href={`/products/${id}/edit`}>
             <Pencil className="size-4" aria-hidden /> {t("edit")}
@@ -113,20 +115,22 @@ export default async function ProductDetailPage({
             <p className="text-sm text-muted-foreground">{t("noMovements")}</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="border-b text-left text-xs text-muted-foreground">
+              <table className="w-full border-collapse text-left text-[13px]">
+                <thead className="bg-surface-100 text-left">
                   <tr>
-                    <th className="py-2 pr-3 font-medium">{t("date")}</th>
-                    <th className="py-2 pr-3 text-right font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                      {t("date")}
+                    </th>
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                       {t("qty")}
                     </th>
-                    <th className="py-2 pr-3 text-right font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                       {t("unitCost")}
                     </th>
-                    <th className="py-2 pr-3 text-right font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                       {t("balance")}
                     </th>
-                    <th className="py-2 text-right font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                       {t("avgCost")}
                     </th>
                   </tr>

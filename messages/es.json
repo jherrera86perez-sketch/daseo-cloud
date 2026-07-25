@@ -893,7 +893,11 @@
         "draft": "Borrador",
         "confirmed": "Confirmada",
         "cancelled": "Cancelada"
-      }
+      },
+      "order": "Orden",
+      "date": "Fecha",
+      "quantity": "Cantidad",
+      "status": "Estado"
     },
     "recipes": {
       "title": "Recetas",
