@@ -1,4 +1,5 @@
 import { getTranslations, getLocale } from "next-intl/server";
+import { TH } from "@/components/ui/data-table";
 import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
 import {
@@ -39,8 +40,12 @@ export default async function ReceivablesPage({
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+          <h1 className="t-display text-2xl tracking-[-0.025em]">
+            {t("title")}
+          </h1>
+          <p className="t-display-italic mt-1.5 text-sm text-muted-foreground">
+            {t("subtitle")}
+          </p>
         </div>
         {/* ERP: tipo=CLIENTE|PDV agrupa CxC bajo su propio filtro */}
         <div className="flex rounded-md border p-0.5 text-sm">
@@ -64,34 +69,34 @@ export default async function ReceivablesPage({
 
       {/* Resumen de cobranza (GET /cobros/resumen del ERP) */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="rounded-md border p-3">
-          <p className="text-xs text-muted-foreground">{t("totalOwed")}</p>
-          <p className="text-lg font-bold" data-numeric="">
+        <div className="rounded-md border border-border bg-card p-4">
+          <p className="t-eyebrow">{t("totalOwed")}</p>
+          <p className="t-num-display mt-1 text-[20px]" data-numeric="">
             {centsToDecimalString(resumen.total_adeudado_base_cents)}
           </p>
         </div>
-        <div className="rounded-md border p-3">
-          <p className="text-xs text-muted-foreground">{t("numSales")}</p>
-          <p className="text-lg font-bold" data-numeric="">
+        <div className="rounded-md border border-border bg-card p-4">
+          <p className="t-eyebrow">{t("numSales")}</p>
+          <p className="t-num-display mt-1 text-[20px]" data-numeric="">
             {resumen.num_ventas}
           </p>
         </div>
-        <div className="rounded-md border p-3">
-          <p className="text-xs text-muted-foreground">{t("numCustomers")}</p>
-          <p className="text-lg font-bold" data-numeric="">
+        <div className="rounded-md border border-border bg-card p-4">
+          <p className="t-eyebrow">{t("numCustomers")}</p>
+          <p className="t-num-display mt-1 text-[20px]" data-numeric="">
             {resumen.num_clientes}
           </p>
         </div>
-        <div className="rounded-md border p-3">
-          <p className="text-xs text-muted-foreground">{t("maxDays")}</p>
-          <p className="text-lg font-bold" data-numeric="">
+        <div className="rounded-md border border-border bg-card p-4">
+          <p className="t-eyebrow">{t("maxDays")}</p>
+          <p className="t-num-display mt-1 text-[20px]" data-numeric="">
             {resumen.max_dias_atraso}
           </p>
         </div>
-        <div className="rounded-md border p-3">
-          <p className="text-xs text-muted-foreground">{t("overdueCount")}</p>
+        <div className="rounded-md border border-border bg-card p-4">
+          <p className="t-eyebrow">{t("overdueCount")}</p>
           <p
-            className={`text-lg font-bold ${resumen.num_vencidas > 0 ? "text-destructive" : ""}`}
+            className={`t-num-display mt-1 text-[20px] ${resumen.num_vencidas > 0 ? "text-destructive" : ""}`}
             data-numeric=""
           >
             {resumen.num_vencidas}
@@ -120,29 +125,24 @@ export default async function ReceivablesPage({
               </span>
             </header>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="border-b text-left">
+              <table className="w-full border-collapse text-left text-[13px]">
+                <thead className="bg-surface-100 text-left">
                   <tr>
-                    <th className="px-4 py-2 font-medium">Nº</th>
-                    <th className="px-4 py-2 font-medium">{t("saleDate")}</th>
-                    <th className="px-4 py-2 font-medium">
-                      {t("daysLateCol")}
-                    </th>
-                    <th className="px-4 py-2 text-right font-medium">
-                      {t("total")}
-                    </th>
-                    <th className="px-4 py-2 text-right font-medium">
-                      {t("paid")}
-                    </th>
-                    <th className="px-4 py-2 text-right font-medium">
-                      {t("balance")}
-                    </th>
+                    <TH>Nº</TH>
+                    <TH>{t("saleDate")}</TH>
+                    <TH>{t("daysLateCol")}</TH>
+                    <TH numeric>{t("total")}</TH>
+                    <TH numeric>{t("paid")}</TH>
+                    <TH numeric>{t("balance")}</TH>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-surface-100">
                   {g.ventas.map((s) => (
-                    <tr key={s.id} className="hover:bg-accent">
-                      <td className="px-4 py-2" data-numeric="">
+                    <tr
+                      key={s.id}
+                      className="transition-colors hover:bg-surface-hover"
+                    >
+                      <td data-numeric="">
                         <Link
                           href={`/sales/${s.id}`}
                           className="font-medium underline-offset-4 hover:underline"
@@ -150,26 +150,23 @@ export default async function ReceivablesPage({
                           {s.series}-{s.number}
                         </Link>
                       </td>
-                      <td className="px-4 py-2 text-muted-foreground">
+                      <td className="text-muted-foreground">
                         {fmtDate.format(s.soldAt ?? s.createdAt)}
                       </td>
-                      <td className="px-4 py-2">
+                      <td>
                         <span
                           className={`rounded-full px-2 py-0.5 text-xs ${atrasoBadge(s.dias_atraso)}`}
                         >
                           {s.dias_atraso}
                         </span>
                       </td>
-                      <td className="px-4 py-2 text-right" data-numeric="">
+                      <td className="text-right" data-numeric="">
                         {centsToDecimalString(s.totalCents)} {s.currency}
                       </td>
-                      <td className="px-4 py-2 text-right" data-numeric="">
+                      <td className="text-right" data-numeric="">
                         {centsToDecimalString(s.paidCents)}
                       </td>
-                      <td
-                        className="px-4 py-2 text-right font-medium"
-                        data-numeric=""
-                      >
+                      <td className="text-right font-medium" data-numeric="">
                         {centsToDecimalString(s.balanceCents)} {s.currency}
                       </td>
                     </tr>
