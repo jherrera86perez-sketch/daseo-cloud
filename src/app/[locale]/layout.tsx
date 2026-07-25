@@ -5,7 +5,6 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -54,10 +53,7 @@ export default async function LocaleLayout({
     >
       <body className="flex min-h-dvh flex-col">
         <ThemeProvider>
-          <NextIntlClientProvider>
-            {children}
-            <Toaster />
-          </NextIntlClientProvider>
+          <NextIntlClientProvider>{children}</NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>

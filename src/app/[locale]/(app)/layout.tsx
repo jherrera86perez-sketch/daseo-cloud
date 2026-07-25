@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { requireOrg } from "@/lib/session";
 import { Link } from "@/i18n/navigation";
 import { AppHeader } from "@/components/app-header";
+import { Toaster } from "@/components/ui/sonner";
 import {
   LayoutDashboard,
   Settings,
@@ -219,6 +220,7 @@ export default async function AppLayout({
           {children}
         </main>
       </div>
+      <Toaster />
     </div>
   );
 }
