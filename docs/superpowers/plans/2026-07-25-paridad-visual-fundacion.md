@@ -163,7 +163,7 @@ git commit -m "docs: inventario de referencias visuales del ERP (22 pantallas + 
 - Consumes: `<scratchpad>/erp-ref/ventas.png` de la Tarea 1 como referencia de verificación.
 - Produces: los tokens semánticos existentes (`--background`, `--card`, `--border`, `--primary`, `--muted-foreground`, `--sidebar*`…) con valores del ERP, más los tokens nuevos `--surface-100`, `--surface-200`, `--surface-hover`, `--border-hover`, `--btn-*`, `--shadow-*`, `--chart-*`, y las escalas 50–900 de success/warning/danger/info. Todas las tareas siguientes los consumen.
 
-- [ ] **Step 1: Reemplazar el bloque `:root` de tema claro**
+- [x] **Step 1: Reemplazar el bloque `:root` de tema claro**
 
 En `src/app/globals.css`, sustituye el `:root` completo por:
 
@@ -270,7 +270,7 @@ En `src/app/globals.css`, sustituye el `:root` completo por:
 }
 ```
 
-- [ ] **Step 2: Reemplazar el bloque `.dark`**
+- [x] **Step 2: Reemplazar el bloque `.dark`**
 
 Valores tomados de `html[data-theme="dark"]` (index.css:599). Nota que en oscuro el navy **se aclara** a `#5B8BD8` y el amber a `#B58A5C`, porque el navy original no contrasta sobre `#08090A`:
 
@@ -349,7 +349,7 @@ Valores tomados de `html[data-theme="dark"]` (index.css:599). Nota que en oscuro
 }
 ```
 
-- [ ] **Step 3: Exponer los tokens nuevos a Tailwind**
+- [x] **Step 3: Exponer los tokens nuevos a Tailwind**
 
 En el bloque `@theme inline`, **añade** (sin borrar los existentes) al final, antes de los `--radius-*`:
 
@@ -376,7 +376,7 @@ Y **sustituye** el bloque de radios por la escala del ERP:
 --radius-2xl: 20px;
 ```
 
-- [ ] **Step 4: Verificar que compila y la suite no se movió**
+- [x] **Step 4: Verificar que compila y la suite no se movió**
 
 ```bash
 cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build
@@ -384,7 +384,7 @@ cd "C:/dev/crmventas" && npm run typecheck && npm test && npm run build
 
 Expected: typecheck limpio, 268 tests PASS, build OK. **Si algún test falla, este paso rompió algo que no debía** — los tokens no tocan lógica.
 
-- [ ] **Step 5: Verificación visual contra la referencia**
+- [x] **Step 5: Verificación visual contra la referencia**
 
 ```bash
 cd "C:/dev/crmventas" && npm run dev
@@ -394,7 +394,7 @@ Abre `/sales` y compáralo con `<scratchpad>/erp-ref/ventas.png`. **Sin haber to
 
 Si el fondo sigue teal o crema, el `@theme inline` no está leyendo los valores nuevos: revisa que los nombres de `:root` coincidan exactamente con los que el puente referencia.
 
-- [ ] **Step 6: Medir contraste del texto atenuado**
+- [x] **Step 6: Medir contraste del texto atenuado**
 
 `--muted-foreground: #8B8D94` sobre `--background: #FAFAFA` da ≈2.8:1, por debajo de 4.5:1. Busca sus usos:
 
@@ -404,7 +404,7 @@ cd "C:/dev/crmventas" && grep -rn "text-muted-foreground" --include=*.tsx src/ |
 
 Revisa que ninguno sea **texto esencial** (valores de datos, mensajes de error, etiquetas de formulario). Si lo es, ese uso concreto pasa a `text-foreground` o `--color-text-secondary` (`#5C5E66`, ≈6.9:1). Anota en el commit cuántos usos se reclasificaron.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd "C:/dev/crmventas"
