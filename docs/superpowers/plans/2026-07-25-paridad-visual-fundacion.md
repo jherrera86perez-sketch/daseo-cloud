@@ -688,8 +688,9 @@ git commit -m "feat(visual): portar primitivas de formulario del ERP"
 
 **Files:**
 - Create: `src/components/ui/card.tsx` (reemplaza el actual), `badge.tsx`, `stat-card.tsx`, `kpi-strip.tsx`
-- Create: `src/components/ui/atoms/section-header.tsx`, `status-dot.tsx`, `table-empty-row.tsx`
+- Create: `src/components/ui/atoms/section-header.tsx`, `status-dot.tsx`, `table-empty-row.tsx`, `density-toggle.tsx`
 - Reference: `<ERP>/src/components/{Card,Badge,StatCard}.tsx`, `<ERP>/src/components/ui/KpiStrip.tsx`, `<ERP>/src/components/ui/atoms/*`
+- Reference: `<scratchpad>/erp-ref/ventas.jpg` (la barra de herramientas con el DensityToggle)
 
 **Interfaces:**
 - Consumes: tokens (T2), utilidades tipográficas (T3), `cn` de `@/lib/utils`.
@@ -699,7 +700,14 @@ git commit -m "feat(visual): portar primitivas de formulario del ERP"
   - `StatCard({ label: string, value: string, hint?: string, tone?, icon?: ReactNode })`.
   - `KpiStrip({ items: Array<{ label: string; value: string; tone? }> })`.
   - `SectionHeader({ eyebrow?: string, title: string, action?: ReactNode })`, `StatusDot({ tone })`, `TableEmptyRow({ colSpan: number, message: string })`.
-- Todos **server components**, sin `"use client"`.
+  - `DensityToggle({ value: "compacta" | "comoda" | "espaciosa", onChange })` — **client component**, el único de esta tarea.
+- El resto son **server components**, sin `"use client"`.
+
+> **Añadido tras la Tarea 1.** El `DensityToggle` no estaba en el inventario original: la captura de
+> referencia lo reveló en la barra de herramientas de **7 pantallas** (Ventas, CxC, CxP, Compras,
+> Inventario, Producción, Auditoría) con las opciones literales `Compacta · Cómoda · Espaciosa`.
+> Controla la altura de fila de la tabla, así que su valor lo consume `DataTable` (T6) vía prop
+> `density`. Es la clase de brecha que la fase 0 existía para encontrar.
 
 - [ ] **Step 1: Leer los originales**
 
@@ -822,8 +830,12 @@ git commit -m "feat(visual): portar tarjetas, badges, StatCard y KpiStrip del ER
 - Reference: `<ERP>/src/components/ui/DataTable.tsx` (487 líneas)
 
 **Interfaces:**
-- Consumes: `TableEmptyRow` (T5), tokens (T2).
-- Produces: `DataTable({ children, className? })`, `THead`, `TRow`, `TH({ align?, numeric? })`, `TD({ align?, numeric? })` — **primitivas de presentación puras**, server components, sin estado.
+- Consumes: `TableEmptyRow` y `DensityToggle` (T5), tokens (T2).
+- Produces: `DataTable({ children, density?: "compacta" | "comoda" | "espaciosa", className? })`, `THead`, `TRow`, `TH({ align?, numeric? })`, `TD({ align?, numeric? })` — **primitivas de presentación puras**, server components, sin estado.
+
+`density` sólo cambia el padding vertical de las celdas (`py-1` / `py-2` / `py-3`); el valor por defecto
+es `"comoda"`, que es el que el ERP trae seleccionado. Quién es dueño del estado (searchParams o
+`localStorage`) se decide en el lote 1, con la pantalla de Ventas delante.
 
 **Excepción documentada del spec:** el `DataTable` del ERP trae orden, filtrado y paginación en cliente. **No se porta esa parte.** Varias listas de Cloud (Ventas, Compras, Estados de Cuenta) ya resuelven eso en servidor con `searchParams` — es mejor, ya está testeado, y visualmente es indistinguible. Se porta **sólo la piel**.
 
