@@ -96,7 +96,11 @@ test.describe.serial("ventas: multi-moneda end-to-end", () => {
     await openNav(page);
     await page.getByRole("link", { name: /panel/i }).click();
     await expect(page.getByText("8000.00")).toBeVisible(); // 25 USD × 320
-    await expect(page.getByText(/cuentas por cobrar/i)).toBeVisible();
+    // El hero del panel anade su propio rotulo "Cuentas por cobrar": se apunta
+    // al titulo exacto de la tarjeta para no casar con ambos.
+    await expect(
+      page.getByText("Cuentas por cobrar", { exact: true }),
+    ).toBeVisible();
     await expect(page.getByText(/15\.00 USD/).first()).toBeVisible();
   });
 });

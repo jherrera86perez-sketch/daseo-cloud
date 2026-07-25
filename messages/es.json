@@ -602,7 +602,20 @@
       "lowStock": "{count} producto(s) bajo el stock mínimo — ver productos",
       "topCustomers": "Top clientes (año)",
       "noSales": "Sin ventas confirmadas aún.",
-      "commitmentsDue": "{count} compromiso(s) sin cumplir este período"
+      "commitmentsDue": "{count} compromiso(s) sin cumplir este período",
+      "hero": {
+        "receivables": "Cuentas por cobrar · al {date}",
+        "concentrationWarn": "{pct}% en un solo cliente",
+        "context": "{invoices, plural, one {# factura} other {# facturas}} · {customers, plural, one {# cliente} other {# clientes}}",
+        "bankBalance": "Saldo en banco",
+        "concentration": "Concentración",
+        "concentrationHint": "{pct}% del total · riesgo de caja",
+        "banked": "Bancarización",
+        "bankedHint": "ingresos cobrados por banco · ONAT"
+      },
+      "salesTrend": "Ventas facturadas",
+      "invoiced": "Facturado",
+      "collected": "Cobrado"
     },
     "customers": {
       "title": "Clientes",
