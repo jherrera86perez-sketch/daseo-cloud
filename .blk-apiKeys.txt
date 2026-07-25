@@ -1,0 +1,16 @@
+        {isAdmin && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{tk("title")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ApiKeysCard
+                keys={apiKeysRows.map((k) => ({
+                  id: k.id,
+                  name: k.name,
+                  prefix: k.prefix,
+                }))}
+              />
+            </CardContent>
+          </Card>
+        )}

@@ -28,8 +28,8 @@ test.describe.serial("API pública end-to-end", () => {
     await page.waitForURL(/\/customers\/[0-9a-f-]+$/);
 
     // generar API key
-    await openNav(page);
-    await page.getByRole("link", { name: /configuración/i }).click();
+    // Las API keys pasaron a la seccion "Usuarios" de Configuracion
+    await page.goto("/settings?seccion=usuarios");
     await page.getByPlaceholder(/laika/i).fill("Bot E2E");
     await page.getByRole("button", { name: /generar key/i }).click();
     const keyEl = page.locator("code", { hasText: /^dsk_/ });
@@ -63,7 +63,9 @@ test.describe.serial("API pública end-to-end", () => {
     expect(revoked.status()).toBe(401);
 
     // Telegram: umbrales de cobranza (paridad ERP cobranza_dias_min/monto_min)
-    // se guardan junto al token/chat en el mismo notify_settings
+    // se guardan junto al token/chat en el mismo notify_settings.
+    // Vive en la seccion "Sistema" de Configuracion.
+    await page.goto("/settings?seccion=sistema");
     const tgForm = page
       .locator("form")
       .filter({ has: page.getByPlaceholder(/token del bot/i) });

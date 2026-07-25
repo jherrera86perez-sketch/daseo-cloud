@@ -17,8 +17,6 @@ import {
   Truck,
   Landmark,
   Scale,
-  UsersRound,
-  ScrollText,
   Coins,
   Wallet,
   Banknote,
@@ -151,11 +149,9 @@ export default async function AppLayout({
     },
     {
       title: t("section.settings"),
-      items: [
-        { href: "/employees", label: t("employees"), icon: UsersRound },
-        { href: "/audit", label: t("audit"), icon: ScrollText },
-        { href: "/settings", label: t("settings"), icon: Settings },
-      ],
+      // El ERP no tiene Empleados ni Auditoría como items propios: viven
+      // DENTRO de Configuración, y así se han montado aquí.
+      items: [{ href: "/settings", label: t("settings"), icon: Settings }],
     },
   ];
   const db = getDb();

@@ -1333,6 +1333,21 @@
       "linkCopied": "Enlace copiado — mándalo por WhatsApp",
       "pendingCount": "{count} invitación(es) pendiente(s)",
       "baseCurrency": "Moneda base"
+    },
+    "settings": {
+      "title": "Configuración del Sistema",
+      "subtitle": "Administración general, usuarios y preferencias",
+      "sections": "Secciones",
+      "s_empresa": "Empresa",
+      "d_empresa": "Datos y tasas",
+      "s_empleados": "Empleados",
+      "d_empleados": "Trabajadores de la empresa",
+      "s_usuarios": "Usuarios",
+      "d_usuarios": "Acceso y permisos del sistema",
+      "s_auditoria": "Auditoría",
+      "d_auditoria": "Registro de actividad",
+      "s_sistema": "Sistema",
+      "d_sistema": "Etapas, asistente y avisos"
     }
   }
 }

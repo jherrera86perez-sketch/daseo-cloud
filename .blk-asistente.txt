@@ -1,0 +1,16 @@
+        {isAdmin && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{ta("title")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AssistantCard
+                baseCurrency={settings?.baseCurrency ?? "CUP"}
+                initial={{
+                  salesGoal: notify.salesGoalBase ?? "",
+                  overdueLimit: notify.overdueLimitBase ?? "",
+                }}
+              />
+            </CardContent>
+          </Card>
+        )}

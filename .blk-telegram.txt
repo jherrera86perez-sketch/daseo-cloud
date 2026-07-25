@@ -1,0 +1,18 @@
+        {isAdmin && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{tg("title")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TelegramCard
+                initial={{
+                  botToken: notify.telegramBotToken ?? "",
+                  chatId: notify.telegramChatId ?? "",
+                  cobranzaDiasMin: notify.cobranzaDiasMin?.toString() ?? "",
+                  cobranzaMontoMin: notify.cobranzaMontoMinCents
+                    ? centsToDecimalString(BigInt(notify.cobranzaMontoMinCents))
+                    : "",
+                }}
+              />
+            </CardContent>
+          </Card>
