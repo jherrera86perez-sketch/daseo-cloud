@@ -195,7 +195,7 @@ export function OutflowsView({
               <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                 {t(key)}
               </p>
-              <p className="text-xl font-bold" data-numeric="">
+              <p className="t-num-display text-[22px]" data-numeric="">
                 {value}
               </p>
             </CardContent>
@@ -219,24 +219,28 @@ export function OutflowsView({
               <table className="w-full text-sm">
                 <thead className="border-b bg-muted text-left">
                   <tr>
-                    <th className="px-2 py-1.5 font-medium">{t("colDate")}</th>
-                    <th className="px-2 py-1.5 font-medium">{t("colType")}</th>
-                    <th className="px-2 py-1.5 font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                      {t("colDate")}
+                    </th>
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                      {t("colType")}
+                    </th>
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                       {t("colDestination")}
                     </th>
-                    <th className="px-2 py-1.5 font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                       {t("colProducts")}
                     </th>
-                    <th className="px-2 py-1.5 text-right font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                       {t("colProductsValue")}
                     </th>
-                    <th className="px-2 py-1.5 text-right font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                       {t("colCash")}
                     </th>
                     <th className="px-2 py-1.5" />
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-surface-100">
                   {filtradas.map((s) => (
                     <tr key={s.id}>
                       <td className="px-2 py-1.5 font-mono text-xs">

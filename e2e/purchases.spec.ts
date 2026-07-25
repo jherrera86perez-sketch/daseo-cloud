@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openNav } from "./nav";
 
 // F2: proveedor → compra USD con lote → confirmar recepción → stock al costo
 // en base + lote visible en el producto → pago parcial al proveedor.
@@ -17,12 +18,14 @@ test.describe.serial("compras end-to-end", () => {
     await page.waitForURL(/\/dashboard/);
 
     // tasa USD 320
+    await openNav(page);
     await page.getByRole("link", { name: /configuración/i }).click();
     await page.getByPlaceholder(/ej\. 320/i).fill("320");
     await page.getByRole("button", { name: /registrar tasa/i }).click();
     await expect(page.getByText(/1 USD = 320/)).toBeVisible();
 
     // producto insumo
+    await openNav(page);
     await page.getByRole("link", { name: /productos/i }).click();
     await page.getByRole("link", { name: /nuevo producto/i }).click();
     await page.getByLabel(/nombre \*/i).fill("SLES F2");
@@ -33,6 +36,7 @@ test.describe.serial("compras end-to-end", () => {
     const productUrl = page.url();
 
     // proveedor
+    await openNav(page);
     await page.getByRole("link", { name: /proveedores/i }).click();
     await page.getByRole("link", { name: /nuevo proveedor/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Química E2E");
@@ -40,6 +44,7 @@ test.describe.serial("compras end-to-end", () => {
     await page.waitForURL(/\/suppliers/);
 
     // compra: 100 kg @ 1.50 USD con lote
+    await openNav(page);
     await page.getByRole("link", { name: /^compras$/i }).click();
     await page.getByRole("link", { name: /nueva compra/i }).click();
     await page.getByLabel(/moneda/i).selectOption("USD");

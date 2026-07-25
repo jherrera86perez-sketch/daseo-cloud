@@ -27,7 +27,7 @@ export default async function EmployeesPage() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        <h1 className="t-display text-2xl tracking-[-0.025em]">{t("title")}</h1>
         <p className="text-sm text-muted-foreground" data-numeric="">
           {t("payrollTotal")}: <strong>{centsToDecimalString(payroll)}</strong>
         </p>
@@ -39,25 +39,33 @@ export default async function EmployeesPage() {
           .map((e) => ({ id: e.id, name: e.name }))}
       />
       {rows.length === 0 ? (
-        <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+        <div className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
           {t("empty")}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-md border">
           <table className="w-full text-sm">
-            <thead className="border-b bg-muted/50 text-left">
+            <thead className="bg-surface-100 text-left">
               <tr>
-                <th className="px-4 py-2 font-medium">{t("name")}</th>
-                <th className="px-4 py-2 font-medium">{t("role")}</th>
-                <th className="px-4 py-2 text-right font-medium">
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("name")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("role")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                   {t("salary")}
                 </th>
-                <th className="px-4 py-2 font-medium">{t("status")}</th>
-                <th className="px-4 py-2 font-medium">{t("evaluation")}</th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("status")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("evaluation")}
+                </th>
                 <th className="px-4 py-2" />
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-surface-100">
               {rows.map((e) => (
                 <tr
                   key={e.id}

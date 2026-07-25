@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openNav } from "./nav";
 
 // M6: oportunidad → cotización desde el deal → aceptar → venta borrador
 // y el deal aparece en la columna Ganado.
@@ -17,6 +18,7 @@ test.describe.serial("pipeline + cotizaciones end-to-end", () => {
     await page.getByRole("button", { name: /crear organización/i }).click();
     await page.waitForURL(/\/dashboard/);
 
+    await openNav(page);
     await page.getByRole("link", { name: "Clientes", exact: true }).click();
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Cliente Pipeline");
@@ -24,6 +26,7 @@ test.describe.serial("pipeline + cotizaciones end-to-end", () => {
     await page.waitForURL(/\/customers\/[0-9a-f-]+$/);
 
     // oportunidad
+    await openNav(page);
     await page.getByRole("link", { name: /pipeline/i }).click();
     await page
       .getByPlaceholder(/título de la oportunidad/i)
@@ -57,6 +60,7 @@ test.describe.serial("pipeline + cotizaciones end-to-end", () => {
     await expect(page.getByText("Detergente mensual")).toBeVisible();
 
     // deal en Ganado
+    await openNav(page);
     await page.getByRole("link", { name: /pipeline/i }).click();
     const wonColumn = page.locator("section", { hasText: "Ganado" });
     await expect(wonColumn.getByText("Pedido mensual")).toBeVisible();

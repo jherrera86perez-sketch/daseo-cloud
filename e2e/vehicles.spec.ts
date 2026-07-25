@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openNav } from "./nav";
 
 // M-RESTO: registro de vehículos (ONAT 071012, "La Chapa") — CRUD simple +
 // suma anual informativa de las categorías activas.
@@ -18,6 +19,7 @@ test.describe.serial("vehículos end-to-end", () => {
     await page.getByRole("button", { name: /crear organización/i }).click();
     await page.waitForURL(/\/dashboard/);
 
+    await openNav(page);
     await page.getByRole("link", { name: /veh[ií]culos/i }).click();
     await page.waitForURL(/\/vehicles/);
 

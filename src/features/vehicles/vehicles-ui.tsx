@@ -29,7 +29,7 @@ export function VehicleForm() {
   return (
     <form
       action={formAction}
-      className="flex flex-wrap items-end gap-2 rounded-md border p-3"
+      className="flex flex-wrap items-end gap-2 rounded-md border border-border bg-card p-4"
     >
       <div className="flex flex-col gap-1">
         <Label htmlFor="v-plate">{t("plate")}</Label>
@@ -92,20 +92,30 @@ export function VehiclesTable({
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="border-b text-left text-xs text-muted-foreground">
+        <thead className="bg-surface-100 text-left">
           <tr>
-            <th className="py-2 pr-3 font-medium">{t("form.plate")}</th>
-            <th className="py-2 pr-3 font-medium">{t("form.brand")}</th>
-            <th className="py-2 pr-3 font-medium">{t("form.model")}</th>
-            <th className="py-2 pr-3 font-medium">{t("form.category")}</th>
-            <th className="py-2 pr-3 text-right font-medium">
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              {t("form.plate")}
+            </th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              {t("form.brand")}
+            </th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              {t("form.model")}
+            </th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              {t("form.category")}
+            </th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
               {t("annualFee")}
             </th>
-            <th className="py-2 pr-3 font-medium">{t("status")}</th>
-            <th className="py-2 font-medium" />
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              {t("status")}
+            </th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted" />
           </tr>
         </thead>
-        <tbody className="divide-y">
+        <tbody className="divide-y divide-surface-100">
           {vehicles.map((v) => {
             const cat = VEHICLE_CATEGORIES.find(
               (c) => c.code === v.categoryCode,

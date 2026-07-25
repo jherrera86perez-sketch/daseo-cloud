@@ -308,7 +308,7 @@ export function SaleForm({
 
           {/* Pagos múltiples, solo Contado (>1 método = MIXTO del ERP) */}
           {saleType === "cash" && (
-            <div className="flex flex-col gap-2 rounded-md border p-3">
+            <div className="flex flex-col gap-2 rounded-md border border-border bg-card p-4">
               <Label>{t("payments")}</Label>
               {payLines.map((p, i) => (
                 <div key={i} className="flex flex-wrap items-center gap-2">

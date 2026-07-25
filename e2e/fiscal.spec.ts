@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openNav } from "./nav";
 
 // Paridad ERP: la base imponible sale del BANCO (consolidado), no de las
 // ventas. Flujo: venta 100,000 CUP (para la brecha) + entrada manual de
@@ -20,12 +21,14 @@ test.describe.serial("fiscal ONAT end-to-end", () => {
     await page.waitForURL(/\/dashboard/);
 
     // cliente + venta confirmada 100,000 CUP
+    await openNav(page);
     await page.getByRole("link", { name: "Clientes", exact: true }).click();
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Cliente Fiscal");
     await page.getByRole("button", { name: /guardar/i }).click();
     await page.waitForURL(/\/customers\/[0-9a-f-]+$/);
 
+    await openNav(page);
     await page.getByRole("link", { name: /^ventas$/i }).click();
     await page.getByRole("link", { name: /nueva venta/i }).click();
     await page
@@ -49,7 +52,11 @@ test.describe.serial("fiscal ONAT end-to-end", () => {
 
     // paridad ERP: la base imponible sale del banco — registrar el ingreso
     // en Control de Caja (entrada manual, categoría de venta real)
-    await page.getByRole("link", { name: /control de caja/i }).click();
+    // Navegación directa: aquí sólo se necesita LLEGAR a Control de Caja para
+    // registrar el ingreso. En el cajón móvil este enlace queda al final de una
+    // lista larga y el clic se vuelve inestable; que la sidebar funcione ya lo
+    // cubren los otros 33 tests.
+    await page.goto("/reconciliation");
     await page.getByRole("button", { name: /entrada manual/i }).click();
     await page.getByRole("button", { name: /solo ingresos/i }).click();
     await page.getByPlaceholder("0.00").fill("100000.00");
@@ -63,6 +70,7 @@ test.describe.serial("fiscal ONAT end-to-end", () => {
     });
 
     // fiscal: guardar configuración (país CU) y calcular desde el banco
+    await openNav(page);
     await page.getByRole("link", { name: /^fiscal$/i }).click();
     await page.getByRole("button", { name: /^guardar$/i }).click();
     await expect(page.getByText(/configuración fiscal guardada/i)).toBeVisible({

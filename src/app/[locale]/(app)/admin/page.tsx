@@ -30,22 +30,37 @@ export default async function AdminPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">{t("title")}</h1>
+      <h1 className="t-display text-2xl tracking-[-0.025em]">{t("title")}</h1>
       <div className="overflow-x-auto rounded-md border">
         <table className="w-full text-sm">
-          <thead className="border-b bg-muted/50 text-left">
+          <thead className="bg-surface-100 text-left">
             <tr>
-              <th className="px-4 py-2 font-medium">{t("org")}</th>
-              <th className="px-4 py-2 font-medium">{t("members")}</th>
-              <th className="px-4 py-2 font-medium">{t("plan")}</th>
-              <th className="px-4 py-2 font-medium">{t("status")}</th>
-              <th className="px-4 py-2 font-medium">{t("trialEnds")}</th>
-              <th className="px-4 py-2 font-medium">{t("actions")}</th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("org")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("members")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("plan")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("status")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("trialEnds")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("actions")}
+              </th>
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody className="divide-y divide-surface-100">
             {rows.map((o) => (
-              <tr key={o.id} className="hover:bg-accent">
+              <tr
+                key={o.id}
+                className="transition-colors hover:bg-surface-hover"
+              >
                 <td className="px-4 py-2">
                   <span className="font-medium">{o.name}</span>{" "}
                   <span className="text-xs text-muted-foreground">

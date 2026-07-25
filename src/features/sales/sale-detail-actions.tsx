@@ -132,7 +132,7 @@ export function PaymentForm({
         <div className="flex w-full gap-2 text-xs">
           <button
             type="button"
-            className="rounded-md border px-2 py-1 hover:bg-accent"
+            className="rounded-md border px-2 py-1 transition-colors hover:bg-surface-hover"
             onClick={() => {
               setAmount(balance);
               setMethod("cash");
@@ -143,7 +143,7 @@ export function PaymentForm({
           </button>
           <button
             type="button"
-            className="rounded-md border px-2 py-1 hover:bg-accent"
+            className="rounded-md border px-2 py-1 transition-colors hover:bg-surface-hover"
             onClick={() => {
               setAmount(balance);
               setMethod("transfer");

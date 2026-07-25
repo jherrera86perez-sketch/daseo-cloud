@@ -37,7 +37,7 @@ export default async function CustomerDetailPage({
   return (
     <div className="flex max-w-2xl flex-col gap-6">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="flex items-center gap-2 text-2xl font-bold">
+        <h1 className="t-display flex items-center gap-2 text-2xl tracking-[-0.025em]">
           {customer.name}
           <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-normal">
             {customer.customerType === "PDV"
@@ -184,7 +184,10 @@ export default async function CustomerDetailPage({
           ) : (
             <ol className="flex flex-col gap-3">
               {interactions.map((i) => (
-                <li key={i.id} className="rounded-md border p-3 text-sm">
+                <li
+                  key={i.id}
+                  className="rounded-md border border-border bg-card p-4 text-sm"
+                >
                   <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                     <span>{t(`types.${i.type}`)}</span>
                     <time dateTime={i.occurredAt.toISOString()}>

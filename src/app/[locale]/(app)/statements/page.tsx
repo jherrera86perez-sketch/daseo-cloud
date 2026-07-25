@@ -1,4 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/ui/layout/page-header";
+import { PageLayout } from "@/components/ui/layout/page-layout";
 import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
 import { listStatements } from "@/features/statements/queries";
@@ -28,12 +30,10 @@ export default async function StatementsPage() {
   }));
 
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
-      </div>
+    <PageLayout
+      header={<PageHeader title={t("title")} subtitle={t("subtitle")} />}
+    >
       <StatementsView statements={dtos} />
-    </div>
+    </PageLayout>
   );
 }

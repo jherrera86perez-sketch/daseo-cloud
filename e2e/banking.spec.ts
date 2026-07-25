@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openNav } from "./nav";
 
 // F3: venta cobrada por transferencia → cuenta bancaria → importar CSV →
 // sugerencia de conciliación → vincular → conciliado.
@@ -17,12 +18,14 @@ test.describe.serial("banco: conciliación end-to-end", () => {
     await page.waitForURL(/\/dashboard/);
 
     // cliente + venta CUP 8000 confirmada + cobro por transferencia
+    await openNav(page);
     await page.getByRole("link", { name: "Clientes", exact: true }).click();
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Bodega Banco");
     await page.getByRole("button", { name: /guardar/i }).click();
     await page.waitForURL(/\/customers\/[0-9a-f-]+$/);
 
+    await openNav(page);
     await page.getByRole("link", { name: /^ventas$/i }).click();
     await page.getByRole("link", { name: /nueva venta/i }).click();
     await page
@@ -52,6 +55,7 @@ test.describe.serial("banco: conciliación end-to-end", () => {
     await expect(page.getByText(/pagada por completo/i)).toBeVisible();
 
     // cuenta bancaria + CSV con el ingreso
+    await openNav(page);
     await page.getByRole("link", { name: /^banco$/i }).click();
     await page.getByLabel(/nombre de la cuenta/i).fill("BANDEC CUP");
     await page.getByRole("button", { name: /crear cuenta/i }).click();

@@ -16,7 +16,7 @@ export default async function EditCustomerPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">{t("edit")}</h1>
+      <h1 className="t-display text-2xl tracking-[-0.025em]">{t("edit")}</h1>
       <CustomerForm
         action={updateCustomerAction.bind(null, id)}
         initial={customer}

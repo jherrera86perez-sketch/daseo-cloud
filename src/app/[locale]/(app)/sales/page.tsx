@@ -10,18 +10,51 @@ import {
 import { convertToBase, centsToDecimalString } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { Badge, type BadgeTone } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { StatusDot } from "@/components/ui/atoms/status-dot";
+import { DensityToggle } from "@/components/ui/atoms/density-toggle";
+import { EmptyState } from "@/components/ui/feedback/empty-state";
+import { PageHeader } from "@/components/ui/layout/page-header";
+import { PageLayout } from "@/components/ui/layout/page-layout";
+import {
+  DataTable,
+  THead,
+  TBody,
+  TRow,
+  TH,
+  TD,
+} from "@/components/ui/data-table";
 import { SalesFilters } from "@/features/sales/sales-filters";
 
 // Port fiel de "Ventas y Facturación" del ERP: filtros (búsqueda, estado de
 // cobro, rango de fechas default mes actual) + panel lateral con Total
 // facturado (excluye canceladas), Top 3 clientes, Por estado y Métricas.
+//
+// LOTE 1 de la paridad visual: la pantalla se recompone con las piezas de la
+// fundación (PageLayout, PageHeader, DataTable, Card, Badge). Las queries, los
+// filtros y los cálculos no se tocan — sólo cambia cómo se presenta.
+//
+// NO se porta la paginación del ERP ("Mostrando 1 - 15 de 18" + 1/2): exigiría
+// paginar en servidor, y este trabajo tiene prohibido tocar queries.
 
-const ESTADO_CLS: Record<EstadoCobro, string> = {
-  PAGADA: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  PARCIAL: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  PENDIENTE: "bg-secondary text-muted-foreground",
-  CANCELADA: "bg-destructive/10 text-destructive",
-  BORRADOR: "border text-muted-foreground",
+const ESTADO_TONE: Record<EstadoCobro, BadgeTone> = {
+  PAGADA: "success",
+  PARCIAL: "warning",
+  PENDIENTE: "neutral",
+  CANCELADA: "danger",
+  BORRADOR: "neutral",
+};
+
+const ESTADO_DOT: Record<
+  EstadoCobro,
+  "success" | "warning" | "neutral" | "danger"
+> = {
+  PAGADA: "success",
+  PARCIAL: "warning",
+  PENDIENTE: "neutral",
+  CANCELADA: "danger",
+  BORRADOR: "neutral",
 };
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -97,173 +130,182 @@ export default async function SalesPage({
     activas.length > 0 ? facturadoBase / BigInt(activas.length) : 0n;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-2">
-        <div>
-          <h1 className="text-2xl font-bold">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
-        </div>
-        <Button asChild>
-          <Link href="/sales/new">
-            <Plus className="size-4" aria-hidden /> {t("new")}
-          </Link>
-        </Button>
-      </div>
-
-      <SalesFilters
-        q={sp.q ?? ""}
-        estado={estadoFiltro}
-        desde={desde}
-        hasta={hasta}
-      />
-
-      <div className="flex flex-col gap-4 lg:flex-row">
-        <div className="min-w-0 flex-1">
-          {rows.length === 0 ? (
-            <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-              {all.length === 0 ? t("empty") : t("emptyFiltered")}
-            </div>
-          ) : (
-            <div className="overflow-x-auto rounded-md border">
-              <table className="w-full text-sm">
-                <thead className="border-b bg-muted/50 text-left">
-                  <tr>
-                    <th className="px-4 py-2 font-medium">{t("invoice")}</th>
-                    <th className="px-4 py-2 font-medium">{t("date")}</th>
-                    <th className="px-4 py-2 font-medium">{t("customer")}</th>
-                    <th className="px-4 py-2 text-right font-medium">
-                      {t("total")}
-                    </th>
-                    <th className="px-4 py-2 text-right font-medium">
-                      {t("balance")}
-                    </th>
-                    <th className="px-4 py-2 font-medium">{t("status")}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {rows.map((s) => {
-                    const balance = s.totalCents - s.paidCents;
-                    return (
-                      <tr key={s.id} className="hover:bg-accent">
-                        <td className="px-4 py-2" data-numeric="">
-                          <Link
-                            href={`/sales/${s.id}`}
-                            className="font-medium underline-offset-4 hover:underline"
-                          >
-                            {s.number ? `${s.series}-${s.number}` : t("draft")}
-                          </Link>
-                        </td>
-                        <td className="px-4 py-2 text-muted-foreground">
-                          {s.fecha.toLocaleDateString()}
-                        </td>
-                        <td className="px-4 py-2">{s.customerName}</td>
-                        <td className="px-4 py-2 text-right" data-numeric="">
-                          {centsToDecimalString(s.totalCents)} {s.currency}
-                        </td>
-                        <td className="px-4 py-2 text-right" data-numeric="">
-                          {s.status === "confirmed" && balance > 0n
-                            ? `${centsToDecimalString(balance)} ${s.currency}`
-                            : "—"}
-                        </td>
-                        <td className="px-4 py-2">
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-xs ${ESTADO_CLS[s.estadoCobro]}`}
-                          >
-                            {t(`payStatus.${s.estadoCobro}`)}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        {/* Panel lateral (VentasSummaryPanel del ERP) */}
-        <aside className="flex w-full shrink-0 flex-col gap-3 lg:w-64">
-          <div className="rounded-md border p-3">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              {t("panel.totalInvoiced")}
-            </p>
-            <p className="text-xl font-bold" data-numeric="">
-              {centsToDecimalString(facturadoBase)}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {t("panel.activeCount", {
-                active: activas.length,
-                total: rows.length,
-              })}
-            </p>
-          </div>
-          <div className="rounded-md border p-3">
-            <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
-              {t("panel.topCustomers")}
-            </p>
-            {topClientes.length === 0 ? (
-              <p className="text-xs text-muted-foreground">
-                {t("panel.topEmpty")}
+    <PageLayout
+      header={
+        <PageHeader
+          title={t("title")}
+          subtitle={t("subtitle")}
+          actions={
+            <Button asChild size="sm">
+              <Link href="/sales/new">
+                <Plus className="size-4" aria-hidden /> {t("new")}
+              </Link>
+            </Button>
+          }
+        />
+      }
+      filters={
+        <>
+          <SalesFilters
+            q={sp.q ?? ""}
+            estado={estadoFiltro}
+            desde={desde}
+            hasta={hasta}
+          />
+          <DensityToggle className="ml-auto" />
+        </>
+      }
+      aside={
+        <>
+          {/* Panel lateral (VentasSummaryPanel del ERP) */}
+          <Card className="gap-1 py-4">
+            <div className="px-4">
+              <p className="t-eyebrow">{t("panel.totalInvoiced")}</p>
+              <p className="t-num-display mt-1 text-[22px]" data-numeric="">
+                {centsToDecimalString(facturadoBase)}
               </p>
-            ) : (
-              <ul className="flex flex-col gap-1 text-sm">
-                {topClientes.map(([name, total]) => (
-                  <li key={name} className="flex justify-between gap-2">
-                    <span className="truncate">{name}</span>
-                    <span data-numeric="">{centsToDecimalString(total)}</span>
+              <p className="mt-0.5 text-xs text-text-muted">
+                {t("panel.activeCount", {
+                  active: activas.length,
+                  total: rows.length,
+                })}
+              </p>
+            </div>
+          </Card>
+
+          <Card className="gap-2 py-4">
+            <div className="px-4">
+              <p className="t-eyebrow mb-2">{t("panel.topCustomers")}</p>
+              {topClientes.length === 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  {t("panel.topEmpty")}
+                </p>
+              ) : (
+                <ul className="flex flex-col gap-1.5 text-sm">
+                  {topClientes.map(([name, total]) => (
+                    <li key={name} className="flex justify-between gap-2">
+                      <span className="truncate">{name}</span>
+                      <span className="t-num shrink-0" data-numeric="">
+                        {centsToDecimalString(total)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </Card>
+
+          <Card className="gap-2 py-4">
+            <div className="px-4">
+              <p className="t-eyebrow mb-2">{t("panel.byStatus")}</p>
+              <ul className="flex flex-col gap-2">
+                {porEstado.map(([e, n]) => (
+                  <li key={e} className="text-xs">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-1.5">
+                        <StatusDot tone={ESTADO_DOT[e]} />
+                        {t(`payStatus.${e}`)}
+                      </span>
+                      <span className="t-num" data-numeric="">
+                        {n}
+                      </span>
+                    </div>
+                    <div className="mt-1 h-1 rounded-full bg-surface-200">
+                      <div
+                        className="h-1 rounded-full bg-primary"
+                        style={{ width: `${(n / maxEstado) * 100}%` }}
+                      />
+                    </div>
                   </li>
                 ))}
               </ul>
-            )}
-          </div>
-          <div className="rounded-md border p-3">
-            <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
-              {t("panel.byStatus")}
-            </p>
-            <ul className="flex flex-col gap-1">
-              {porEstado.map(([e, n]) => (
-                <li key={e} className="text-xs">
-                  <div className="flex justify-between">
-                    <span>{t(`payStatus.${e}`)}</span>
-                    <span data-numeric="">{n}</span>
-                  </div>
-                  <div className="mt-0.5 h-1.5 rounded bg-muted">
-                    <div
-                      className="h-1.5 rounded bg-primary"
-                      style={{ width: `${(n / maxEstado) * 100}%` }}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="rounded-md border p-3 text-sm">
-            <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
-              {t("panel.metrics")}
-            </p>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{t("panel.avg")}</span>
-              <span data-numeric="">{centsToDecimalString(promedio)}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {t("payStatus.PAGADA")}
-              </span>
-              <span data-numeric="">
-                {rows.filter((s) => s.estadoCobro === "PAGADA").length}
-              </span>
+          </Card>
+
+          <Card className="gap-2 py-4">
+            <div className="px-4 text-sm">
+              <p className="t-eyebrow mb-2">{t("panel.metrics")}</p>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{t("panel.avg")}</span>
+                <span className="t-num" data-numeric="">
+                  {centsToDecimalString(promedio)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  {t("payStatus.PAGADA")}
+                </span>
+                <span className="t-num" data-numeric="">
+                  {rows.filter((s) => s.estadoCobro === "PAGADA").length}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  {t("payStatus.CANCELADA")}
+                </span>
+                <span className="t-num" data-numeric="">
+                  {rows.filter((s) => s.estadoCobro === "CANCELADA").length}
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                {t("payStatus.CANCELADA")}
-              </span>
-              <span data-numeric="">
-                {rows.filter((s) => s.estadoCobro === "CANCELADA").length}
-              </span>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </div>
+          </Card>
+        </>
+      }
+    >
+      {rows.length === 0 ? (
+        <Card>
+          <EmptyState
+            title={all.length === 0 ? t("empty") : t("emptyFiltered")}
+          />
+        </Card>
+      ) : (
+        <DataTable>
+          <THead>
+            <TRow className="hover:bg-transparent">
+              <TH>{t("invoice")}</TH>
+              <TH>{t("date")}</TH>
+              <TH>{t("customer")}</TH>
+              <TH numeric>{t("total")}</TH>
+              <TH numeric>{t("balance")}</TH>
+              <TH>{t("status")}</TH>
+            </TRow>
+          </THead>
+          <TBody>
+            {rows.map((s) => {
+              const balance = s.totalCents - s.paidCents;
+              return (
+                <TRow key={s.id}>
+                  <TD data-numeric="">
+                    <Link
+                      href={`/sales/${s.id}`}
+                      className="t-num font-medium underline-offset-4 hover:underline"
+                    >
+                      {s.number ? `${s.series}-${s.number}` : t("draft")}
+                    </Link>
+                  </TD>
+                  <TD className="text-muted-foreground">
+                    {s.fecha.toLocaleDateString()}
+                  </TD>
+                  <TD>{s.customerName}</TD>
+                  <TD numeric data-numeric="">
+                    {centsToDecimalString(s.totalCents)} {s.currency}
+                  </TD>
+                  <TD numeric data-numeric="">
+                    {s.status === "confirmed" && balance > 0n
+                      ? `${centsToDecimalString(balance)} ${s.currency}`
+                      : "—"}
+                  </TD>
+                  <TD>
+                    <Badge tone={ESTADO_TONE[s.estadoCobro]}>
+                      {t(`payStatus.${s.estadoCobro}`)}
+                    </Badge>
+                  </TD>
+                </TRow>
+              );
+            })}
+          </TBody>
+        </DataTable>
+      )}
+    </PageLayout>
   );
 }

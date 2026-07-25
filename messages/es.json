@@ -5,7 +5,8 @@
     "language": "Idioma",
     "loading": "Cargando…",
     "save": "Guardar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "close": "Cerrar"
   },
   "landing": {
     "title": "Daseo Cloud",
@@ -99,7 +100,11 @@
         "finance": "Finanzas",
         "tax": "Impuestos (ONAT)",
         "settings": "Configuración"
-      }
+      },
+      "openMenu": "Abrir menú",
+      "collapseSidebar": "Contraer barra lateral",
+      "expandSidebar": "Expandir barra lateral",
+      "collapse": "Contraer"
     },
     "header": {
       "search": "Buscar",
@@ -108,7 +113,8 @@
       "receivable": "Te deben {amount} {currency}",
       "receivableTitle": "Ver cuentas por cobrar",
       "lowStockTitle": "{count} producto(s) bajo el stock mínimo",
-      "noAlerts": "Sin alertas de stock"
+      "noAlerts": "Sin alertas de stock",
+      "userMenu": "Menú de usuario"
     },
     "reconciliation": {
       "title": "Control de Caja",
@@ -663,8 +669,16 @@
       "lowStock": "Bajo mínimo",
       "lowStockAlert": "{count} producto(s) por debajo del stock mínimo",
       "status": "Estado",
-      "stockStatus": { "critico": "Crítico", "bajo": "Bajo", "ok": "OK" },
-      "urgency": { "CRITICA": "Crítica", "ALTA": "Alta", "MEDIA": "Media" },
+      "stockStatus": {
+        "critico": "Crítico",
+        "bajo": "Bajo",
+        "ok": "OK"
+      },
+      "urgency": {
+        "CRITICA": "Crítica",
+        "ALTA": "Alta",
+        "MEDIA": "Media"
+      },
       "cascadeNote": "Afecta producción de: {products}",
       "panel": {
         "inventoryValue": "Valor inventariado",
@@ -718,7 +732,11 @@
           "servicio": "Servicio"
         },
         "unit": "Unidad",
-        "units": { "kg": "kg", "L": "L", "unit": "ud" },
+        "units": {
+          "kg": "kg",
+          "L": "L",
+          "unit": "ud"
+        },
         "price": "Precio de venta",
         "stockMin": "Stock mínimo (alerta)",
         "autoStockMin": "Calcular automáticamente (según consumo)",
@@ -875,7 +893,11 @@
         "draft": "Borrador",
         "confirmed": "Confirmada",
         "cancelled": "Cancelada"
-      }
+      },
+      "order": "Orden",
+      "date": "Fecha",
+      "quantity": "Cantidad",
+      "status": "Estado"
     },
     "recipes": {
       "title": "Recetas",
@@ -1079,7 +1101,10 @@
       "title": "Fiscal (ONAT)",
       "settingsTitle": "Configuración fiscal",
       "regime": "Régimen",
-      "regimes": { "general": "TCP General", "simplified": "TCP Simplificado" },
+      "regimes": {
+        "general": "TCP General",
+        "simplified": "TCP Simplificado"
+      },
       "payroll": "Nómina mensual",
       "quota": "Cuota fija (simplif.)",
       "minExempt": "Mínimo exento DJ",
@@ -1174,7 +1199,10 @@
       "link": "Vincular",
       "linked": "Movimiento conciliado",
       "ignore": "Ignorar",
-      "statuses": { "matched": "Conciliado", "ignored": "Ignorado" }
+      "statuses": {
+        "matched": "Conciliado",
+        "ignored": "Ignorado"
+      }
     },
     "suppliers": {
       "title": "Proveedores",

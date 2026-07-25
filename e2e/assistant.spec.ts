@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openNav } from "./nav";
 
 // Asistente directivo (port fiel del ERP): producto bajo mínimo → recomendación
 // "Stock bajo" en /assistant → marcarla Completada en el seguimiento.
@@ -20,6 +21,7 @@ test.describe.serial("asistente directivo: recomendación → seguimiento", () =
     await page.waitForURL(/\/dashboard/);
 
     // producto con stock mínimo 10
+    await openNav(page);
     await page.getByRole("link", { name: /productos/i }).click();
     await page.getByRole("link", { name: /nuevo producto/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Jabón AD");
@@ -34,6 +36,7 @@ test.describe.serial("asistente directivo: recomendación → seguimiento", () =
     await expect(page.locator("table tbody tr")).toHaveCount(1);
 
     // el Panel del Negocio muestra la recomendación literal del ERP
+    await openNav(page);
     await page.getByRole("link", { name: /^asistente$/i }).click();
     await page.waitForURL(/\/assistant/);
     await expect(page.getByText("Stock bajo: Jabón AD").first()).toBeVisible();

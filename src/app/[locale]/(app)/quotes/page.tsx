@@ -15,7 +15,7 @@ export default async function QuotesPage() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        <h1 className="t-display text-2xl tracking-[-0.025em]">{t("title")}</h1>
         <Button asChild>
           <Link href="/quotes/new">
             <Plus className="size-4" aria-hidden /> {t("new")}
@@ -24,7 +24,7 @@ export default async function QuotesPage() {
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+        <div className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
           {t("empty")}
         </div>
       ) : (
@@ -33,7 +33,7 @@ export default async function QuotesPage() {
             <li key={q.id}>
               <Link
                 href={`/quotes/${q.id}`}
-                className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 hover:bg-accent"
+                className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 transition-colors hover:bg-surface-hover"
               >
                 <span className="font-medium" data-numeric="">
                   {q.series}-{q.number} · {q.customerName}

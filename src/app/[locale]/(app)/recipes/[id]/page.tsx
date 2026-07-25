@@ -20,7 +20,9 @@ export default async function RecipeDetailPage({
   return (
     <div className="flex max-w-2xl flex-col gap-6">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">{recipe.name}</h1>
+        <h1 className="t-display text-2xl tracking-[-0.025em]">
+          {recipe.name}
+        </h1>
         <Button asChild variant="outline" size="sm">
           <Link href={`/recipes/${id}/edit`}>
             <Pencil className="size-4" aria-hidden /> {t("edit")}
@@ -36,7 +38,7 @@ export default async function RecipeDetailPage({
         </CardHeader>
         <CardContent>
           <table className="w-full text-sm">
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-surface-100">
               {items.map((i) => (
                 <tr key={i.id}>
                   <td className="py-2 pr-2">{i.componentName}</td>

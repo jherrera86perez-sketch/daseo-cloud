@@ -20,7 +20,7 @@ export default async function EditRecipePage({
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">{t("edit")}</h1>
+      <h1 className="t-display text-2xl tracking-[-0.025em]">{t("edit")}</h1>
       <RecipeForm
         producibles={products
           .filter((p) => p.isProducible)

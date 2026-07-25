@@ -425,7 +425,7 @@ export function ControlCajaView() {
                 <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                   {label}
                 </p>
-                <p className="text-lg font-bold" data-numeric="">
+                <p className="t-num-display text-[20px]" data-numeric="">
                   {value}
                 </p>
               </CardContent>
@@ -650,19 +650,31 @@ function BancoTable({
           <table className="w-full text-sm">
             <thead className="border-b bg-muted text-left">
               <tr>
-                <th className="px-2 py-1.5 font-medium">{t("colDate")}</th>
-                <th className="px-2 py-1.5 font-medium">{t("colType")}</th>
-                <th className="px-2 py-1.5 font-medium">{t("colRef")}</th>
-                <th className="px-2 py-1.5 font-medium">{t("colObs")}</th>
-                <th className="px-2 py-1.5 text-right font-medium">
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colDate")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colType")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colRef")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colObs")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                   {t("colAmount")}
                 </th>
-                <th className="px-2 py-1.5 font-medium">{t("colState")}</th>
-                <th className="px-2 py-1.5 font-medium">{t("colCategory")}</th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colState")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colCategory")}
+                </th>
                 <th className="px-2 py-1.5" />
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-surface-100">
               {rows.map((m) => (
                 <tr key={m.id} className={m.conciliado ? "opacity-60" : ""}>
                   <td className="px-2 py-1.5 font-mono text-xs">{m.fecha}</td>
@@ -761,21 +773,31 @@ function LibrosTable({
           <table className="w-full text-sm">
             <thead className="border-b bg-muted text-left">
               <tr>
-                <th className="px-2 py-1.5 font-medium">{t("colDate")}</th>
-                <th className="px-2 py-1.5 font-medium">{t("colType")}</th>
-                <th className="px-2 py-1.5 text-right font-medium">
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colDate")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colType")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                   {t("colAmount")}
                 </th>
-                <th className="px-2 py-1.5 font-medium">{t("colCategory")}</th>
-                <th className="px-2 py-1.5 font-medium">
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colCategory")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                   {t("colSubcategory")}
                 </th>
-                <th className="px-2 py-1.5 font-medium">{t("colDesc")}</th>
-                <th className="px-2 py-1.5 font-medium">{t("colOrigin")}</th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colDesc")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colOrigin")}
+                </th>
                 <th className="px-2 py-1.5" />
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-surface-100">
               {rows.map((r) => (
                 <tr key={r.id}>
                   <td className="px-2 py-1.5 font-mono text-xs">{r.fecha}</td>
@@ -837,7 +859,7 @@ function LibrosTable({
                 </tr>
               ))}
             </tbody>
-            <tfoot className="border-t bg-muted/50 text-xs">
+            <tfoot className="border-t bg-surface-100 text-xs">
               <tr>
                 <td colSpan={2} className="px-2 py-1.5 font-medium">
                   {t("totals")}
@@ -1021,20 +1043,22 @@ function CobrosPanel({
               <table className="w-full text-sm">
                 <thead className="border-b bg-muted text-left">
                   <tr>
-                    <th className="px-2 py-1.5 font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                       {t("colCobroDate")}
                     </th>
-                    <th className="px-2 py-1.5 font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                       {t("colClient")}
                     </th>
-                    <th className="px-2 py-1.5 font-medium">{t("colSale")}</th>
-                    <th className="px-2 py-1.5 text-right font-medium">
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                      {t("colSale")}
+                    </th>
+                    <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                       {t("colTransfer")}
                     </th>
                     <th className="px-2 py-1.5" />
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-surface-100">
                   {filtrados.map((c) => (
                     <BodyCobro
                       key={c.paymentId}
@@ -1160,7 +1184,7 @@ function BodyCobro({
                     <th className="px-2 py-1" />
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-surface-100">
                   {sugerencias.map((s) => (
                     <tr key={s.movimientoId}>
                       <td className="px-2 py-1">

@@ -139,7 +139,7 @@ export function PipelineBoard({
                       )}`}
                       aria-label={t("quoteIt")}
                       title={t("quoteIt")}
-                      className="rounded p-1 hover:bg-accent"
+                      className="rounded p-1 transition-colors hover:bg-surface-hover"
                     >
                       <FileText className="size-4" aria-hidden />
                     </Link>

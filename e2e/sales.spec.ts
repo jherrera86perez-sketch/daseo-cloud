@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openNav } from "./nav";
 
 // Flujo M5 completo: tasa → cliente → producto+stock → venta USD 2 líneas →
 // confirmar (número + stock) → cobro parcial en CUP → saldo correcto.
@@ -18,12 +19,14 @@ test.describe.serial("ventas: multi-moneda end-to-end", () => {
     await page.waitForURL(/\/dashboard/);
 
     // tasa USD = 320
+    await openNav(page);
     await page.getByRole("link", { name: /configuración/i }).click();
     await page.getByPlaceholder(/ej\. 320/i).fill("320");
     await page.getByRole("button", { name: /registrar tasa/i }).click();
     await expect(page.getByText(/1 USD = 320/)).toBeVisible();
 
     // cliente
+    await openNav(page);
     await page.getByRole("link", { name: "Clientes", exact: true }).click();
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Bodega Ventas");
@@ -31,6 +34,7 @@ test.describe.serial("ventas: multi-moneda end-to-end", () => {
     await page.waitForURL(/\/customers\/[0-9a-f-]+$/);
 
     // producto con stock
+    await openNav(page);
     await page.getByRole("link", { name: /productos/i }).click();
     await page.getByRole("link", { name: /nuevo producto/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Detergente Venta");
@@ -42,6 +46,7 @@ test.describe.serial("ventas: multi-moneda end-to-end", () => {
     await expect(page.getByText(/^50 ud$/)).toBeVisible();
 
     // venta en USD: 10 uds del producto a 2.00 + flete libre 5.00
+    await openNav(page);
     await page.getByRole("link", { name: /^ventas$/i }).click();
     await page.getByRole("link", { name: /nueva venta/i }).click();
     await page.getByLabel(/moneda/i).selectOption("USD");
@@ -88,6 +93,7 @@ test.describe.serial("ventas: multi-moneda end-to-end", () => {
     await expect(page.getByText(/saldo: 15\.00 USD/i)).toBeVisible();
 
     // dashboard (M9): consolidado a tasa fijada y CxC con el saldo
+    await openNav(page);
     await page.getByRole("link", { name: /panel/i }).click();
     await expect(page.getByText("8000.00")).toBeVisible(); // 25 USD × 320
     await expect(page.getByText(/cuentas por cobrar/i)).toBeVisible();

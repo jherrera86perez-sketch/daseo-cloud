@@ -423,7 +423,7 @@ export function TopClientsView() {
           {t("loading")}
         </p>
       ) : rows.length === 0 ? (
-        <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+        <div className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
           <Users className="mx-auto mb-2 size-6" aria-hidden />
           <p className="font-medium">{t("emptyTitle")}</p>
           <p>{t("emptyBody")}</p>
@@ -460,7 +460,7 @@ function KpiCard({
     <Card className={tone === "warning" ? "border-amber-500/40" : ""}>
       <CardContent className="pt-4">
         <p
-          className={`text-2xl font-bold ${tone === "success" ? "text-success" : ""}`}
+          className={`t-num-display text-2xl ${tone === "success" ? "text-success" : ""}`}
           data-numeric=""
         >
           {value}
@@ -557,30 +557,40 @@ function RankingTab({
   return (
     <div className="overflow-x-auto rounded-md border">
       <table className="w-full text-sm">
-        <thead className="border-b bg-muted/50 text-left">
+        <thead className="bg-surface-100 text-left">
           <tr>
-            <th className="px-2 py-2 text-center font-medium">#</th>
-            <th className="px-3 py-2 font-medium">{t("colClient")}</th>
-            <th className="px-3 py-2 text-right font-medium">
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              #
+            </th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              {t("colClient")}
+            </th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
               {t("colTransfers")}
             </th>
-            <th className="px-3 py-2 text-right font-medium">
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
               {t("colTotal")}
             </th>
-            <th className="px-3 py-2 text-right font-medium">
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
               {t("colTicket")}
             </th>
-            <th className="px-3 py-2 font-medium">{t("colFrequency")}</th>
-            <th className="px-3 py-2 font-medium">{t("colLastOp")}</th>
-            <th className="px-3 py-2 font-medium">{t("colPhone")}</th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              {t("colFrequency")}
+            </th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              {t("colLastOp")}
+            </th>
+            <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+              {t("colPhone")}
+            </th>
           </tr>
         </thead>
-        <tbody className="divide-y">
+        <tbody className="divide-y divide-surface-100">
           {rows.map((r, i) => (
             <tr
               key={`${r.client_name}|${r.pan_origen}`}
               onClick={() => onSelect(r)}
-              className={`cursor-pointer hover:bg-accent ${i < 3 ? "bg-primary/5" : ""}`}
+              className={`cursor-pointer transition-colors hover:bg-surface-hover ${i < 3 ? "bg-primary/5" : ""}`}
             >
               <td className="px-2 py-2 text-center">
                 {i === 0 ? (
@@ -647,7 +657,7 @@ function TendenciasTab({
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+      <div className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
         <TrendingUp className="mx-auto mb-2 size-6" aria-hidden />
         <p className="font-medium">{t("trendsEmptyTitle")}</p>
         <p>{t("trendsEmptyBody")}</p>
@@ -707,23 +717,29 @@ function TendTable({
           <table className="w-full text-sm">
             <thead className="text-left text-xs text-muted-foreground">
               <tr>
-                <th className="py-1 pr-2 font-medium">#</th>
-                <th className="py-1 pr-2 font-medium">{t("colClient")}</th>
-                <th className="py-1 pr-2 text-right font-medium">
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  #
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                  {t("colClient")}
+                </th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                   {t("colPrevMonth")}
                 </th>
-                <th className="py-1 pr-2 text-right font-medium">
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                   {t("colThisMonth")}
                 </th>
-                <th className="py-1 text-right font-medium">Δ</th>
+                <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
+                  Δ
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-surface-100">
               {list.map((r, i) => (
                 <tr
                   key={`${r.client_name}|${r.pan_origen}`}
                   onClick={() => onSelect(r)}
-                  className="cursor-pointer hover:bg-accent"
+                  className="cursor-pointer transition-colors hover:bg-surface-hover"
                 >
                   <td className="py-1.5 pr-2 font-mono text-muted-foreground">
                     {i + 1}
@@ -777,7 +793,7 @@ function RfmTab({
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+      <div className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
         <Star className="mx-auto mb-2 size-6" aria-hidden />
         <p className="font-medium">{t("rfmEmptyTitle")}</p>
         <p>{t("rfmEmptyBody")}</p>
@@ -815,33 +831,42 @@ function RfmTab({
       </div>
       <div className="overflow-x-auto rounded-md border">
         <table className="w-full text-sm">
-          <thead className="border-b bg-muted/50 text-left">
+          <thead className="bg-surface-100 text-left">
             <tr>
-              <th className="px-3 py-2 font-medium">{t("colSegment")}</th>
-              <th className="px-3 py-2 font-medium">{t("colClient")}</th>
-              <th className="px-3 py-2 text-right font-medium">
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colSegment")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colClient")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                 {t("colOps")}
               </th>
-              <th className="px-3 py-2 text-right font-medium">
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                 {t("colTotal")}
               </th>
-              <th className="px-3 py-2 text-right font-medium">
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                 {t("colTicket")}
               </th>
-              <th className="px-3 py-2 font-medium">{t("colLastOp")}</th>
-              <th className="px-3 py-2 font-medium" title={t("rfmTooltip")}>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colLastOp")}
+              </th>
+              <th
+                className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted"
+                title={t("rfmTooltip")}
+              >
                 RFM
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody className="divide-y divide-surface-100">
             {shown.map((r) => {
               const { label, Icon, color } = SEGMENT_META[r.segment];
               return (
                 <tr
                   key={`${r.client_name}|${r.pan_origen}`}
                   onClick={() => onSelect(r)}
-                  className="cursor-pointer hover:bg-accent"
+                  className="cursor-pointer transition-colors hover:bg-surface-hover"
                 >
                   <td className="px-3 py-2">
                     <span className="flex items-center gap-1 text-xs">
@@ -892,7 +917,7 @@ function RiesgoTab({
   const t = useTranslations("app.topClients");
   if (rows.length === 0) {
     return (
-      <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+      <div className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
         <Heart className="mx-auto mb-2 size-6 text-success" aria-hidden />
         <p className="font-medium">{t("riskEmptyTitle")}</p>
         <p>{t("riskEmptyBody")}</p>
@@ -927,29 +952,37 @@ function RiesgoTab({
       </div>
       <div className="overflow-x-auto rounded-md border">
         <table className="w-full text-sm">
-          <thead className="border-b bg-muted/50 text-left">
+          <thead className="bg-surface-100 text-left">
             <tr>
-              <th className="px-3 py-2 font-medium">{t("colClient")}</th>
-              <th className="px-3 py-2 font-medium">{t("colNormalFreq")}</th>
-              <th className="px-3 py-2 text-right font-medium">
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colClient")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colNormalFreq")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                 {t("colNoOpsSince")}
               </th>
-              <th className="px-3 py-2 text-right font-medium">
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                 {t("colOps")}
               </th>
-              <th className="px-3 py-2 text-right font-medium">
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted text-right">
                 {t("colTotal")}
               </th>
-              <th className="px-3 py-2 font-medium">{t("colSeverity")}</th>
-              <th className="px-3 py-2 font-medium">{t("colAction")}</th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colSeverity")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colAction")}
+              </th>
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody className="divide-y divide-surface-100">
             {rows.map((r) => (
               <tr
                 key={`${r.client_name}|${r.pan_origen}`}
                 onClick={() => onSelect(r)}
-                className={`cursor-pointer border-l-2 hover:bg-accent ${sevMeta[r.sev].border}`}
+                className={`cursor-pointer border-l-2 transition-colors hover:bg-surface-hover ${sevMeta[r.sev].border}`}
               >
                 <td className="px-3 py-2">
                   <ClienteCell r={r} />

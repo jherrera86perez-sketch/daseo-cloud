@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openNav } from "./nav";
 
 // Flujo M3: crear cliente → registrar interacción → ver timeline → editar.
 // Crea su propio usuario+org (aislado de otras corridas).
@@ -20,6 +21,7 @@ test.describe.serial("clientes: patrón CRUD + ficha", () => {
     await page.waitForURL(/\/dashboard/);
 
     // estado vacío
+    await openNav(page);
     await page.getByRole("link", { name: "Clientes", exact: true }).click();
     await expect(page.getByText(/aún no tienes clientes/i)).toBeVisible();
 
@@ -50,6 +52,7 @@ test.describe.serial("clientes: patrón CRUD + ficha", () => {
     ).toBeVisible();
 
     // aparece en la lista
+    await openNav(page);
     await page
       .getByRole("link", { name: "Clientes", exact: true })
       .first()

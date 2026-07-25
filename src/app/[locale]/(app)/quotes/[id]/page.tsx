@@ -17,7 +17,7 @@ export default async function QuoteDetailPage({
   return (
     <div className="flex max-w-2xl flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">
+        <h1 className="t-display text-2xl tracking-[-0.025em]">
           {quote.series}-{quote.number}
           <span className="ml-3 align-middle rounded-full bg-secondary px-2 py-0.5 text-xs font-normal">
             {t(`statuses.${quote.status}`)}
@@ -32,7 +32,7 @@ export default async function QuoteDetailPage({
         </CardHeader>
         <CardContent>
           <table className="w-full text-sm">
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-surface-100">
               {items.map((i) => (
                 <tr key={i.id}>
                   <td className="py-2 pr-2">{i.description}</td>

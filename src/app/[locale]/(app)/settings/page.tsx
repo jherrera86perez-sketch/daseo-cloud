@@ -1,4 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/ui/layout/page-header";
+import { PageLayout } from "@/components/ui/layout/page-layout";
 import { and, eq, gt, isNull, or } from "drizzle-orm";
 import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
@@ -62,146 +64,149 @@ export default async function SettingsPage() {
   const ta = await getTranslations("app.assistant");
 
   return (
-    <div className="flex max-w-2xl flex-col gap-6">
-      <h1 className="text-2xl font-bold">{t("title")}</h1>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("membersTitle")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="flex flex-col divide-y">
-            {memberRows.map((m) => (
-              <li key={m.id} className="flex items-center justify-between py-2">
-                <span>
-                  <span className="font-medium">{m.name}</span>{" "}
-                  <span className="text-sm text-muted-foreground">
-                    {m.email}
-                  </span>
-                </span>
-                <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">
-                  {m.role}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
-
-      {isAdmin && (
+    <PageLayout header={<PageHeader title={t("title")} />}>
+      <div className="flex max-w-2xl flex-col gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>{t("inviteTitle")}</CardTitle>
+            <CardTitle>{t("membersTitle")}</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <InviteForm />
-            {pending.length > 0 && (
-              <div className="text-sm text-muted-foreground">
-                {t("pendingCount", { count: pending.length })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {tr("title")} ({t("baseCurrency")}: {settings?.baseCurrency})
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
-          {isAdmin && <RateForm />}
-          {rates.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{tr("empty")}</p>
-          ) : (
-            <ul className="divide-y text-sm">
-              {rates.slice(0, 10).map((r) => (
-                <li key={r.id} className="flex justify-between py-2">
-                  <span data-numeric="">
-                    1 {r.currency} = {r.rateToBase} {settings?.baseCurrency}
+          <CardContent>
+            <ul className="flex flex-col divide-y divide-surface-100">
+              {memberRows.map((m) => (
+                <li
+                  key={m.id}
+                  className="flex items-center justify-between py-2"
+                >
+                  <span>
+                    <span className="font-medium">{m.name}</span>{" "}
+                    <span className="text-sm text-muted-foreground">
+                      {m.email}
+                    </span>
                   </span>
-                  <span className="text-xs text-muted-foreground">
-                    {r.effectiveAt.toISOString().slice(0, 10)}
+                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">
+                    {m.role}
                   </span>
                 </li>
               ))}
             </ul>
-          )}
-        </CardContent>
-      </Card>
-      {isAdmin && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{tk("title")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ApiKeysCard
-              keys={apiKeysRows.map((k) => ({
-                id: k.id,
-                name: k.name,
-                prefix: k.prefix,
-              }))}
-            />
           </CardContent>
         </Card>
-      )}
 
-      {isAdmin && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{ts("title")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <StagesEditor
-              stages={board.map((b) => ({
-                id: b.stage.id,
-                name: b.stage.name,
-                isWon: b.stage.isWon,
-                isLost: b.stage.isLost,
-                dealCount: b.deals.length,
-              }))}
-            />
-          </CardContent>
-        </Card>
-      )}
+        {isAdmin && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("inviteTitle")}</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <InviteForm />
+              {pending.length > 0 && (
+                <div className="text-sm text-muted-foreground">
+                  {t("pendingCount", { count: pending.length })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
-      {isAdmin && (
         <Card>
           <CardHeader>
-            <CardTitle>{ta("title")}</CardTitle>
+            <CardTitle>
+              {tr("title")} ({t("baseCurrency")}: {settings?.baseCurrency})
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <AssistantCard
-              baseCurrency={settings?.baseCurrency ?? "CUP"}
-              initial={{
-                salesGoal: notify.salesGoalBase ?? "",
-                overdueLimit: notify.overdueLimitBase ?? "",
-              }}
-            />
+          <CardContent className="flex flex-col gap-3">
+            {isAdmin && <RateForm />}
+            {rates.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{tr("empty")}</p>
+            ) : (
+              <ul className="divide-y text-sm">
+                {rates.slice(0, 10).map((r) => (
+                  <li key={r.id} className="flex justify-between py-2">
+                    <span data-numeric="">
+                      1 {r.currency} = {r.rateToBase} {settings?.baseCurrency}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {r.effectiveAt.toISOString().slice(0, 10)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </CardContent>
         </Card>
-      )}
+        {isAdmin && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{tk("title")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ApiKeysCard
+                keys={apiKeysRows.map((k) => ({
+                  id: k.id,
+                  name: k.name,
+                  prefix: k.prefix,
+                }))}
+              />
+            </CardContent>
+          </Card>
+        )}
 
-      {isAdmin && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{tg("title")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <TelegramCard
-              initial={{
-                botToken: notify.telegramBotToken ?? "",
-                chatId: notify.telegramChatId ?? "",
-                cobranzaDiasMin: notify.cobranzaDiasMin?.toString() ?? "",
-                cobranzaMontoMin: notify.cobranzaMontoMinCents
-                  ? centsToDecimalString(BigInt(notify.cobranzaMontoMinCents))
-                  : "",
-              }}
-            />
-          </CardContent>
-        </Card>
-      )}
-    </div>
+        {isAdmin && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{ts("title")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <StagesEditor
+                stages={board.map((b) => ({
+                  id: b.stage.id,
+                  name: b.stage.name,
+                  isWon: b.stage.isWon,
+                  isLost: b.stage.isLost,
+                  dealCount: b.deals.length,
+                }))}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        {isAdmin && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{ta("title")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AssistantCard
+                baseCurrency={settings?.baseCurrency ?? "CUP"}
+                initial={{
+                  salesGoal: notify.salesGoalBase ?? "",
+                  overdueLimit: notify.overdueLimitBase ?? "",
+                }}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        {isAdmin && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{tg("title")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TelegramCard
+                initial={{
+                  botToken: notify.telegramBotToken ?? "",
+                  chatId: notify.telegramChatId ?? "",
+                  cobranzaDiasMin: notify.cobranzaDiasMin?.toString() ?? "",
+                  cobranzaMontoMin: notify.cobranzaMontoMinCents
+                    ? centsToDecimalString(BigInt(notify.cobranzaMontoMinCents))
+                    : "",
+                }}
+              />
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </PageLayout>
   );
 }

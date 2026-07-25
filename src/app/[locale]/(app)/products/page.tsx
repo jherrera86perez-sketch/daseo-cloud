@@ -9,6 +9,12 @@ import {
 import { centsToDecimalString } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { DensityToggle } from "@/components/ui/atoms/density-toggle";
+import { EmptyState } from "@/components/ui/feedback/empty-state";
+import { PageHeader } from "@/components/ui/layout/page-header";
+import { PageLayout } from "@/components/ui/layout/page-layout";
+import { TH } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
 
 // Port fiel de "Inventario Global" del ERP: Estado por umbrales (Crítico≤5 /
@@ -80,154 +86,49 @@ export default async function ProductsPage({
   const maxDist = Math.max(1, ...Object.values(distribucion));
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <Button asChild>
-          <Link href="/products/new">
-            <Plus className="size-4" aria-hidden /> {t("new")}
-          </Link>
-        </Button>
-      </div>
-
-      {alerts.total > 0 && (
-        <details className="rounded-md border border-warning/50 bg-warning/10">
-          <summary className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm">
-            <TriangleAlert className="size-4 text-warning" aria-hidden />
-            {t("lowStockAlert", { count: alerts.total })}
-          </summary>
-          <div className="flex flex-col gap-2 px-3 pb-3">
-            {alerts.alerts.map((a) => (
-              <div
-                key={a.productId}
-                className="flex flex-wrap items-center gap-2 rounded-md border bg-background p-2 text-sm"
-              >
-                <span
-                  className={`rounded-full px-2 py-0.5 text-xs ${URGENCIA_CLS[a.urgencia]}`}
-                >
-                  {t(`urgency.${a.urgencia}`)}
-                </span>
-                <span className="font-medium">{a.nombre}</span>
-                <span className="text-muted-foreground" data-numeric="">
-                  {a.stockActual} / {a.stockMinimo}
-                </span>
-                {a.productosAfectados.length > 0 && (
-                  <span className="text-xs text-muted-foreground">
-                    {t("cascadeNote", {
-                      products: a.productosAfectados
-                        .map(
-                          (x) =>
-                            `${x.finalProductName} (${x.batchesProducibles})`,
-                        )
-                        .join(", "),
-                    })}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </details>
-      )}
-
-      <form method="get" className="relative max-w-sm">
-        <Search
-          className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground"
-          aria-hidden
+    <PageLayout
+      header={
+        <PageHeader
+          title={t("title")}
+          actions={
+            <Button asChild size="sm">
+              <Link href="/products/new">
+                <Plus className="size-4" aria-hidden /> {t("new")}
+              </Link>
+            </Button>
+          }
         />
-        <Input
-          name="q"
-          defaultValue={q ?? ""}
-          placeholder={t("searchPlaceholder")}
-          className="pl-8"
-        />
-      </form>
-
-      <div className="flex flex-col gap-4 lg:flex-row">
-        <div className="min-w-0 flex-1">
-          {rows.length === 0 ? (
-            <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-              {t("empty")}
-            </div>
-          ) : (
-            <div className="overflow-x-auto rounded-md border">
-              <table className="w-full text-sm">
-                <thead className="border-b bg-muted/50 text-left">
-                  <tr>
-                    <th className="px-4 py-2 font-medium">{t("form.name")}</th>
-                    <th className="px-4 py-2 font-medium">{t("form.sku")}</th>
-                    <th className="px-4 py-2 font-medium">
-                      {t("form.category")}
-                    </th>
-                    <th className="px-4 py-2 text-right font-medium">
-                      {t("stock")}
-                    </th>
-                    <th className="px-4 py-2 text-right font-medium">
-                      {t("avgCost")}
-                    </th>
-                    <th className="px-4 py-2 font-medium">{t("status")}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {rows.map((p) => {
-                    const stock = Number(p.balance);
-                    const estado = estadoStock(stock, Number(p.stockMin));
-                    return (
-                      <tr key={p.id} className="hover:bg-accent">
-                        <td className="px-4 py-2">
-                          <Link
-                            href={`/products/${p.id}`}
-                            className="font-medium underline-offset-4 hover:underline"
-                          >
-                            {p.name}
-                          </Link>
-                        </td>
-                        <td className="px-4 py-2 text-muted-foreground">
-                          {p.sku ?? "—"}
-                        </td>
-                        <td className="px-4 py-2 text-muted-foreground">
-                          {p.category
-                            ? t(`form.categories.${p.category}`)
-                            : "—"}
-                        </td>
-                        <td className="px-4 py-2 text-right" data-numeric="">
-                          {p.balance} {t(`form.units.${p.unit}`)}
-                        </td>
-                        <td className="px-4 py-2 text-right" data-numeric="">
-                          {centsToDecimalString(BigInt(p.avg_cost_cents))}
-                        </td>
-                        <td className="px-4 py-2">
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-xs ${ESTADO_CLS[estado]}`}
-                          >
-                            {t(`stockStatus.${estado}`)}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        {/* Panel lateral (InventarioSummaryPanel del ERP) */}
-        <aside className="flex w-full shrink-0 flex-col gap-3 lg:w-64">
-          <div className="rounded-md border p-3">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              {t("panel.inventoryValue")}
-            </p>
-            <p className="text-xl font-bold" data-numeric="">
+      }
+      filters={
+        <>
+          <form method="get" className="relative max-w-sm">
+            <Search
+              className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden
+            />
+            <Input
+              name="q"
+              defaultValue={q ?? ""}
+              placeholder={t("searchPlaceholder")}
+              className="pl-8"
+            />
+          </form>
+          <DensityToggle className="ml-auto" />
+        </>
+      }
+      aside={
+        <>
+          <div className="rounded-md border border-border bg-card p-4">
+            <p className="t-eyebrow">{t("panel.inventoryValue")}</p>
+            <p className="t-num-display mt-1 text-[22px]" data-numeric="">
               {valorInventariado.toFixed(2)}
             </p>
             <p className="text-xs text-muted-foreground">
               {t("panel.skuCount", { count: activos.length })}
             </p>
           </div>
-          <div className="rounded-md border p-3">
-            <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
-              {t("panel.topByValue")}
-            </p>
+          <div className="rounded-md border border-border bg-card p-4">
+            <p className="t-eyebrow mb-2">{t("panel.topByValue")}</p>
             <ul className="flex flex-col gap-1 text-sm">
               {topPorValor.map((p) => (
                 <li key={p.id} className="flex justify-between gap-2">
@@ -237,10 +138,8 @@ export default async function ProductsPage({
               ))}
             </ul>
           </div>
-          <div className="rounded-md border p-3">
-            <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
-              {t("panel.byStatus")}
-            </p>
+          <div className="rounded-md border border-border bg-card p-4">
+            <p className="t-eyebrow mb-2">{t("panel.byStatus")}</p>
             <ul className="flex flex-col gap-1">
               {(
                 [
@@ -255,9 +154,9 @@ export default async function ProductsPage({
                     <span>{t(`panel.dist.${k}`)}</span>
                     <span data-numeric="">{n}</span>
                   </div>
-                  <div className="mt-0.5 h-1.5 rounded bg-muted">
+                  <div className="mt-1 h-1 rounded-full bg-surface-200">
                     <div
-                      className="h-1.5 rounded bg-primary"
+                      className="h-1 rounded-full bg-primary"
                       style={{ width: `${(n / maxDist) * 100}%` }}
                     />
                   </div>
@@ -265,10 +164,8 @@ export default async function ProductsPage({
               ))}
             </ul>
           </div>
-          <div className="rounded-md border p-3 text-sm">
-            <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
-              {t("panel.metrics")}
-            </p>
+          <div className="rounded-md border border-border bg-card p-4 text-sm">
+            <p className="t-eyebrow mb-2">{t("panel.metrics")}</p>
             <div className="flex justify-between">
               <span className="text-muted-foreground">
                 {t("panel.avgCost")}
@@ -282,8 +179,116 @@ export default async function ProductsPage({
               <span data-numeric="">{vendibles}</span>
             </div>
           </div>
-        </aside>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-4">
+        {alerts.total > 0 && (
+          <details className="rounded-md border border-warning/50 bg-warning/10">
+            <summary className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm">
+              <TriangleAlert className="size-4 text-warning" aria-hidden />
+              {t("lowStockAlert", { count: alerts.total })}
+            </summary>
+            <div className="flex flex-col gap-2 px-3 pb-3">
+              {alerts.alerts.map((a) => (
+                <div
+                  key={a.productId}
+                  className="flex flex-wrap items-center gap-2 rounded-md border bg-background p-2 text-sm"
+                >
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs ${URGENCIA_CLS[a.urgencia]}`}
+                  >
+                    {t(`urgency.${a.urgencia}`)}
+                  </span>
+                  <span className="font-medium">{a.nombre}</span>
+                  <span className="text-muted-foreground" data-numeric="">
+                    {a.stockActual} / {a.stockMinimo}
+                  </span>
+                  {a.productosAfectados.length > 0 && (
+                    <span className="text-xs text-muted-foreground">
+                      {t("cascadeNote", {
+                        products: a.productosAfectados
+                          .map(
+                            (x) =>
+                              `${x.finalProductName} (${x.batchesProducibles})`,
+                          )
+                          .join(", "),
+                      })}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </details>
+        )}
+
+        <div className="flex flex-col gap-4 lg:flex-row">
+          <div className="min-w-0 flex-1">
+            {rows.length === 0 ? (
+              <Card>
+                <EmptyState title={t("empty")} />
+              </Card>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-border bg-card">
+                <table className="w-full border-collapse text-left text-[13px]">
+                  <thead className="bg-surface-100 text-left">
+                    <tr>
+                      <TH>{t("form.name")}</TH>
+                      <TH>{t("form.sku")}</TH>
+                      <TH>{t("form.category")}</TH>
+                      <TH numeric>{t("stock")}</TH>
+                      <TH numeric>{t("avgCost")}</TH>
+                      <TH>{t("status")}</TH>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-surface-100">
+                    {rows.map((p) => {
+                      const stock = Number(p.balance);
+                      const estado = estadoStock(stock, Number(p.stockMin));
+                      return (
+                        <tr
+                          key={p.id}
+                          className="transition-colors hover:bg-surface-hover"
+                        >
+                          <td>
+                            <Link
+                              href={`/products/${p.id}`}
+                              className="font-medium underline-offset-4 hover:underline"
+                            >
+                              {p.name}
+                            </Link>
+                          </td>
+                          <td className="text-muted-foreground">
+                            {p.sku ?? "—"}
+                          </td>
+                          <td className="text-muted-foreground">
+                            {p.category
+                              ? t(`form.categories.${p.category}`)
+                              : "—"}
+                          </td>
+                          <td className="text-right" data-numeric="">
+                            {p.balance} {t(`form.units.${p.unit}`)}
+                          </td>
+                          <td className="text-right" data-numeric="">
+                            {centsToDecimalString(BigInt(p.avg_cost_cents))}
+                          </td>
+                          <td>
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-xs ${ESTADO_CLS[estado]}`}
+                            >
+                              {t(`stockStatus.${estado}`)}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

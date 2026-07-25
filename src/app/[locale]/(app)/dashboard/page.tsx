@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/ui/layout/page-header";
 import { eq } from "drizzle-orm";
 import { TriangleAlert } from "lucide-react";
 import { requireOrg } from "@/lib/session";
@@ -13,6 +14,16 @@ import { centsToDecimalString, parseDecimalToCents } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+/*
+ * PARIDAD VISUAL — lote 3.
+ *
+ * El Panel de Control del ERP lleva sparklines y un gráfico de "Ventas
+ * facturadas vs Cobros registrados" en ECharts. NO se portan: son series
+ * temporales y los datos de este dashboard son totales del mes, embudo y CxC
+ * — no hay serie que dibujar. Traerla exige una query nueva y este trabajo no
+ * toca queries. Instalar ECharts (~300 KB) sin datos que representar seria
+ * peso muerto. Diferido como trabajo propio.
+ */
 export default async function DashboardPage() {
   const { orgId } = await requireOrg();
   const t = await getTranslations("app.dashboard");
@@ -63,14 +74,17 @@ export default async function DashboardPage() {
     }
   }
 
+  const now = new Date();
+  const eyebrow = `№ ${String(now.getMonth() + 1).padStart(2, "0")} · ${now.getFullYear()}`;
+
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">
-        {t("title")}
-        <span className="ml-2 text-base font-normal text-muted-foreground">
-          {org?.name}
-        </span>
-      </h1>
+      <PageHeader
+        large
+        eyebrow={eyebrow}
+        title={t("title")}
+        subtitle={org?.name ?? undefined}
+      />
 
       {assistant.length > 0 && (
         <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm">
@@ -111,22 +125,20 @@ export default async function DashboardPage() {
       <div className="grid gap-3 sm:grid-cols-3">
         <Card>
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">
-              {t("monthSales", { base })}
-            </p>
-            <p className="text-2xl font-bold" data-numeric="">
+            <p className="t-eyebrow">{t("monthSales", { base })}</p>
+            <p className="t-num-display mt-1 text-2xl" data-numeric="">
               {centsToDecimalString(data.monthTotalBaseCents)}
             </p>
-            <p className="text-xs text-muted-foreground">{t("fixedRates")}</p>
+            <p className="mt-0.5 text-xs text-text-muted">{t("fixedRates")}</p>
           </CardContent>
         </Card>
         {data.salesByCurrency.map((s) => (
           <Card key={s.currency}>
             <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">
+              <p className="t-eyebrow">
                 {t("inCurrency", { currency: s.currency, count: s.count })}
               </p>
-              <p className="text-2xl font-bold" data-numeric="">
+              <p className="t-num-display mt-1 text-2xl" data-numeric="">
                 {centsToDecimalString(s.totalCents)}
               </p>
             </CardContent>
@@ -134,10 +146,8 @@ export default async function DashboardPage() {
         ))}
         <Card>
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">
-              {t("productionMonth")}
-            </p>
-            <p className="text-2xl font-bold" data-numeric="">
+            <p className="t-eyebrow">{t("productionMonth")}</p>
+            <p className="t-num-display mt-1 text-2xl" data-numeric="">
               {data.productionMonth.orders}
             </p>
           </CardContent>

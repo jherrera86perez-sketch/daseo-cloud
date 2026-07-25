@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openNav } from "./nav";
 
 // M7: insumos con costo → producto terminado → receta → costo teórico visible
 const unique = `m7-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
@@ -16,6 +17,7 @@ test.describe.serial("recetas: costo teórico end-to-end", () => {
     await page.waitForURL(/\/dashboard/);
 
     // insumo con stock 100 kg @ 50.00
+    await openNav(page);
     await page.getByRole("link", { name: /productos/i }).click();
     await page.getByRole("link", { name: /nuevo producto/i }).click();
     await page.getByLabel(/nombre \*/i).fill("SLES 70");
@@ -30,6 +32,7 @@ test.describe.serial("recetas: costo teórico end-to-end", () => {
     await expect(page.getByText(/^100 kg$/)).toBeVisible();
 
     // producto terminado producible
+    await openNav(page);
     await page.getByRole("link", { name: /productos/i }).click();
     await page.getByRole("link", { name: /nuevo producto/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Detergente M7");
@@ -39,6 +42,7 @@ test.describe.serial("recetas: costo teórico end-to-end", () => {
     await page.waitForURL(/\/products\/[0-9a-f-]+$/);
 
     // receta: 10 kg SLES rinde 100 L
+    await openNav(page);
     await page.getByRole("link", { name: /recetas/i }).click();
     await page.getByRole("link", { name: /nueva receta/i }).click();
     await page.getByLabel(/nombre de la fórmula/i).fill("Fórmula E2E");

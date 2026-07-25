@@ -144,7 +144,7 @@ export function PanelNegocioView({
           <button
             type="button"
             aria-label={t("prevMonth")}
-            className="px-2 py-1.5 hover:bg-accent"
+            className="px-2 py-1.5 transition-colors hover:bg-surface-hover"
             onClick={mesAnterior}
           >
             <ChevronLeft className="size-4" aria-hidden />
@@ -159,7 +159,7 @@ export function PanelNegocioView({
           <button
             type="button"
             aria-label={t("nextMonth")}
-            className="px-2 py-1.5 hover:bg-accent"
+            className="px-2 py-1.5 transition-colors hover:bg-surface-hover"
             onClick={mesSiguiente}
           >
             <ChevronRight className="size-4" aria-hidden />
@@ -239,7 +239,7 @@ export function PanelNegocioView({
 
       {/* Acciones más urgentes */}
       {visibles.length === 0 ? (
-        <div className="rounded-md border border-dashed p-8 text-center">
+        <div className="rounded-md border border-border bg-card p-10 text-center">
           <p className="font-medium">{t("emptyTitle")}</p>
           <p className="text-sm text-muted-foreground">{t("emptyBody")}</p>
         </div>
@@ -255,7 +255,7 @@ export function PanelNegocioView({
                 return (
                   <div
                     key={r.id}
-                    className="flex flex-wrap items-start gap-2 rounded-md border p-3"
+                    className="flex flex-wrap items-start gap-2 rounded-md border border-border bg-card p-4"
                   >
                     <span
                       className={`rounded-full border px-2 py-0.5 text-xs ${badge.cls}`}
@@ -363,18 +363,32 @@ function SeguimientoTable({
       </h2>
       <div className="overflow-x-auto rounded-md border">
         <table className="w-full text-sm">
-          <thead className="border-b bg-muted/50 text-left">
+          <thead className="bg-surface-100 text-left">
             <tr>
-              <th className="px-3 py-2 font-medium">#</th>
-              <th className="px-3 py-2 font-medium">{t("colImpact")}</th>
-              <th className="px-3 py-2 font-medium">{t("colRec")}</th>
-              <th className="px-3 py-2 font-medium">{t("colCat")}</th>
-              <th className="px-3 py-2 font-medium">{t("colScore")}</th>
-              <th className="px-3 py-2 font-medium">{t("colStatus")}</th>
-              <th className="px-3 py-2 font-medium">{t("colActions")}</th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                #
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colImpact")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colRec")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colCat")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colScore")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colStatus")}
+              </th>
+              <th className="font-mono text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+                {t("colActions")}
+              </th>
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody className="divide-y divide-surface-100">
             {recomendaciones.map((r) => {
               const estado = byId.get(r.id)?.status ?? "PENDIENTE";
               const isOpen = expanded === r.id;
@@ -509,7 +523,7 @@ function IconBtn({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="rounded-md border p-1.5 hover:bg-accent disabled:opacity-50"
+      className="rounded-md border p-1.5 transition-colors hover:bg-surface-hover disabled:opacity-50"
     >
       {children}
     </button>
