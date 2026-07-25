@@ -399,6 +399,37 @@
   input[type="radio"] {
     accent-color: var(--primary);
   }
+
+  /*
+   * ── Densidad de tabla (ERP index.css:306-336) ──
+   * En el ERP son clases envoltorio `.dt-density-*` por tabla. Aquí el
+   * DensityToggle escribe `data-density` en <html>, igual que next-themes
+   * con el tema, para que las tablas sigan siendo server components.
+   * Por defecto "cozy" (Cómoda), que es lo que trae seleccionado el ERP.
+   */
+  [data-density="compact"] table {
+    font-size: 12.5px;
+  }
+  [data-density="compact"] th,
+  [data-density="compact"] td {
+    padding: 6px 10px;
+  }
+
+  [data-density="cozy"] table {
+    font-size: 13px;
+  }
+  [data-density="cozy"] th,
+  [data-density="cozy"] td {
+    padding: 10px 12px;
+  }
+
+  [data-density="comfortable"] table {
+    font-size: 13px;
+  }
+  [data-density="comfortable"] th,
+  [data-density="comfortable"] td {
+    padding: 14px;
+  }
 }
 
 /*
