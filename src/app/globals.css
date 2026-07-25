@@ -353,6 +353,52 @@
     outline-offset: 1px;
     border-radius: 4px;
   }
+
+  /*
+   * El ERP oculta los spinners nativos de los campos numéricos
+   * (Input.tsx). Cloud está lleno de campos de dinero y cantidades, donde
+   * las flechitas estorban más que ayudan.
+   */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  /*
+   * Los <select> y <textarea> crudos que ya existen en 29 archivos heredan
+   * los colores y el foco del ERP sin tocar su marcado. Las utilidades
+   * Tailwind de cada llamada siguen ganando en tamaño y borde; esto sólo
+   * rellena lo que no declaran. Los componentes Select/Textarea son para
+   * las pantallas nuevas de la fase 4.
+   */
+  select,
+  textarea {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+  select:hover:enabled,
+  textarea:hover:enabled {
+    border-color: var(--border-hover);
+  }
+  select:focus-visible,
+  textarea:focus-visible {
+    background-color: var(--card);
+  }
+  textarea::placeholder,
+  input::placeholder {
+    color: var(--text-muted);
+  }
+
+  /* Los checkbox/radio nativos adoptan el navy de marca */
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--primary);
+  }
 }
 
 /*
