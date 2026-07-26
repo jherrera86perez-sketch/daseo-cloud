@@ -1,10 +1,11 @@
-import { and, asc, desc, eq, ilike, sql as dsql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, sql as dsql } from "drizzle-orm";
 import {
   suppliers,
   purchases,
   purchaseItems,
   supplierPayments,
   lots,
+  products,
   documentSequences,
 } from "@/db/schema";
 import { assertOwnedByOrg, notDeleted } from "@/lib/tenant";
@@ -755,4 +756,36 @@ export async function listLots(
     .from(lots)
     .where(and(eq(lots.orgId, orgId), eq(lots.productId, productId)))
     .orderBy(asc(lots.expiryDate));
+}
+
+/**
+ * ≈ "Trazabilidad por Lote" del ERP: búsqueda global de lotes, no por producto.
+ *
+ * `listLots` sirve la ficha de un producto; esta alimenta la pantalla propia de
+ * Trazabilidad que el ERP tiene en su menú. Devuelve el nombre del producto
+ * porque la pantalla lista lotes de todo el catálogo.
+ */
+export async function listAllLots(
+  db: Db,
+  orgId: string,
+  q?: string,
+): Promise<Array<LotRow & { productName: string }>> {
+  const rows = await db
+    .select({ lot: lots, productName: products.name })
+    .from(lots)
+    .innerJoin(products, eq(lots.productId, products.id))
+    .where(
+      q
+        ? and(
+            eq(lots.orgId, orgId),
+            or(ilike(lots.code, `%${q}%`), ilike(products.name, `%${q}%`)),
+          )
+        : eq(lots.orgId, orgId),
+    )
+    .orderBy(asc(lots.expiryDate))
+    .limit(200);
+  return rows.map((r: { lot: LotRow; productName: string }) => ({
+    ...r.lot,
+    productName: r.productName,
+  }));
 }

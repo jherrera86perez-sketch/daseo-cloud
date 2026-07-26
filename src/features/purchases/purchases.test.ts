@@ -13,6 +13,7 @@ import {
   addSupplierPayment,
   accountsPayable,
   listLots,
+  listAllLots,
 } from "./queries";
 
 let db: TestDb;
@@ -103,6 +104,29 @@ describe("compras multi-moneda con lotes", () => {
     expect(lots).toHaveLength(1);
     expect(lots[0].code).toBe("IBC-2026-07");
     expect(String(lots[0].expiryDate)).toContain("2027-07-01");
+  });
+
+  it("listAllLots busca en todo el catalogo y aisla por org", async () => {
+    // Sin filtro: devuelve el lote con el nombre de su producto
+    const todos = await listAllLots(db, orgA);
+    expect(todos).toHaveLength(1);
+    expect(todos[0].code).toBe("IBC-2026-07");
+    expect(todos[0].productName).toBeTruthy();
+
+    // Filtro por codigo de lote
+    expect(await listAllLots(db, orgA, "IBC")).toHaveLength(1);
+    expect(await listAllLots(db, orgA, "no-existe")).toHaveLength(0);
+
+    // Filtro por nombre de producto
+    const porProducto = await listAllLots(
+      db,
+      orgA,
+      todos[0].productName.slice(0, 4),
+    );
+    expect(porProducto).toHaveLength(1);
+
+    // Otra org no ve nada
+    expect(await listAllLots(db, orgB)).toHaveLength(0);
   });
 
   it("no se confirma dos veces y otra org no la ve", async () => {

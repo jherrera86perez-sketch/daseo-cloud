@@ -18,8 +18,11 @@ test.describe.serial("personas y análisis end-to-end", () => {
     await page.waitForURL(/\/dashboard/);
 
     // empleado con salario
-    await openNav(page);
-    await page.getByRole("link", { name: /empleados/i }).click();
+    // Empleados vive dentro de Configuración desde la paridad de menú.
+    // Navegación directa: aquí sólo hace falta LLEGAR; que el menú funciona lo
+    // cubren los otros tests, y en el cajón móvil este enlace queda al final de
+    // una lista con scroll y el clic se vuelve inestable.
+    await page.goto("/settings?seccion=empleados");
     await page.getByPlaceholder(/^nombre$/i).fill("Obrero E2E");
     await page.getByPlaceholder(/salario/i).fill("5000.00");
     await page.getByRole("button", { name: /^agregar$/i }).click();
@@ -29,8 +32,9 @@ test.describe.serial("personas y análisis end-to-end", () => {
     await expect(page.getByText(/nómina activa/i)).toBeVisible();
 
     // cliente + compromiso semanal
-    await openNav(page);
-    await page.getByRole("link", { name: "Clientes", exact: true }).click();
+    // Clientes, Proveedores y Recetas viven ahora bajo Catalogos (como el ERP):
+    // se navega directo, que aqui es setup y no lo que el test verifica.
+    await page.goto("/customers");
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("J-Carlos E2E");
     await page.getByRole("button", { name: /guardar/i }).click();
@@ -76,8 +80,8 @@ test.describe.serial("personas y análisis end-to-end", () => {
     await expect(page.getByText("J-Carlos E2E").first()).toBeVisible();
 
     // auditoría registra lo hecho
-    await openNav(page);
-    await page.getByRole("link", { name: /auditoría/i }).click();
+    // Auditoría, igual: sección de Configuración
+    await page.goto("/settings?seccion=auditoria");
     await expect(page.getByText("employee").first()).toBeVisible();
     await expect(page.getByText("sale").first()).toBeVisible();
   });

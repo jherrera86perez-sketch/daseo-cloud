@@ -18,8 +18,9 @@ test.describe.serial("pipeline + cotizaciones end-to-end", () => {
     await page.getByRole("button", { name: /crear organización/i }).click();
     await page.waitForURL(/\/dashboard/);
 
-    await openNav(page);
-    await page.getByRole("link", { name: "Clientes", exact: true }).click();
+    // Clientes, Proveedores y Recetas viven ahora bajo Catalogos (como el ERP):
+    // se navega directo, que aqui es setup y no lo que el test verifica.
+    await page.goto("/customers");
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Cliente Pipeline");
     await page.getByRole("button", { name: /guardar/i }).click();

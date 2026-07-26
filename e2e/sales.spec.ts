@@ -26,8 +26,9 @@ test.describe.serial("ventas: multi-moneda end-to-end", () => {
     await expect(page.getByText(/1 USD = 320/)).toBeVisible();
 
     // cliente
-    await openNav(page);
-    await page.getByRole("link", { name: "Clientes", exact: true }).click();
+    // Clientes, Proveedores y Recetas viven ahora bajo Catalogos (como el ERP):
+    // se navega directo, que aqui es setup y no lo que el test verifica.
+    await page.goto("/customers");
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Bodega Ventas");
     await page.getByRole("button", { name: /guardar/i }).click();
@@ -96,7 +97,11 @@ test.describe.serial("ventas: multi-moneda end-to-end", () => {
     await openNav(page);
     await page.getByRole("link", { name: /panel/i }).click();
     await expect(page.getByText("8000.00")).toBeVisible(); // 25 USD × 320
-    await expect(page.getByText(/cuentas por cobrar/i)).toBeVisible();
+    // El hero del panel anade su propio rotulo "Cuentas por cobrar": se apunta
+    // al titulo exacto de la tarjeta para no casar con ambos.
+    await expect(
+      page.getByText("Cuentas por cobrar", { exact: true }),
+    ).toBeVisible();
     await expect(page.getByText(/15\.00 USD/).first()).toBeVisible();
   });
 });

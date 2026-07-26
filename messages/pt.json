@@ -104,7 +104,10 @@
       "openMenu": "Abrir menu",
       "collapseSidebar": "Recolher barra lateral",
       "expandSidebar": "Expandir barra lateral",
-      "collapse": "Recolher"
+      "collapse": "Recolher",
+      "commitments": "Compromissos",
+      "traceability": "Rastreabilidade",
+      "catalogs": "Catálogos"
     },
     "header": {
       "search": "Buscar",
@@ -602,7 +605,20 @@
       "lowStock": "{count} produto(s) abaixo do estoque mínimo — ver produtos",
       "topCustomers": "Top clientes (ano)",
       "noSales": "Sem vendas confirmadas ainda.",
-      "commitmentsDue": "{count} compromisso(s) não cumprido(s) neste período"
+      "commitmentsDue": "{count} compromisso(s) não cumprido(s) neste período",
+      "hero": {
+        "receivables": "Contas a receber · em {date}",
+        "concentrationWarn": "{pct}% num só cliente",
+        "context": "{invoices, plural, one {# fatura} other {# faturas}} · {customers, plural, one {# cliente} other {# clientes}}",
+        "bankBalance": "Saldo no banco",
+        "concentration": "Concentração",
+        "concentrationHint": "{pct}% do total · risco de caixa",
+        "banked": "Bancarização",
+        "bankedHint": "receitas cobradas por banco · ONAT"
+      },
+      "salesTrend": "Vendas faturadas",
+      "invoiced": "Faturado",
+      "collected": "Cobrado"
     },
     "customers": {
       "title": "Clientes",
@@ -1078,7 +1094,7 @@
       "obsHours": "Horas"
     },
     "commitments": {
-      "title": "Compromissos recorrentes",
+      "title": "Compromissos de entrega",
       "placeholder": "ex. 20 L de detergente semanais",
       "weekly": "Semanal",
       "monthly": "Mensal",
@@ -1086,7 +1102,18 @@
       "created": "Compromisso criado",
       "fulfilled": "Cumprido",
       "dueLabel": "Pendente neste período",
-      "deactivate": "Desativar"
+      "deactivate": "Desativar",
+      "subtitle": "O que deve entregar e seu estado no período",
+      "empty": "Sem compromissos",
+      "customer": "Cliente",
+      "description": "Descrição",
+      "frequency": "Periodicidade",
+      "status": "Estado",
+      "pending": "Pendente",
+      "frequencies": {
+        "weekly": "Semanal",
+        "monthly": "Mensal"
+      }
     },
     "audit": {
       "title": "Auditoria",
@@ -1320,6 +1347,32 @@
       "linkCopied": "Link copiado — envie pelo WhatsApp",
       "pendingCount": "{count} convite(s) pendente(s)",
       "baseCurrency": "Moeda base"
+    },
+    "settings": {
+      "title": "Configuração do Sistema",
+      "subtitle": "Administração geral, usuários e preferências",
+      "sections": "Seções",
+      "s_empresa": "Empresa",
+      "d_empresa": "Dados e taxas",
+      "s_empleados": "Funcionários",
+      "d_empleados": "Trabalhadores da empresa",
+      "s_usuarios": "Usuários",
+      "d_usuarios": "Acesso e permissões",
+      "s_auditoria": "Auditoria",
+      "d_auditoria": "Registro de atividade",
+      "s_sistema": "Sistema",
+      "d_sistema": "Etapas, assistente e avisos"
+    },
+    "traceability": {
+      "title": "Rastreabilidade por Lote",
+      "subtitle": "Busque um lote por código ou produto",
+      "searchPlaceholder": "Buscar por lote ou produto…",
+      "empty": "Ainda não há lotes registrados",
+      "emptyFiltered": "Nenhum lote corresponde à busca",
+      "code": "Código",
+      "product": "Produto",
+      "expiry": "Vencimento",
+      "noExpiry": "—"
     }
   }
 }

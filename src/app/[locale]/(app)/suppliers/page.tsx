@@ -1,4 +1,7 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/ui/layout/page-header";
+import { PageLayout } from "@/components/ui/layout/page-layout";
+import { CatalogTabs } from "@/components/catalog-tabs";
 import { Plus, Pencil } from "lucide-react";
 import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
@@ -12,43 +15,54 @@ export default async function SuppliersPage() {
   const rows = await listSuppliers(getDb(), orgId, {});
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-2">
-        <h1 className="t-display text-2xl tracking-[-0.025em]">{t("title")}</h1>
-        <Button asChild>
-          <Link href="/suppliers/new">
-            <Plus className="size-4" aria-hidden /> {t("new")}
-          </Link>
-        </Button>
-      </div>
-      {rows.length === 0 ? (
-        <div className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
-          {t("empty")}
-        </div>
-      ) : (
-        <ul className="divide-y rounded-md border">
-          {rows.map((s) => (
-            <li
-              key={s.id}
-              className="flex items-center justify-between gap-2 px-4 py-3"
-            >
-              <span>
-                <span className="font-medium">{s.name}</span>{" "}
-                <span className="text-sm text-muted-foreground" data-numeric="">
-                  {s.phone ?? s.email ?? ""}
-                </span>
-              </span>
-              <Link
-                href={`/suppliers/${s.id}/edit`}
-                aria-label={t("edit")}
-                className="rounded p-1 transition-colors hover:bg-surface-hover"
-              >
-                <Pencil className="size-4" aria-hidden />
+    <PageLayout
+      header={
+        <PageHeader
+          title={t("title")}
+          actions={
+            <Button asChild size="sm">
+              <Link href="/suppliers/new">
+                <Plus className="size-4" aria-hidden /> {t("new")}
               </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+            </Button>
+          }
+        />
+      }
+    >
+      <CatalogTabs active="suppliers" />
+      <div className="flex flex-col gap-4">
+        {rows.length === 0 ? (
+          <div className="rounded-md border border-border bg-card p-10 text-center text-sm text-muted-foreground">
+            {t("empty")}
+          </div>
+        ) : (
+          <ul className="divide-y rounded-md border">
+            {rows.map((s) => (
+              <li
+                key={s.id}
+                className="flex items-center justify-between gap-2 px-4 py-3"
+              >
+                <span>
+                  <span className="font-medium">{s.name}</span>{" "}
+                  <span
+                    className="text-sm text-muted-foreground"
+                    data-numeric=""
+                  >
+                    {s.phone ?? s.email ?? ""}
+                  </span>
+                </span>
+                <Link
+                  href={`/suppliers/${s.id}/edit`}
+                  aria-label={t("edit")}
+                  className="rounded p-1 transition-colors hover:bg-surface-hover"
+                >
+                  <Pencil className="size-4" aria-hidden />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </PageLayout>
   );
 }

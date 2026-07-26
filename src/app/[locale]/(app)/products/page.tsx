@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { CatalogTabs } from "@/components/catalog-tabs";
 import { Plus, Search, TriangleAlert } from "lucide-react";
 import { requireOrg } from "@/lib/session";
 import { getDb } from "@/db";
@@ -182,6 +183,7 @@ export default async function ProductsPage({
         </>
       }
     >
+      <CatalogTabs active="products" />
       <div className="flex flex-col gap-4">
         {alerts.total > 0 && (
           <details className="rounded-md border border-warning/50 bg-warning/10">
