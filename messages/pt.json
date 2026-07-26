@@ -104,7 +104,10 @@
       "openMenu": "Abrir menu",
       "collapseSidebar": "Recolher barra lateral",
       "expandSidebar": "Expandir barra lateral",
-      "collapse": "Recolher"
+      "collapse": "Recolher",
+      "commitments": "Compromissos",
+      "traceability": "Rastreabilidade",
+      "catalogs": "Catálogos"
     },
     "header": {
       "search": "Buscar",
@@ -1091,7 +1094,7 @@
       "obsHours": "Horas"
     },
     "commitments": {
-      "title": "Compromissos recorrentes",
+      "title": "Compromissos de entrega",
       "placeholder": "ex. 20 L de detergente semanais",
       "weekly": "Semanal",
       "monthly": "Mensal",
@@ -1099,7 +1102,18 @@
       "created": "Compromisso criado",
       "fulfilled": "Cumprido",
       "dueLabel": "Pendente neste período",
-      "deactivate": "Desativar"
+      "deactivate": "Desativar",
+      "subtitle": "O que deve entregar e seu estado no período",
+      "empty": "Sem compromissos",
+      "customer": "Cliente",
+      "description": "Descrição",
+      "frequency": "Periodicidade",
+      "status": "Estado",
+      "pending": "Pendente",
+      "frequencies": {
+        "weekly": "Semanal",
+        "monthly": "Mensal"
+      }
     },
     "audit": {
       "title": "Auditoria",
@@ -1348,6 +1362,17 @@
       "d_auditoria": "Registro de atividade",
       "s_sistema": "Sistema",
       "d_sistema": "Etapas, assistente e avisos"
+    },
+    "traceability": {
+      "title": "Rastreabilidade por Lote",
+      "subtitle": "Busque um lote por código ou produto",
+      "searchPlaceholder": "Buscar por lote ou produto…",
+      "empty": "Ainda não há lotes registrados",
+      "emptyFiltered": "Nenhum lote corresponde à busca",
+      "code": "Código",
+      "product": "Produto",
+      "expiry": "Vencimento",
+      "noExpiry": "—"
     }
   }
 }

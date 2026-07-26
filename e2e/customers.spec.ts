@@ -1,5 +1,4 @@
 import { test, expect } from "@playwright/test";
-import { openNav } from "./nav";
 
 // Flujo M3: crear cliente → registrar interacción → ver timeline → editar.
 // Crea su propio usuario+org (aislado de otras corridas).
@@ -21,8 +20,9 @@ test.describe.serial("clientes: patrón CRUD + ficha", () => {
     await page.waitForURL(/\/dashboard/);
 
     // estado vacío
-    await openNav(page);
-    await page.getByRole("link", { name: "Clientes", exact: true }).click();
+    // Clientes, Proveedores y Recetas viven ahora bajo Catalogos (como el ERP):
+    // se navega directo, que aqui es setup y no lo que el test verifica.
+    await page.goto("/customers");
     await expect(page.getByText(/aún no tienes clientes/i)).toBeVisible();
 
     // crear
@@ -52,11 +52,7 @@ test.describe.serial("clientes: patrón CRUD + ficha", () => {
     ).toBeVisible();
 
     // aparece en la lista
-    await openNav(page);
-    await page
-      .getByRole("link", { name: "Clientes", exact: true })
-      .first()
-      .click();
+    await page.goto("/customers");
     await expect(page.getByText("Bodega E2E Editada")).toBeVisible();
   });
 });

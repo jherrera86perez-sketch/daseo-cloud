@@ -104,7 +104,10 @@
       "openMenu": "Abrir menú",
       "collapseSidebar": "Contraer barra lateral",
       "expandSidebar": "Expandir barra lateral",
-      "collapse": "Contraer"
+      "collapse": "Contraer",
+      "commitments": "Compromisos",
+      "traceability": "Trazabilidad",
+      "catalogs": "Catálogos"
     },
     "header": {
       "search": "Buscar",
@@ -1091,7 +1094,7 @@
       "obsHours": "Horas"
     },
     "commitments": {
-      "title": "Compromisos recurrentes",
+      "title": "Compromisos de entrega",
       "placeholder": "ej. 20 L de detergente semanales",
       "weekly": "Semanal",
       "monthly": "Mensual",
@@ -1099,7 +1102,18 @@
       "created": "Compromiso creado",
       "fulfilled": "Cumplido",
       "dueLabel": "Pendiente este período",
-      "deactivate": "Desactivar"
+      "deactivate": "Desactivar",
+      "subtitle": "Lo que debes entregar y su estado en el período",
+      "empty": "Sin compromisos",
+      "customer": "Cliente",
+      "description": "Descripción",
+      "frequency": "Periodicidad",
+      "status": "Estado",
+      "pending": "Pendiente",
+      "frequencies": {
+        "weekly": "Semanal",
+        "monthly": "Mensual"
+      }
     },
     "audit": {
       "title": "Auditoría",
@@ -1348,6 +1362,17 @@
       "d_auditoria": "Registro de actividad",
       "s_sistema": "Sistema",
       "d_sistema": "Etapas, asistente y avisos"
+    },
+    "traceability": {
+      "title": "Trazabilidad por Lote",
+      "subtitle": "Busca un lote por código o producto",
+      "searchPlaceholder": "Buscar por lote o producto…",
+      "empty": "Aún no hay lotes registrados",
+      "emptyFiltered": "Ningún lote coincide con la búsqueda",
+      "code": "Código",
+      "product": "Producto",
+      "expiry": "Vencimiento",
+      "noExpiry": "—"
     }
   }
 }

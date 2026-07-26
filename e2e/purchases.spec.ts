@@ -36,8 +36,9 @@ test.describe.serial("compras end-to-end", () => {
     const productUrl = page.url();
 
     // proveedor
-    await openNav(page);
-    await page.getByRole("link", { name: /proveedores/i }).click();
+    // Clientes, Proveedores y Recetas viven ahora bajo Catalogos (como el ERP):
+    // se navega directo, que aqui es setup y no lo que el test verifica.
+    await page.goto("/suppliers");
     await page.getByRole("link", { name: /nuevo proveedor/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Química E2E");
     await page.getByRole("button", { name: /guardar/i }).click();

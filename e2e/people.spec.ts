@@ -32,8 +32,9 @@ test.describe.serial("personas y análisis end-to-end", () => {
     await expect(page.getByText(/nómina activa/i)).toBeVisible();
 
     // cliente + compromiso semanal
-    await openNav(page);
-    await page.getByRole("link", { name: "Clientes", exact: true }).click();
+    // Clientes, Proveedores y Recetas viven ahora bajo Catalogos (como el ERP):
+    // se navega directo, que aqui es setup y no lo que el test verifica.
+    await page.goto("/customers");
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("J-Carlos E2E");
     await page.getByRole("button", { name: /guardar/i }).click();

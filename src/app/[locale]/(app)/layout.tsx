@@ -6,15 +6,12 @@ import { Toaster } from "@/components/ui/sonner";
 import {
   LayoutDashboard,
   Settings,
-  Users,
   Package,
   Receipt,
   KanbanSquare,
   FileText,
-  FlaskConical,
   Factory,
   ShoppingCart,
-  Truck,
   Landmark,
   Scale,
   Coins,
@@ -26,6 +23,9 @@ import {
   BookOpenCheck,
   Sparkles,
   Car,
+  Handshake,
+  Tag,
+  BookUser,
 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/logout-button";
 import { LocaleSwitcher } from "@/features/auth/locale-switcher";
@@ -98,9 +98,9 @@ export default async function AppLayout({
     {
       title: t("section.sales"),
       items: [
-        { href: "/customers", label: t("customers"), icon: Users },
         { href: "/sales", label: t("sales"), icon: Receipt },
         { href: "/receivables", label: t("receivables"), icon: Coins },
+        { href: "/commitments", label: t("commitments"), icon: Handshake },
         { href: "/quotes", label: t("quotes"), icon: FileText },
         { href: "/pipeline", label: t("pipeline"), icon: KanbanSquare },
         { href: "/top-clients", label: t("topClients"), icon: Trophy },
@@ -111,15 +111,14 @@ export default async function AppLayout({
       items: [
         { href: "/purchases", label: t("purchases"), icon: ShoppingCart },
         { href: "/payables", label: t("payables"), icon: Wallet },
-        { href: "/suppliers", label: t("suppliers"), icon: Truck },
       ],
     },
     {
       title: t("section.inventory"),
       items: [
         { href: "/products", label: t("products"), icon: Package },
-        { href: "/recipes", label: t("recipes"), icon: FlaskConical },
         { href: "/production", label: t("production"), icon: Factory },
+        { href: "/traceability", label: t("traceability"), icon: Tag },
         {
           href: "/internal-outflows",
           label: t("internalOutflows"),
@@ -151,7 +150,10 @@ export default async function AppLayout({
       title: t("section.settings"),
       // El ERP no tiene Empleados ni Auditoría como items propios: viven
       // DENTRO de Configuración, y así se han montado aquí.
-      items: [{ href: "/settings", label: t("settings"), icon: Settings }],
+      items: [
+        { href: "/catalogs", label: t("catalogs"), icon: BookUser },
+        { href: "/settings", label: t("settings"), icon: Settings },
+      ],
     },
   ];
   const db = getDb();

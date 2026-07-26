@@ -1,5 +1,4 @@
 import { test, expect } from "@playwright/test";
-import { openNav } from "./nav";
 
 // F6: generar API key en settings → consumir /api/v1 con ella → revocar → 401.
 const unique = `f6-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
@@ -20,8 +19,9 @@ test.describe.serial("API pública end-to-end", () => {
     await page.waitForURL(/\/dashboard/);
 
     // cliente para que la API tenga algo que devolver
-    await openNav(page);
-    await page.getByRole("link", { name: "Clientes", exact: true }).click();
+    // Clientes, Proveedores y Recetas viven ahora bajo Catalogos (como el ERP):
+    // se navega directo, que aqui es setup y no lo que el test verifica.
+    await page.goto("/customers");
     await page.getByRole("link", { name: /nuevo cliente/i }).click();
     await page.getByLabel(/nombre \*/i).fill("Cliente API");
     await page.getByRole("button", { name: /guardar/i }).click();

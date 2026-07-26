@@ -42,8 +42,9 @@ test.describe.serial("recetas: costo teórico end-to-end", () => {
     await page.waitForURL(/\/products\/[0-9a-f-]+$/);
 
     // receta: 10 kg SLES rinde 100 L
-    await openNav(page);
-    await page.getByRole("link", { name: /recetas/i }).click();
+    // Clientes, Proveedores y Recetas viven ahora bajo Catalogos (como el ERP):
+    // se navega directo, que aqui es setup y no lo que el test verifica.
+    await page.goto("/recipes");
     await page.getByRole("link", { name: /nueva receta/i }).click();
     await page.getByLabel(/nombre de la fórmula/i).fill("Fórmula E2E");
     await page.getByLabel(/rinde/i).fill("100");

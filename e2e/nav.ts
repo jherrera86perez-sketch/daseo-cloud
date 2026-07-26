@@ -35,8 +35,13 @@ export async function openNav(page: Page) {
  * de clic acaba sobre el enlace vecino ("… intercepts pointer events").
  * Desplazarlo explícitamente antes de pulsar elimina esa carrera.
  *
- * Úsalo para enlaces que quedan lejos en la lista; para los primeros basta con
- * `openNav`.
+ * Aviso: para enlaces al FINAL de la lista dentro del cajón móvil ni esto
+ * basta — el vecino intercepta el punto de clic. Ahí se navega con `page.goto`,
+ * que es lo correcto cuando llegar es setup y no lo que el test verifica.
+ *
+ * NO usar `click({ force: true })`: pulsa las coordenadas aunque estén tapadas,
+ * así que acaba abriendo el enlace VECINO y el test sigue en la pantalla
+ * equivocada. Comprobado: convierte un fallo ruidoso en uno silencioso.
  */
 export async function clickNav(page: Page, name: RegExp | string) {
   await openNav(page);
