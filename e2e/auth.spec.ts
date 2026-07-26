@@ -41,10 +41,20 @@ test.describe
   });
 
   /*
-   * Con sesión viva, "Explorar la demo" llamaba a signIn sin cerrar la anterior:
-   * Better Auth la conservaba y el push acababa en el dashboard de la org REAL.
-   * Parecía que la demo no abría; abría la organización equivocada, que en un
-   * ordenador compartido es además un problema de privacidad.
+   * Regresión de "Explorar la demo deja al usuario en su propia organización",
+   * observado en producción el 26/07 con una sesión real abierta.
+   *
+   * AVISO — esto NO es una barrera del `signOut()` que añadimos en onDemo:
+   * comprobado por mutación, este test pasa igual con signOut y sin él, porque
+   * en un contexto nuevo de Playwright el signIn sí reemplaza la sesión. El
+   * fallo real no se logró reproducir aquí, así que el signOut es defensa
+   * razonada, no arreglo verificado. Si alguien vuelve a ver la org equivocada,
+   * el mecanismo sigue sin identificar: sospechas pendientes de descartar son
+   * la caché del router de Next (payload RSC de /dashboard cacheado del usuario
+   * anterior, que se arreglaría con router.refresh()) y algún estado de sesión
+   * de larga vida que un contexto nuevo no tiene.
+   *
+   * Lo que sí cubre: que entrar a la demo no deje al usuario dentro de su org.
    */
   test("Explorar la demo cambia de organización aunque haya sesión abierta", async ({
     page,
