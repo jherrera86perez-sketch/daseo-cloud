@@ -39,4 +39,28 @@ test.describe
     await page.goto("/dashboard");
     await page.waitForURL(/\/login/);
   });
+
+  /*
+   * Con sesión viva, "Explorar la demo" llamaba a signIn sin cerrar la anterior:
+   * Better Auth la conservaba y el push acababa en el dashboard de la org REAL.
+   * Parecía que la demo no abría; abría la organización equivocada, que en un
+   * ordenador compartido es además un problema de privacidad.
+   */
+  test("Explorar la demo cambia de organización aunque haya sesión abierta", async ({
+    page,
+  }) => {
+    await page.goto("/login");
+    await page.getByLabel(/correo/i).fill(EMAIL);
+    await page.getByLabel(/contraseña/i).fill(PASSWORD);
+    await page.getByRole("button", { name: /entrar/i }).click();
+    await page.waitForURL(/\/dashboard/);
+    await expect(page.getByText(new RegExp(ORG))).toBeVisible();
+
+    await page.goto("/login");
+    await page.getByRole("button", { name: /explorar la demo/i }).click();
+    await page.waitForURL(/\/dashboard/);
+
+    // Ya NO estamos en la org del usuario de este spec
+    await expect(page.getByText(new RegExp(ORG))).toBeHidden();
+  });
 });

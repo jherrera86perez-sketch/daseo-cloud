@@ -30,7 +30,13 @@ export default function LandingPage({
           {t("subtitle")}
         </p>
         <Button asChild size="lg">
-          <Link href="/">{t("cta")}</Link>
+          {/*
+           * A /login, no a "/": con href="/" el botón enlazaba a la propia
+           * landing y un visitante nuevo no tenía forma de llegar ni al login
+           * ni a la demo, que vive dentro de él. El smoke test comprobaba que
+           * el enlace estuviera visible, no que llevara a algún sitio.
+           */}
+          <Link href="/login">{t("cta")}</Link>
         </Button>
       </div>
 
