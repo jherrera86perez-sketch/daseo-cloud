@@ -43,6 +43,11 @@ export default function LoginPage() {
   // Credenciales públicas por diseño: la org "demo" solo contiene datos ficticios.
   async function onDemo() {
     setPending(true);
+    // Cerrar la sesión que hubiera antes de entrar como demo. Sin esto, con una
+    // sesión viva el signIn no la reemplaza y el push acaba en el dashboard de
+    // la organización REAL del usuario — parecía que la demo no abría cuando lo
+    // que pasaba es que abría la org equivocada. Da igual si no había sesión.
+    await authClient.signOut().catch(() => {});
     const { error } = await authClient.signIn.email({
       email: "demo@daseo.app",
       password: "demo-daseo-2026",

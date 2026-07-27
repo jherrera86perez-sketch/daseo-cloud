@@ -39,4 +39,38 @@ test.describe
     await page.goto("/dashboard");
     await page.waitForURL(/\/login/);
   });
+
+  /*
+   * Regresión de "Explorar la demo deja al usuario en su propia organización",
+   * observado en producción el 26/07 con una sesión real abierta.
+   *
+   * AVISO — esto NO es una barrera del `signOut()` que añadimos en onDemo:
+   * comprobado por mutación, este test pasa igual con signOut y sin él, porque
+   * en un contexto nuevo de Playwright el signIn sí reemplaza la sesión. El
+   * fallo real no se logró reproducir aquí, así que el signOut es defensa
+   * razonada, no arreglo verificado. Si alguien vuelve a ver la org equivocada,
+   * el mecanismo sigue sin identificar: sospechas pendientes de descartar son
+   * la caché del router de Next (payload RSC de /dashboard cacheado del usuario
+   * anterior, que se arreglaría con router.refresh()) y algún estado de sesión
+   * de larga vida que un contexto nuevo no tiene.
+   *
+   * Lo que sí cubre: que entrar a la demo no deje al usuario dentro de su org.
+   */
+  test("Explorar la demo cambia de organización aunque haya sesión abierta", async ({
+    page,
+  }) => {
+    await page.goto("/login");
+    await page.getByLabel(/correo/i).fill(EMAIL);
+    await page.getByLabel(/contraseña/i).fill(PASSWORD);
+    await page.getByRole("button", { name: /entrar/i }).click();
+    await page.waitForURL(/\/dashboard/);
+    await expect(page.getByText(new RegExp(ORG))).toBeVisible();
+
+    await page.goto("/login");
+    await page.getByRole("button", { name: /explorar la demo/i }).click();
+    await page.waitForURL(/\/dashboard/);
+
+    // Ya NO estamos en la org del usuario de este spec
+    await expect(page.getByText(new RegExp(ORG))).toBeHidden();
+  });
 });
