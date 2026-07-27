@@ -35,8 +35,17 @@ export default function LandingPage({
            * landing y un visitante nuevo no tenía forma de llegar ni al login
            * ni a la demo, que vive dentro de él. El smoke test comprobaba que
            * el enlace estuviera visible, no que llevara a algún sitio.
+           *
+           * prefetch={false} NO es adorno: al entrar en el viewport, <Link>
+           * precarga la ruta destino, y /login arrastra su cliente (authClient
+           * + sonner). Eso subió los scripts de la landing a 203KB y reventó el
+           * presupuesto de 175KB de Lighthouse — el mismo motivo por el que el
+           * Toaster se sacó del layout raíz. La landing es la única página con
+           * presupuesto medido; aquí un enlace no se precarga.
            */}
-          <Link href="/login">{t("cta")}</Link>
+          <Link href="/login" prefetch={false}>
+            {t("cta")}
+          </Link>
         </Button>
       </div>
 
